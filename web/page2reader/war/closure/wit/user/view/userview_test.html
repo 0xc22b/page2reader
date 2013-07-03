@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Closure Unit Tests - wit.user.view.UserView</title>
+</head>
+<body>
+  <a href="/">Back</a>
+
+  <h1>Account settings</h1>
+  <div id="changeUsernamePanel" class="panel">
+    <div class="lb">Username:</div>
+    <div id="changeUsernameLb" class="value">Wit</div>
+    <button id="changeUsernameBtn">change</button>
+    <div id="changeUsernameEditor" style="display: none;" class="editor">
+      <label id="changeUsernameErrLb" class="errLb">&nbsp;</label>
+      <input type="text" placeholder="New username" id="changeUsernameTB" />
+      <label id="changeUsernamePasswordErrLb" class="errLb">&nbsp;</label>
+      <input type="password" placeholder="password" id="changeUsernamePasswordTB" />
+      <button id="changeUsernameOkBtn">OK</button>
+      <button id="changeUsernameCancelBtn">Cancel</button>
+      <img src="/img/loading.gif" id="changeUsernameLoadingImg" style="display: none;" />
+    </div>
+  </div>
+  <div id="changeEmailPanel" class="panel">
+    <div class="lb">Email:</div>
+    <span id="changeEmailLb" class="value">wit@mail.com</span>
+    <button id="changeEmailBtn">change</button>
+      <label>Email verified.</label>
+      <button id="resendEmailConfirmBtn">Resend email verification</button>
+    <div id="changeEmailEditor" style="display: none;" class="editor">
+      <label id="changeEmailErrLb" class="errLb">&nbsp;</label>
+      <input type="text" placeholder="New email" id="changeEmailTB" />
+      <label id="changeEmailPasswordErrLb" class="errLb">&nbsp;</label>
+      <input type="password" placeholder="password" id="changeEmailPasswordTB" />
+      <button id="changeEmailOkBtn">OK</button>
+      <button id="changeEmailCancelBtn">Cancel</button>
+      <img src="/img/loading.gif" id="changeEmailLoadingImg" style="display: none;" />
+    </div>
+  </div>    
+  <div id="changePasswordPanel" class="panel">
+    <div class="lb">Password:</div>
+    <button id="changePasswordBtn">Change password</button>
+    <div id="changePasswordEditor" style="display: none;" class="editor">
+      <label id="changeNewPasswordErrLb" class="errLb">&nbsp;</label>
+      <input type="password" placeholder="New password" id="changeNewPasswordTB" />
+      <label id="changeRepeatPasswordErrLb" class="errLb">&nbsp;</label>
+      <input type="password" placeholder="Repeat New password" id="changeRepeatPasswordTB" />
+      <label id="changePasswordErrLb" class="errLb">&nbsp;</label>
+      <input type="password" placeholder="Current password" id="changePasswordTB" />
+      <button id="changePasswordOkBtn">OK</button>
+      <button id="changePasswordCancelBtn">Cancel</button>
+      <img src="/img/loading.gif" id="changePasswordLoadingImg" style="display: none;" />
+    </div>
+  </div>
+  <div id="deleteAccountPanel" class="panel">
+    <div class="lb">Delete account:</div>
+    <button id="deleteAccountBtn">Delete account</button>
+    <div id="deleteAccountEditor" style="display: none;" class="editor">
+      <label id="deleteAccountPasswordErrLb" class="errLb">&nbsp;</label>
+      <input type="password" placeholder="password" id="deleteAccountPasswordTB" />
+      <button id="deleteAccountOkBtn">OK</button>
+      <button id="deleteAccountCancelBtn">Cancel</button>
+      <img src="/img/loading.gif" id="deleteAccountLoadingImg" style="display: none;" />
+    </div>
+  </div>
+
+  <script src="../../../closure-library/closure/goog/base.js"></script>
+  <script src="../../deps.js"></script>
+  <script>
+    goog.require('goog.testing.jsunit');
+  </script>
+  <script src="userview_test.js"></script>
+</body>
+</html>

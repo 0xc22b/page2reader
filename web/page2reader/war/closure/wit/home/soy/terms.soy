@@ -1,0 +1,53 @@
+{namespace wit.home.soy.terms}
+
+/**
+ * init
+ */
+{template .init}
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.home.soy.home.css_ /}
+    {/param}
+    {param content}
+      {call wit.home.soy.terms.content_ /}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * initDebug
+ */
+{template .initDebug }
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.home.soy.home.cssDebug_ /}
+    {/param}
+    {param content}
+      {call wit.home.soy.terms.content_ /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * content_
+ */
+{template .content_}
+
+  {call wit.base.soy.base.header /}
+
+  <div class="{css main-container}">
+    <div class="{css main} {css wrapper} {css clearfix}">
+      <article>
+        <header>
+          <p>Terms</p>
+        </header>
+        <section>
+          
+        </section>
+      </article>
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
+
+  {call wit.base.soy.base.footer /}
+{/template}

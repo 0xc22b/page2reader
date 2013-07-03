@@ -1,0 +1,104 @@
+{namespace wit.base.soy.base}
+
+/**
+ * init
+ * @param css
+ * @param? opt_js
+ * @param content
+ */
+{template .init}
+  <!DOCTYPE html>
+  <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+  <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+  <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+  <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Page2Reader</title>
+    <meta name="description" content="Send a web page to eReader">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="{$css|noAutoescape}">
+  </head>
+  <body>
+    <!--[if lt IE 7]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    {$content|noAutoescape}
+
+    {if $opt_js}
+      {$opt_js|noAutoescape}
+    {/if}
+  </body>
+</html>
+{/template}
+
+
+/**
+ * Header for not logged-in page
+ */
+{template .header}
+  <div class="{css header-container}">
+    <header class="{css wrapper} {css clearfix}">
+      <h1 class="{css title}"><a href="/">Page2Reader</a></h1>
+      <nav>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/feedback">Feedback</a></li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+{/template}
+
+
+/**
+ * Header for logged-in page
+ */
+{template .loggedInHeader}
+  <div class="{css header-container}">
+    <header class="{css wrapper} {css clearfix}">
+      <h1 class="{css title}"><a href="/">Page2Reader</a></h1>
+      <nav>
+        <ul>
+          <li><a href="/user">Settings</a></li>
+          <li><a href="/logout">Sign out</a></li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+{/template}
+
+
+/**
+ * Footer
+ */
+{template .footer}
+  <div class="{css footer-container}">
+    <footer class="{css wrapper}">
+      <h3>© 2013 Page2Reader</h3>
+    </footer>
+  </div>
+{/template}
+
+
+/**
+ * Footer with menu
+ */
+{template .footerWithMenu}
+  <div class="{css footer-container}">
+    <footer class="{css wrapper}">
+      <h3>© 2013 Page2Reader</h3>
+      <nav>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/feedback">Feedback</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+{/template}

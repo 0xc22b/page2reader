@@ -1,0 +1,54 @@
+{namespace wit.home.soy.confirmEmail}
+
+/**
+ * init
+ * @param didConfirmEmail
+ */
+{template .init}
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.home.soy.home.css_ /}
+    {/param}
+    {param content}
+      {call wit.home.soy.confirmEmail.content_ data="all" /}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * initDebug
+ * @param didConfirmEmail
+ */
+{template .initDebug }
+  {call wit.base.soy.base.init }
+    {param css}
+      {call wit.home.soy.home.cssDebug_ /}
+    {/param}
+    {param content}
+      {call wit.home.soy.confirmEmail.content_ data="all" /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * content_
+ * @param didConfirmEmail
+ */
+{template .content_}
+
+  {call wit.base.soy.base.header /}
+
+  <h2>Email verification</h2>
+  {if $didConfirmEmail == true}
+    <p>Your email has been verified.</p><a href="/">Continue</a>
+  {else}
+    <p>We could not verify your email. Please try again.</p>
+    <ul>
+      <li>log in, go to user settings</li>
+      <li>click 'resend email verification' button.</li>
+    </ul>
+  {/if}
+
+  {call wit.base.soy.base.footer /}
+{/template}

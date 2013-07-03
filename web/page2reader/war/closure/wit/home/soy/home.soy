@@ -1,0 +1,126 @@
+{namespace wit.home.soy.home}
+
+/**
+ * init
+ */
+{template .init}
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.home.soy.home.css_ /}
+    {/param}
+    {param opt_js}
+      {call wit.home.soy.home.js_ /}
+    {/param}
+    {param content}
+      {call wit.home.soy.home.content_ /}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * initDebug
+ */
+{template .initDebug }
+  {call wit.base.soy.base.init }
+    {param css}
+      {call wit.home.soy.home.cssDebug_ /}
+    {/param}
+    {param opt_js}
+      {call wit.home.soy.home.jsDebug_ /}
+    {/param}
+    {param content}
+      {call wit.home.soy.home.content_ /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * content_
+ */
+{template .content_}
+
+  {call wit.base.soy.base.header /}
+
+  <div class="{css main-container}">
+    <div class="{css main} {css wrapper} {css clearfix}">
+      <article>
+        <header>
+          <p>Send a web page to your reader instantly!</p>
+        </header>
+        <section>
+          <h2>Sign in</h2>
+          <span id="logInErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+          <input id="logInUsernameTB" type="text" placeholder="Username or email">
+          <input id="logInPasswordTB" type="password" placeholder="Password">
+          <button id="logInBtn" type="button" class="{css btn} {css btn-primary}">OK</button>
+          <img src="/img/loading.gif" id="logInLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+        <section>
+          <h2>Create an account</h2>
+          <span id="signUpUsernameErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpUsernameTB" type="text" class="{css input-block-level}" placeholder="Username">
+            <span id="signUpPasswordErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpPasswordTB" type="password" class="{css input-block-level}" placeholder="Password">
+            <span id="signUpRepeatPasswordErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpRepeatPasswordTB" type="password" class="{css input-block-level}" placeholder="Repeat password">
+            <span id="signUpEmailErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpEmailTB" type="text" class="{css input-block-level}" placeholder="Email address">
+            <button id="signUpBtn" type="button" class="{css btn} {css btn-primary} {css btn-large}">OK</button>
+            <img src="/img/loading.gif" id="signUpLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+        <footer>
+          <h3>Forget password?</h3>
+          <span class="{css msg-block}">Please enter your username or email.</span>
+          <span id="forgotUsernameErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+          <input id="forgotUsernameTB" type="text" placeholder="username or email" />
+          <button id="forgotOkBtn" class="{css btn} {css btn-primary}">OK</button>
+          <img src="/img/loading.gif" id="forgotLoadingImg" class="{css loading-img}" style="display: none;" />
+        </footer>
+      </article>
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
+
+  {call wit.base.soy.base.footer /}
+{/template}
+
+
+/**
+ * css_
+ */
+{template .css_}
+css/home-compiled.css
+{/template}
+
+/**
+ * cssDebug_
+ */
+{template .cssDebug_}
+css/home-debug.css
+{/template}
+
+
+/**
+ * js_
+ */
+{template .js_}
+<script src="js/home-compiled.js"></script>
+<script>
+  new wit.home.Home();
+</script>
+{/template}
+
+/**
+ * jsDebug_
+ */
+{template .jsDebug_}
+<script src="closure/wit/home/cssrenamingmap/home-debug.js"></script>
+<script src="closure/closure-library/closure/goog/base.js"></script>
+<script src="closure/wit/deps.js"></script>
+<script>
+  goog.require("wit.home.Home");
+</script>
+<script>
+  new wit.home.Home();
+</script>
+{/template}

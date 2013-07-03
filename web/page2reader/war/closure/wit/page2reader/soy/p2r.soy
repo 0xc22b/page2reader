@@ -1,0 +1,138 @@
+{namespace wit.page2reader.soy.p2r}
+
+/**
+ * init
+ * @param content
+ */
+{template .init}
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.page2reader.soy.p2r.css_ /}
+    {/param}
+    {param opt_js}
+      {call wit.page2reader.soy.p2r.js_ /}
+    {/param}
+    {param content}
+      {$content|noAutoescape}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * initDebug
+ * @param content
+ */
+{template .initDebug }
+  {call wit.base.soy.base.init }
+    {param css}
+      {call wit.page2reader.soy.p2r.cssDebug_ /}
+    {/param}
+    {param opt_js}
+      {call wit.page2reader.soy.p2r.jsDebug_ /}
+    {/param}
+    {param content}
+      {$content|noAutoescape}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * content of page2reader
+ * @param pageUrlViews
+ * @param cursorString
+ */
+{template .content}
+
+  {call wit.base.soy.base.loggedInHeader /}
+
+  <div class="{css main-container}">
+    <div class="{css main} {css wrapper} {css clearfix}">
+      <article>
+        <header>
+          <h1>Send a web page to reader</h1>
+          <input type="text" class="{css purl-tb}" placeholder="Page URL">
+          <button type="button" class="{css add-purl-btn}">OK</button>
+        </header>
+        <div class="{css purl-views}">
+          {$pageUrlViews|noAutoescape}
+        </div>
+        <footer>
+          <button type="button" class="{css next-btn}" data-cursor-string="{$cursorString|noAutoescape}">Next</button>
+        </footer>
+      </article>
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
+
+  {call wit.base.soy.base.footerWithMenu /}
+{/template}
+
+
+/**
+ * Page URL view
+ * @param keyString
+ * @param pUrl
+ * @param title
+ * @param text
+ */
+{template .pageUrlView}
+  <section data-key-string="{$keyString}">
+    <a href="{$pUrl}">{$pUrl}</a>
+    <h2><a href="#">{$title}</a></h2>
+    <p>{$text}</p>
+    <button type="button" class="{css del-btn}">Delete</button>
+    <button type="button">Resend to reader</button>
+  </section>
+{/template}
+
+
+/**
+ * No entry
+ */
+{template .noEntry}
+  <section>
+    <h2>No data yet!</h2>
+    <p>Add it.</p>
+  </section>
+{/template}
+
+
+/**
+ * css_
+ */
+{template .css_}
+css/p2r-compiled.css
+{/template}
+
+/**
+ * cssDebug_
+ */
+{template .cssDebug_}
+css/p2r-debug.css
+{/template}
+
+
+/**
+ * js_
+ */
+{template .js_}
+<script src="js/p2r-compiled.js"></script>
+<script>
+  new wit.page2reader.P2r();
+</script>
+{/template}
+
+/**
+ * jsDebug_
+ */
+{template .jsDebug_}
+<script src="closure/wit/page2reader/cssrenamingmap/p2r-debug.js"></script>
+<script src="closure/closure-library/closure/goog/base.js"></script>
+<script src="closure/wit/deps.js"></script>
+<script>
+  goog.require("wit.page2reader.P2r");
+</script>
+<script>
+  new wit.page2reader.P2r();
+</script>
+{/template}

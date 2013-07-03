@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Closure Unit Tests - wit.home.view.HomeView</title>
+</head>
+<body>
+
+ <div id="logInP">
+    <h2>Log in</h2>
+    <label id="logInErrLb" class="{css errLb}">&nbsp;</label>
+    <input type="text" name="username" placeholder="username or email" id="logInUsernameTB" /> 
+    <input type="password" name="password"  placeholder="password" id="logInPasswordTB" />
+    <button id="logInBtn">OK</button>
+    <img src="/img/loading.gif" id="logInLoadingImg" style="display: none;" />
+    <button id="forgotBtn">Forgot password?</button>
+  </div>
+
+  <div id="forgotP" style="display: none;">
+    <div id="forgotResult" style="display: none;">
+      Please check your email to accept confirmation link for resetting password.
+    </div>
+    <div id="forgotForm">
+      <p>Please enter your username or email.</p>
+      <label id="forgotUsernameErrLb" class="{css errLb}">&nbsp;</label>
+      <input type="text" name="username" placeholder="username or email" id="forgotUsernameTB" />
+      <button id="forgotOkBtn">OK</button>
+      <button id="forgotCancelBtn">Cancel</button>
+      <img src="/img/loading.gif" id="forgotLoadingImg" style="display: none;" />
+    </div>
+  </div>
+  
+  <div id="descP"></div>
+
+  <div id="signUpP">
+    <h2>Create an account</h2>    
+    <label id="signUpUsernameErrLb" class="{css errLb}">&nbsp;</label>
+    <input type="text" name="username" placeholder="username" id="signUpUsernameTB" />
+    <label id="signUpPasswordErrLb" class="{css errLb}">&nbsp;</label> 
+    <input type="password" name="password"  placeholder="password" id="signUpPasswordTB" />
+    <label id="signUpRepeatPasswordErrLb" class="{css errLb}">&nbsp;</label> 
+    <input type="password" name="password"  placeholder="Repeat password" id="signUpRepeatPasswordTB" />
+    <label id="signUpEmailErrLb" class="{css errLb}">&nbsp;</label>
+    <input type="text" name="email"  placeholder="email" id="signUpEmailTB" />
+    <button id="signUpBtn">OK</button>
+    <img src="/img/loading.gif" id="signUpLoadingImg" style="display: none;" />
+  </div>
+
+  <script src="../../../closure-library/closure/goog/base.js"></script>
+  <script src="../../deps.js"></script>
+  <script>
+    goog.require('goog.testing.jsunit');
+  </script>
+  <script src="homeview_test.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+{namespace wit.user.soy.user}
+
+/**
+ * init
+ * @param username
+ * @param email
+ * @param didConfirmEmail
+ */
+{template .init}
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.user.soy.user.css_ /}
+    {/param}
+    {param opt_js}
+      {call wit.user.soy.user.js_ /}
+    {/param}
+    {param content}
+      {call wit.user.soy.user.content_ data="all" /}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * initDebug
+ * @param username
+ * @param email
+ * @param didConfirmEmail
+ */
+{template .initDebug}
+  {call wit.base.soy.base.init}
+    {param css}
+      {call wit.user.soy.user.cssDebug_ /}
+    {/param}
+    {param opt_js}
+      {call wit.user.soy.user.jsDebug_ /}
+    {/param}
+    {param content}
+      {call wit.user.soy.user.content_ data="all" /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * content_
+ * @param readerEmail
+ * @param username
+ * @param email
+ * @param didConfirmEmail
+ */
+{template .content_}
+
+  {call wit.base.soy.base.loggedInHeader /}
+
+  <div class="{css main-container}">
+    <div class="{css main} {css wrapper} {css clearfix}">
+      <article>
+        <header>
+          <h1>Reader settings</h1>
+        </header>
+        <section>
+          <h2>Reader email</h2>
+          <label class="{css control-label}">Reader email:</label>
+          <span id="changeReaderEmailLb">{$readerEmail}</span>
+          <span id="changeReaderEmailErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeReaderEmailTB" type="text" placeholder="New readerEmail">
+          <button id="changeReaderEmailOkBtn" type="button" class="{css btn}">OK</button>
+          <img src="/img/loading.gif" id="changeReaderEmailLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+      </article>
+      <article>
+        <header>
+          <h1>User settings</h1>
+        </header>
+        <section>
+          <h2>Change username</h2>
+          <label class="{css control-label}">Username:</label>
+          <span id="changeUsernameLb">{$username}</span>
+          <span id="changeUsernameErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeUsernameTB" type="text" placeholder="New username">
+          <span id="changeUsernamePasswordErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeUsernamePasswordTB" type="password" placeholder="Password">
+          <button id="changeUsernameOkBtn" type="button" class="{css btn}">OK</button>
+          <img src="/img/loading.gif" id="changeUsernameLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+        <section>
+          <h2>Change email</h2>
+          <label class="{css control-label}">Email:</label>
+          <span id="changeEmailLb">{$email}</span>
+          {if $didConfirmEmail == true}
+            <span id="emailVerifiedElement" class="{css text-info}">Email verified.</span>
+          {else}
+            <button id="resendEmailConfirmBtn" class="{css btn-link}">Resend email verification</button>
+          {/if}
+          <span id="changeEmailErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeEmailTB" type="text" placeholder="New email">
+          <span id="changeEmailPasswordErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeEmailPasswordTB" type="password" placeholder="Password">
+          <button id="changeEmailOkBtn" type="button" class="{css btn}">OK</button>
+          <img src="/img/loading.gif" id="changeEmailLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+        <section>
+          <h2>Change password</h2>
+          <label class="{css control-label}">Password:</label>
+          <span>********</span>
+          <span id="changeNewPasswordErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeNewPasswordTB" type="password" placeholder="New password">
+          <span id="changeRepeatPasswordErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changeRepeatPasswordTB" type="password" placeholder="Repeat new password">
+          <span id="changePasswordErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="changePasswordTB" type="password" placeholder="Password">
+          <button id="changePasswordOkBtn" type="button" class="{css btn}">OK</button>
+          <img src="/img/loading.gif" id="changePasswordLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+        <section>
+          <h2>Delete account</h2>
+          <label class="{css control-label}">Delete account:</label>
+          <span class="{css help-block}">This cannot be reversed.<br>Please be sure that you really want to do this.</span>
+          <span id="deleteAccountPasswordErrLb" class="{css text-error}">&nbsp;</span>
+          <input id="deleteAccountPasswordTB" type="password" placeholder="Password">
+          <button id="deleteAccountOkBtn" type="button" class="{css btn}">OK</button>
+          <img src="/img/loading.gif" id="deleteAccountLoadingImg" class="{css loading-img}" style="display: none;" />
+        </section>
+
+      </article>
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
+
+  {call wit.base.soy.base.footerWithMenu /}
+{/template}
+
+/**
+ * css_
+ */
+{template .css_}
+css/user-compiled.css
+{/template}
+
+/**
+ * cssDebug_
+ */
+{template .cssDebug_}
+css/user-debug.css
+{/template}
+
+
+/**
+ * js_
+ */
+{template .js_}
+<script src="js/user-compiled.js"></script>
+<script>
+  new wit.user.User();
+</script>
+{/template}
+
+/**
+ * jsDebug_
+ */
+{template .jsDebug_}
+<script src="closure/wit/user/cssrenamingmap/user-debug.js"></script>
+<script src="closure/closure-library/closure/goog/base.js"></script>
+<script src="closure/wit/deps.js"></script>
+<script>
+  goog.require("wit.user.User");
+</script>
+<script>
+  new wit.user.User();
+</script>
+{/template}

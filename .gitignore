@@ -1,0 +1,32 @@
+.DS_Store
+.Trashes
+
+._*
+Thumbs.db
+Desktop.ini
+
+*.class
+*.pyc
+*.bin
+
+# Web
+web/page2reader/test-classes/
+web/page2reader/tmp/
+
+web/page2reader/war/closure/wit/**/cssrenamingmap/
+web/page2reader/war/closure/wit/**/templates/
+
+web/page2reader/war/closure/wit/deps.js
+web/page2reader/war/closure/wit/all_tests.js
+
+web/page2reader/war/css/
+web/page2reader/war/cssrenamingmap/
+web/page2reader/war/js/
+
+web/page2reader/war/WEB-INF/appengine-generated/
+web/page2reader/war/WEB-INF/classes/
+web/page2reader/war/WEB-INF/lib/
+
+# Android
+Android/page2reader/bin/
+Android/page2reader/gen/

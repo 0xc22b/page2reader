@@ -1,0 +1,453 @@
+<project>
+
+  <property name="closure-library.dir"
+            value="war/closure/closure-library" />
+
+  <property name="closure-builder.py"
+            value="${closure-library.dir}/closure/bin/build/closurebuilder-modified.py" />
+
+  <property name="closure-depswriter.py"
+            value="${closure-library.dir}/closure/bin/build/depswriter.py" />
+
+  <property name="closure-compiler.jar"
+            value="war/closure/closure-compiler/build/compiler.jar" />
+
+  <property name="closure-templates.dir"
+            value="war/closure/closure-templates" />
+
+  <property name="closure-templates.jar"
+            value="${closure-templates.dir}/SoyToJsSrcCompiler.jar" />
+
+  <property name="closure-stylesheets.jar"
+            value="war/closure/closure-stylesheets/build/closure-stylesheets.jar" />
+
+  <property name="wit.dir"
+            value="war/closure/wit" />
+
+  <property name="js.dir" value="war/js" />
+
+  <property name="css.dir" value="war/css" />
+
+  <property name="cssrenamingmapprops.dir" value="war/cssrenamingmap" />
+
+  <property name="appengine-sdk.dir"
+            value="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.1.1/appengine-java-sdk-1.8.1.1" />
+
+  <import file="${appengine-sdk.dir}/config/user/ant-macros.xml" />
+
+  <path id="project.classpath">
+    <pathelement path="war/WEB-INF/classes" />
+    <fileset dir="war/WEB-INF/lib">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${appengine-sdk.dir}/lib">
+      <include name="shared/**/*.jar" />
+    </fileset>
+  </path>
+
+  <macrodef name="closure-stylesheets-command">
+    <attribute name="outputFile" />
+    <attribute name="rename" />
+    <attribute name="outputRenamingMapFormat" />
+    <attribute name="outputRenamingMap" />
+    <attribute name="inputFiles" />
+    <element name="options" optional="true" description="Additional options for closure-stylesheets"/>
+
+    <sequential>
+      <java jar="${closure-stylesheets.jar}"
+            fork="true"
+            failonerror="true"
+            logError="true">
+        <arg line="--gss-function-map-provider com.google.common.css.compiler.gssfunctions.CustomGssFunctionMapProvider" />
+        <arg line='--output-file "${css.dir}/@{outputFile}"' />
+        <arg line='--rename "@{rename}"' />
+        <arg line='--output-renaming-map-format "@{outputRenamingMapFormat}"' />
+        <arg line='--output-renaming-map "@{outputRenamingMap}"' />
+        <arg line='--allowed-unrecognized-property widows' />
+        <options/>
+        <arg line="@{inputFiles}" />
+      </java>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="closure-stylesheets">
+    <attribute name="inputFiles" />
+    <attribute name="outputFile" />
+    <attribute name="outputRenamingMapJs" />
+    <attribute name="outputRenamingMapProps" />
+    <attribute name="outputFileDebug" />
+    <attribute name="outputRenamingMapJsDebug" />
+    <attribute name="outputRenamingMapPropsDebug" />
+
+    <sequential>
+      <closure-stylesheets-command
+          outputFile="@{outputFile}"
+          rename="CLOSURE"
+          outputRenamingMapFormat="CLOSURE_COMPILED"
+          outputRenamingMap="${wit.dir}/@{outputRenamingMapJs}"
+          inputFiles="@{inputFiles}" />
+
+      <closure-stylesheets-command
+          outputFile="@{outputFile}"
+          rename="CLOSURE"
+          outputRenamingMapFormat="PROPERTIES"
+          outputRenamingMap="${cssrenamingmapprops.dir}/@{outputRenamingMapProps}"
+          inputFiles="@{inputFiles}" />
+
+      <closure-stylesheets-command
+          outputFile="@{outputFileDebug}"
+          rename="DEBUG"
+          outputRenamingMapFormat="CLOSURE_UNCOMPILED"
+          outputRenamingMap="${wit.dir}/@{outputRenamingMapJsDebug}"
+          inputFiles="@{inputFiles}">
+        <options>
+          <arg line='--pretty-print' />
+        </options>
+      </closure-stylesheets-command>
+
+      <closure-stylesheets-command
+          outputFile="@{outputFileDebug}"
+          rename="DEBUG"
+          outputRenamingMapFormat="PROPERTIES"
+          outputRenamingMap="${cssrenamingmapprops.dir}/@{outputRenamingMapPropsDebug}"
+          inputFiles="@{inputFiles}">
+        <options>
+          <arg line='--pretty-print' />
+        </options>
+      </closure-stylesheets-command>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="closure-templates">
+    <attribute name="inputFiles" />
+    <attribute name="outputPath" />
+    <sequential>
+      <java jar="${closure-templates.jar}"
+            fork="true"
+            failonerror="true"
+            logError="true">
+        <arg line='--outputPathFormat ${wit.dir}/"@{outputPath}"/{INPUT_FILE_NAME_NO_EXT}.soy.js' />
+        <arg line="--shouldGenerateJsdoc" />
+        <arg line="--shouldProvideRequireSoyNamespaces" />
+        <arg line="--cssHandlingScheme GOOG" />
+        <arg line="@{inputFiles}" />
+      </java>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="closure-templates-path">
+    <attribute name="inputPath" />
+    <attribute name="outputPath" />
+
+    <sequential>
+
+      <local name="input.js.files"/>
+      <pathconvert property="input.js.files"
+                   pathsep=" "
+                   setonempty="false">
+        <path>
+          <fileset dir='${wit.dir}/@{inputPath}' includes="**/*.soy"/>
+        </path>        
+        <firstmatchmapper>
+          <regexpmapper from='^([^ ]*)( .*)$$' to='"\1\2"'/>
+          <identitymapper/>
+        </firstmatchmapper>
+      </pathconvert>
+
+      <closure-templates
+        inputFiles="${input.js.files}"
+        outputPath="@{outputPath}" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="closure-compile">
+    <attribute name="namespace" />
+    <attribute name="cssRenamingMap" />
+    <attribute name="outputFile" />
+
+    <sequential>
+      <exec executable="python" failonerror="true" logError="true">
+        <arg value="${closure-builder.py}" />
+        <arg line='--root=${closure-library.dir}/' />
+        <arg line='--root=${closure-templates.dir}/' />
+        <arg line='--root=${wit.dir}/' />
+        <arg line='--cssrenamingmap=${wit.dir}/"@{cssRenamingMap}"' />
+        <arg line='--namespace="@{namespace}"' />
+        <arg line="--output_mode=compiled" />
+        <arg line='--compiler_jar=${closure-compiler.jar}' />
+        <arg line='--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS"' />
+        <arg line='--compiler_flags="--warning_level=VERBOSE"' />
+        <arg line='--compiler_flags="--jscomp_error=checkTypes"' />
+        <arg line='--compiler_flags="--jscomp_error=accessControls"' />
+        <arg line='--compiler_flags="--jscomp_error=const"' />
+        <arg line='--compiler_flags="--jscomp_error=checkDebuggerStatement"' />
+        <arg line='--compiler_flags="--jscomp_error=checkRegExp"' />
+        <arg line='--compiler_flags="--define=goog.dom.ASSUME_STANDARDS_MODE=true"' />
+        <arg line='--compiler_flags="--output_wrapper=(function(){%output%})();"' />
+        <arg line='--output_file=${js.dir}/"@{outputFile}"' />
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <target name="clean" description="deletes all files created by this script">
+    <delete includeemptydirs="true">
+      <fileset dir="war/js" includes="**/*" />
+      <fileset dir="war/css" includes="**/*" />
+      <fileset dir="war/cssrenamingmap" includes="**/*" />
+      <fileset dir="war/closure/wit" includes="**/cssrenamingmap/*"/>
+      <fileset dir="war/closure/wit" includes="**/templates/*"/>
+      <fileset file="war/closure/wit/deps.js" />
+    </delete>
+  </target>
+
+  <target name="write-deps">
+      <exec executable="python" failonerror="true" logError="true">
+        <arg value="${closure-depswriter.py}" />
+        <arg line='--root_with_prefix="${closure-templates.dir}/ ../../../closure-templates"' />
+        <arg line='--root_with_prefix="${wit.dir}/ ../../../wit"' />
+        <arg line='--output_file=${wit.dir}/deps.js' />
+      </exec>
+  </target>
+
+  <!-- Modify all_tests.html and all_tests.py to be used with Ant. -->
+  <!-- all_tests.html: setBasePath of testRunner to empty string. -->
+  <!-- all_tests.py: in add_test_files, use absolute paths. -->
+  <!-- all_tests.py: in main, print to all_tests_.js instead.  -->
+  <target name="write-all-tests">
+      <exec executable="python" failonerror="true" logError="true">
+        <arg value="${wit.dir}/all_tests.py" />
+        <arg line='${wit.dir}/' />
+      </exec>
+  </target>
+
+  <target name="base-templates">
+    <closure-templates-path
+        inputPath="base/soy"
+        outputPath="base/templates"/>
+  </target>
+
+  <target name="home-stylesheets">
+    <closure-stylesheets
+      inputFiles="war/closure/wit/base/gss/base.gss war/closure/wit/home/gss/home.gss"
+      outputFile="home-compiled.css"
+      outputRenamingMapJs="home/cssrenamingmap/home-compiled.js"
+      outputRenamingMapProps="home-compiled.properties"
+      outputFileDebug="home-debug.css"
+      outputRenamingMapJsDebug="home/cssrenamingmap/home-debug.js"
+      outputRenamingMapPropsDebug="home-debug.properties" />
+  </target>
+
+  <target name="home-templates"
+          depends="base-templates">
+    <closure-templates-path
+        inputPath="home/soy"
+        outputPath="home/templates"/>
+  </target>
+
+  <target name="home-templates-only">
+    <closure-templates-path
+        inputPath="home/soy"
+        outputPath="home/templates"/>
+  </target>
+
+  <target name="home-compile"
+          depends="home-stylesheets, home-templates">
+    <closure-compile
+        namespace="wit.home.Home"
+        cssRenamingMap="home/cssrenamingmap/home-compiled.js"
+        outputFile="home-compiled.js" />
+  </target>
+
+  <target name="home-compile-only">
+    <closure-compile
+        namespace="wit.home.Home"
+        cssRenamingMap="home/cssrenamingmap/home-compiled.js"
+        outputFile="home-compiled.js" />
+  </target>
+
+  <target name="user-stylesheets">
+    <closure-stylesheets
+      inputFiles="war/closure/wit/base/gss/base.gss war/closure/wit/user/gss/user.gss"
+      outputFile="user-compiled.css"
+      outputRenamingMapJs="user/cssrenamingmap/user-compiled.js"
+      outputRenamingMapProps="user-compiled.properties"
+      outputFileDebug="user-debug.css"
+      outputRenamingMapJsDebug="user/cssrenamingmap/user-debug.js"
+      outputRenamingMapPropsDebug="user-debug.properties" />
+  </target>
+
+  <target name="user-templates"
+          depends="base-templates">
+    <closure-templates-path
+        inputPath="user/soy"
+        outputPath="user/templates"/>
+  </target>
+
+  <target name="user-templates-only">
+    <closure-templates-path
+        inputPath="user/soy"
+        outputPath="user/templates"/>
+  </target>
+
+  <target name="user-compile"
+          depends="user-stylesheets, user-templates">
+    <closure-compile
+        namespace="wit.user.User"
+        cssRenamingMap="user/cssrenamingmap/user-compiled.js"
+        outputFile="user-compiled.js" />
+  </target>
+
+  <target name="user-compile-only">
+    <closure-compile
+        namespace="wit.user.User"
+        cssRenamingMap="user/cssrenamingmap/user-compiled.js"
+        outputFile="user-compiled.js" />
+  </target>
+
+  <target name="reset-password-compile">
+    <closure-compile
+        namespace="wit.home.ResetPassword"
+        cssRenamingMap="home/cssrenamingmap/home-compiled.js"
+        outputFile="resetpassword-compiled.js" />
+  </target>
+
+  <target name="reset-password-compile-only">
+    <closure-compile
+        namespace="wit.home.ResetPassword"
+        cssRenamingMap="home/cssrenamingmap/home-compiled.js"
+        outputFile="resetpassword-compiled.js" />
+  </target>
+
+  <target name="p2r-stylesheets">
+    <closure-stylesheets
+      inputFiles="war/closure/wit/base/gss/base.gss war/closure/wit/page2reader/gss/p2r.gss"
+      outputFile="p2r-compiled.css"
+      outputRenamingMapJs="page2reader/cssrenamingmap/p2r-compiled.js"
+      outputRenamingMapProps="p2r-compiled.properties"
+      outputFileDebug="p2r-debug.css"
+      outputRenamingMapJsDebug="page2reader/cssrenamingmap/p2r-debug.js"
+      outputRenamingMapPropsDebug="p2r-debug.properties" />
+  </target>
+
+  <target name="p2r-templates"
+          depends="base-templates">
+    <closure-templates-path
+        inputPath="page2reader/soy"
+        outputPath="page2reader/templates"/>
+  </target>
+
+  <target name="p2r-templates-only">
+    <closure-templates-path
+        inputPath="page2reader/soy"
+        outputPath="page2reader/templates"/>
+  </target>
+
+  <!-- ant -DinputFiles=war/closure/wit/page2reader/soy/work.soy p2r-templates-one -->
+  <target name="p2r-templates-one">
+    <closure-templates
+        inputFiles="${inputFiles}"
+        outputPath="page2reader/templates"/>
+  </target>
+
+  <target name="p2r-compile"
+          depends="p2r-stylesheets, p2r-templates">
+    <closure-compile
+        namespace="wit.page2reader.P2r"
+        cssRenamingMap="page2reader/cssrenamingmap/p2r-compiled.js"
+        outputFile="p2r-compiled.js" />
+  </target>
+
+  <target name="p2r-compile-only">
+    <closure-compile
+        namespace="wit.page2reader.P2r"
+        cssRenamingMap="page2reader/cssrenamingmap/p2r-compiled.js"
+        outputFile="p2r-compiled.js" />
+  </target>
+
+  <target name="appengine-compile"
+          description="Compiles Java source and copies other source files to the WAR.">
+    <mkdir dir="war/WEB-INF/classes" />
+    <copy todir="war/WEB-INF/classes">
+      <fileset dir="src">
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+    <javac srcdir="src"
+           destdir="war/WEB-INF/classes"
+           classpathref="project.classpath"
+           debug="on"
+           includeantruntime="false" />
+  </target>
+
+  <!-- http://www.mattburns.co.uk/blog/2012/07/11/passing-your-credentials-in-order-to-deploy-to-google-app-engine-with-ant/ -->
+  <target name="appengine-update"
+          description="Uploads the application to App Engine.">
+
+    <input message="Enter email" addproperty="gae-email"/>
+    <input message="Enter password :- " addproperty="gae-password">
+        <handler type="secure"/>
+    </input>
+
+    <!-- Call dependencies here rather than with 'depends' attribute to get input first -->
+    <antcall target="appengine-compile" />
+    <antcall target="home-compile" />
+    <antcall target="user-compile" />
+    <antcall target="reset-password-compile" />
+    <antcall target="p2r-compile" />
+
+    <move todir="tmp/closure">
+      <fileset dir="war/closure">
+        <exclude name="**/*.soy"/>
+      </fileset>
+    </move>
+
+    <java classname="com.google.appengine.tools.admin.AppCfg"
+          inputstring="${gae-password}"
+          classpath="${appengine-sdk.dir}/lib/appengine-tools-api.jar"
+          fork="true" failonerror="true">
+        <arg value="--email=${gae-email}" />
+        <arg value="--passin" />
+        <arg value="update" />
+        <arg value="war" />
+    </java>
+
+    <move todir="war/closure">
+      <fileset dir="tmp/closure"></fileset>
+    </move>
+  </target>
+
+  <!-- The authentication credentials must be cached. -->
+  <target name="appengine-update-wc"
+          depends="appengine-compile, home-compile, user-compile, reset-password-compile, p2r-compile"
+          description="Uploads the application to App Engine.">
+
+    <move todir="tmp/closure">
+      <fileset dir="war/closure">
+        <exclude name="**/*.soy"/>
+      </fileset>
+    </move>
+
+    <appcfg action="update" war="war" />
+
+    <move todir="war/closure">
+      <fileset dir="tmp/closure"></fileset>
+    </move>
+  </target>
+
+  <target name="appengine-update_indexes"
+          depends="appengine-compile"
+          description="Uploads just the datastore index configuration to App Engine.">
+    <appcfg action="update_indexes" war="war" />
+  </target>
+
+  <target name="moveback">
+    <move todir="war/closure">
+      <fileset dir="tmp/closure"></fileset>
+    </move>
+  </target>
+
+  <target name="appengine-rollback"
+          description="Rolls back an interrupted application update.">
+    <appcfg action="rollback" war="war" />
+  </target>
+</project>
