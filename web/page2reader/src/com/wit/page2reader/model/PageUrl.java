@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Text;
 import com.wit.base.BaseConstants;
 import com.wit.page2reader.P2rConstants;
 
@@ -78,7 +79,8 @@ public class PageUrl {
     }
 
     public String getCleansedPage() {
-        return (String)entity.getProperty(P2rConstants.CLEANSED_PAGE);
+        Text t = (Text)entity.getProperty(P2rConstants.CLEANSED_PAGE);
+        return t.getValue();
     }
 
     public int getSentCount() {
@@ -94,7 +96,7 @@ public class PageUrl {
     }
 
     public void setCleansedPage(String cleansedPage) {
-        entity.setUnindexedProperty(P2rConstants.CLEANSED_PAGE, cleansedPage);
+        entity.setUnindexedProperty(P2rConstants.CLEANSED_PAGE, new Text(cleansedPage));
     }
 
     public void setSentCount(int count) {
