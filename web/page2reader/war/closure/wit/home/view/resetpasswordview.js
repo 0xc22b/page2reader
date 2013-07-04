@@ -122,8 +122,8 @@ wit.home.view.ResetPasswordView.prototype.enterDocument = function() {
 
   this.getHandler().listen(this.okBtn_, goog.events.EventType.CLICK,
       function(e) {
-        goog.style.showElement(this.okBtn_, false);
-        goog.style.showElement(this.loadingImg_, true);
+        goog.style.setElementShown(this.okBtn_, false);
+        goog.style.setElementShown(this.loadingImg_, true);
 
         var resetPasswordViewEvent = new wit.home.view.ResetPasswordViewEvent(
             wit.home.view.ResetPasswordView.Events.RESET_PASSWORD,
@@ -187,14 +187,14 @@ wit.home.view.ResetPasswordView.prototype.resetPasswordCallback =
     this.repeatPasswordErrLb_.innerHTML = logInfo.msg;
   }
 
-  goog.style.showElement(this.okBtn_, true);
-  goog.style.showElement(this.loadingImg_, false);
+  goog.style.setElementShown(this.okBtn_, true);
+  goog.style.setElementShown(this.loadingImg_, false);
 
   // Succeeded
   logInfo = log.getLogInfo(wit.base.constants.resetPassword, true);
   if (goog.isDef(logInfo)) {
     this.resultLb_.innerHTML = logInfo.msg;
-    goog.style.showElement(this.formPanel_, false);
+    goog.style.setElementShown(this.formPanel_, false);
   }
 };
 

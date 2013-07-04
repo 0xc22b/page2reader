@@ -2,7 +2,7 @@ goog.provide('wit.home.ResetPassword');
 
 goog.require('goog.Uri');
 goog.require('goog.debug.ErrorHandler');
-goog.require('goog.dom');
+goog.require('goog.events.EventWrapper');
 
 goog.require('wit.base.constants');
 goog.require('wit.base.model.Log');
