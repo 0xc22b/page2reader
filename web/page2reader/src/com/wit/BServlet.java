@@ -19,7 +19,7 @@ public class BServlet extends BaseServlet {
 
     public static final String WEB_URL = "http://page2reader.appspot.com";
     public static final String WEB_NAME = "Page2Reader";
-    public static final String FROM_EMAIL = "admin@page2reader.appspot.com";
+    public static final String FROM_EMAIL = "admin@page2reader.appspotmail.com";
     public static final String FROM_NAME = "Page2Reader admin";
 
     @Override
