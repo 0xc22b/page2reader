@@ -58,7 +58,7 @@ public class User implements Serializable {
         return (String)entity.getProperty(BaseConstants.HASH_PASSWORD);
     }
 
-    public boolean didComfirmEmail() {
+    public boolean didConfirmEmail() {
         return (Boolean)entity.getProperty(BaseConstants.DID_CONFIRM_EMAIL);
     }
 

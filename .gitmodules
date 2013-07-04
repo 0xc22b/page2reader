@@ -1,12 +1,16 @@
 [submodule "web/page2reader/src/org/json"]
 	path = web/page2reader/src/org/json
 	url = https://github.com/douglascrockford/JSON-java.git
+        ignore = dirty
 [submodule "web/page2reader/war/closure/closure-compiler"]
 	path = web/page2reader/war/closure/closure-compiler
 	url = https://code.google.com/p/closure-compiler/
+        ignore = dirty
 [submodule "web/page2reader/war/closure/closure-library"]
 	path = web/page2reader/war/closure/closure-library
 	url = https://code.google.com/p/closure-library/
+        ignore = dirty
 [submodule "web/page2reader/war/closure/closure-stylesheets"]
 	path = web/page2reader/war/closure/closure-stylesheets
 	url = https://github.com/witterk/closure-stylesheets.git
+        ignore = dirty

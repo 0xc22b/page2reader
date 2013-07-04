@@ -5,76 +5,41 @@ import java.io.IOException;
 import org.json.JSONException;
 
 import com.google.template.soy.data.SoyMapData;
+import com.wit.base.BaseConstants;
 import com.wit.base.BaseServlet;
 import com.wit.base.model.User;
 import com.wit.page2reader.P2rConstants;
 import com.wit.page2reader.P2rManager;
 import com.wit.page2reader.P2rManager.PageUrlList;
 import com.wit.page2reader.model.PageUrl;
+import com.wit.page2reader.model.ReaderEmail;
 
 @SuppressWarnings("serial")
 public class BServlet extends BaseServlet {
 
+    public static final String WEB_URL = "http://page2reader.appspot.com";
+    public static final String WEB_NAME = "Page2Reader";
+    public static final String FROM_EMAIL = "admin@page2reader.appspot.com";
+    public static final String FROM_NAME = "Page2Reader admin";
+
     @Override
     public String getWebUrl() {
-        return "http://page2reader.appspot.com";
+        return WEB_URL;
     }
 
     @Override
     public String getWebName() {
-        return "Page2Reader";
+        return WEB_NAME;
     }
 
     @Override
     public String getFromEmail() {
-        return "admin@page2reader.appspot.com";
+        return FROM_EMAIL;
     }
 
     @Override
     public String getFromName() {
-        return "Page2Reader admin";
-    }
-
-    @Override
-    public String getWorkContents(User user, int mode, int device) throws JSONException,
-            IOException {
-
-        String[] soyFileList = {getBaseSoyPath(), getWorkSoyPath()};
-        SoyMapData soyMapData = null;
-
-        String pageUrlViews = "";
-        PageUrlList pageUrls = P2rManager.getPagingPageUrls(user, null);
-        if (pageUrls.size() == 0) {
-            pageUrlViews = BaseServlet.getTemplate(
-                    soyFileList,
-                    "wit.page2reader.soy.p2r.noEntry",
-                    getWorkCssRenamingMapFile(device, mode),
-                    soyMapData);
-        } else {
-            for (PageUrl pageUrl : pageUrls) {
-                soyMapData = new SoyMapData(
-                        P2rConstants.KEY_STRING, pageUrl.getKeyString(),
-                        P2rConstants.P_URL, pageUrl.getPUrl(),
-                        P2rConstants.TITLE, pageUrl.getTitle(),
-                        P2rConstants.TEXT, pageUrl.getText());
-                pageUrlViews += BaseServlet.getTemplate(
-                        soyFileList,
-                        "wit.page2reader.soy.p2r.pageUrlView",
-                        getWorkCssRenamingMapFile(device, mode),
-                        soyMapData);
-            }
-        }
-
-        soyMapData = new SoyMapData(
-                        P2rConstants.PAGE_URL_VIEWS, pageUrlViews,
-                        P2rConstants.CURSOR_STRING, pageUrls.getCursorString());
-        String content = BaseServlet.getTemplate(
-                soyFileList,
-                "wit.page2reader.soy.p2r.content",
-                getWorkCssRenamingMapFile(device, mode),
-                soyMapData);
-
-        return content;
+        return FROM_NAME;
     }
 
     @Override
@@ -151,6 +116,56 @@ public class BServlet extends BaseServlet {
         } else {
             return "cssrenamingmap/p2r-compiled.properties";
         }
+    }
+
+    @Override
+    public SoyMapData getWorkSoyMapData(User user, int device, int mode) throws JSONException,
+            IOException {
+        String content = getWorkContent(user, device, mode);
+        return new SoyMapData(BaseConstants.CONTENT, content);
+    }
+
+    private String getWorkContent(User user, int mode, int device) throws JSONException,
+            IOException {
+
+        String[] soyFileList = {getBaseSoyPath(), getWorkSoyPath()};
+        SoyMapData soyMapData = null;
+
+        String pageUrlViews = "";
+        String noDataView = "";
+        PageUrlList pageUrls = P2rManager.getPagingPageUrls(user, null);
+        if (pageUrls.size() == 0) {
+            noDataView = BaseServlet.getTemplate(
+                    soyFileList,
+                    "wit.page2reader.soy.p2r.noEntry",
+                    getWorkCssRenamingMapFile(device, mode),
+                    soyMapData);
+        } else {
+            for (PageUrl pageUrl : pageUrls) {
+                soyMapData = new SoyMapData(
+                        P2rConstants.KEY_STRING, pageUrl.getKeyString(),
+                        P2rConstants.P_URL, pageUrl.getPUrl(),
+                        P2rConstants.TITLE, pageUrl.getTitle(),
+                        P2rConstants.TEXT, pageUrl.getText());
+                pageUrlViews += BaseServlet.getTemplate(
+                        soyFileList,
+                        "wit.page2reader.soy.p2r.pageUrlView",
+                        getWorkCssRenamingMapFile(device, mode),
+                        soyMapData);
+            }
+        }
+
+        soyMapData = new SoyMapData(
+                        P2rConstants.PAGE_URL_VIEWS, pageUrlViews,
+                        P2rConstants.NO_DATA_VIEW, noDataView,
+                        P2rConstants.CURSOR_STRING, pageUrls.getCursorString());
+        String content = BaseServlet.getTemplate(
+                soyFileList,
+                "wit.page2reader.soy.p2r.content",
+                getWorkCssRenamingMapFile(device, mode),
+                soyMapData);
+
+        return content;
     }
 
     @Override
@@ -244,5 +259,18 @@ public class BServlet extends BaseServlet {
         } else {
             return "cssrenamingmap/user-compiled.properties";
         }
+    }
+
+    @Override
+    public SoyMapData getUserSoyMapData(User user, String username, String email,
+            boolean didConfirmEmail) throws JSONException, IOException {
+
+        ReaderEmail readerEmail = P2rManager.getReaderEmail(user);
+        String rEmail = readerEmail == null ? "" : readerEmail.getREmail();
+        return new SoyMapData(
+                P2rConstants.READER_EMAIL, rEmail,
+                BaseConstants.USERNAME, username,
+                BaseConstants.EMAIL, email,
+                BaseConstants.DID_CONFIRM_EMAIL, didConfirmEmail);
     }
 }

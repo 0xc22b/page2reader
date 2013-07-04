@@ -5,6 +5,8 @@ goog.require('goog.dom.classes');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
+goog.require('wit.page2reader.constants');
+goog.require('wit.page2reader.model.DataStore');
 goog.require('wit.user.model.DataStore');
 
 
@@ -38,6 +40,41 @@ wit.user.view.UserView.btnLinkCss_ = goog.getCssName('btn-link');
  * @private
  */
 wit.user.view.UserView.mutedCss_ = goog.getCssName('muted');
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+wit.user.view.UserView.prototype.changeReaderEmailLb_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+wit.user.view.UserView.prototype.changeReaderEmailLoadingImg_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+wit.user.view.UserView.prototype.changeReaderEmailErrLb_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+wit.user.view.UserView.prototype.changeReaderEmailTB_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+wit.user.view.UserView.prototype.changeReaderEmailOkBtn_;
 
 
 /**
@@ -250,6 +287,13 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
   // methods such as getElementByFragment(), it must be careful not to make that
   // assumption for a component that calls decorate Internal() from createDom().
 
+  this.changeReaderEmailLb_ = goog.dom.getElement('changeReaderEmailLb');
+  this.changeReaderEmailLoadingImg_ = goog.dom.getElement(
+      'changeReaderEmailLoadingImg');
+  this.changeReaderEmailErrLb_ = goog.dom.getElement('changeReaderEmailErrLb');
+  this.changeReaderEmailTB_ = goog.dom.getElement('changeReaderEmailTB');
+  this.changeReaderEmailOkBtn_ = goog.dom.getElement('changeReaderEmailOkBtn');
+
   this.changeUsernameLb_ = goog.dom.getElement('changeUsernameLb');
   this.changeUsernameLoadingImg_ = goog.dom.getElement(
       'changeUsernameLoadingImg');
@@ -297,6 +341,21 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
 /** @inheritDoc */
 wit.user.view.UserView.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
+
+  this.getHandler().listen(this.changeReaderEmailOkBtn_,
+      goog.events.EventType.CLICK,
+      function(e) {
+        // Hide the button, show the loading image.
+        goog.style.setElementShown(this.changeReaderEmailOkBtn_, false);
+        goog.style.setElementShown(this.changeReaderEmailLoadingImg_, true);
+
+        var dataStore = wit.page2reader.model.DataStore.getInstance();
+        var log = new wit.base.model.Log();
+        dataStore.updateReaderEmail(
+            this.changeReaderEmailTB_.value,
+            log,
+            goog.bind(this.changeReaderEmailCallback_, this));
+      });
 
   this.getHandler().listen(this.changeUsernameOkBtn_,
       goog.events.EventType.CLICK,
@@ -398,6 +457,39 @@ wit.user.view.UserView.prototype.disposeInternal = function() {
 /** @inheritDoc */
 wit.user.view.UserView.prototype.exitDocument = function() {
   goog.base(this, 'exitDocument');
+};
+
+
+/**
+ * Callback function to update the results of updating reader email.
+ * @param {wit.base.model.Log} log LogInfo array.
+ * @this {wit.user.view.UserView}
+ * @private
+ */
+wit.user.view.UserView.prototype.changeReaderEmailCallback_ = function(log) {
+  var logInfo;
+
+  // If server error occurred, there's gonna be only one log info
+  // type 'server status'.
+  // Just reset the form to let users try again later.
+  if (goog.isDef(log.getLogInfo(wit.base.constants.serverStatus, false))) {
+    window.alert('Some error occurred.' +
+                 'Please wait for a bit and try again.');
+  }
+
+  this.changeReaderEmailErrLb_.innerHTML = wit.base.constants.htmlSpace;
+
+  // TODO: Inputs invalid
+
+  goog.style.setElementShown(this.changeReaderEmailOkBtn_, true);
+  goog.style.setElementShown(this.changeReaderEmailLoadingImg_, false);
+
+  // Succeeded
+  logInfo = log.getLogInfo(wit.page2reader.constants.UPDATE_READER_EMAIL, true);
+  if (goog.isDef(logInfo)) {
+    this.changeReaderEmailLb_.innerHTML = logInfo.value;
+    this.changeReaderEmailTB_.value = '';
+  }
 };
 
 

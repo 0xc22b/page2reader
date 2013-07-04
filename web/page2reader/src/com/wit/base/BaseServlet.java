@@ -80,16 +80,11 @@ public class BaseServlet extends HttpServlet {
                     User user = UserManager.checkLoggedInAndGetUser(
                             sSIDCookie.getValue(), sIDCookie.getValue());
 
-                    String content = getWorkContents(user, mode, device);
-
-                    String[] soyFileList = {getBaseSoyPath(), getWorkSoyPath()};
-                    SoyMapData soyMapData = new SoyMapData(
-                        BaseConstants.CONTENT, content);
                     String page = getTemplate(
-                            soyFileList,
+                            getWorkSoyFileList(),
                             getWorkSoyMethod(device, mode),
                             getWorkCssRenamingMapFile(device, mode),
-                            soyMapData);
+                            getWorkSoyMapData(user, mode, device));
                     response(resp, page);
                     return;
                 } catch (JSONException e) {
@@ -102,36 +97,32 @@ public class BaseServlet extends HttpServlet {
             }
 
             //TODO: Save page to Memcache
-            String[] soyFileList = {getBaseSoyPath(), getHomeSoyPath()};
             String page = getTemplate(
-                    soyFileList,
+                    getHomeSoyFileList(),
                     getHomeSoyMethod(device, mode),
                     getHomeCssRenamingMapFile(device, mode),
-                    null);
+                    getHomeSoyMapData());
             response(resp, page);
         } else if (uri.equals(ABOUT_URI)) {
-            String[] soyFileList = {getBaseSoyPath(), getHomeSoyPath(), getAboutSoyPath()};
             String page = getTemplate(
-                    soyFileList,
+                    getAboutSoyFileList(),
                     getAboutSoyMethod(device, mode),
-                    getHomeCssRenamingMapFile(device, mode),
-                    null);
+                    getAboutCssRenamingMapFile(device, mode),
+                    getAboutSoyMapData());
             response(resp, page);
         } else if (uri.equals(TERMS_URI)) {
-            String[] soyFileList = {getBaseSoyPath(), getHomeSoyPath(), getTermsSoyPath()};
             String page = getTemplate(
-                    soyFileList,
+                    getTermsSoyFileList(),
                     getTermsSoyMethod(device, mode),
-                    getHomeCssRenamingMapFile(device, mode),
-                    null);
+                    getTermsCssRenamingMapFile(device, mode),
+                    getTermsSoyMapData());
             response(resp, page);
         } else if (uri.equals(FEEDBACK_URI)) {
-            String[] soyFileList = {getBaseSoyPath(), getHomeSoyPath(), getFeedbackSoyPath()};
             String page = getTemplate(
-                    soyFileList,
+                    getFeedbackSoyFileList(),
                     getFeedbackSoyMethod(device, mode),
-                    getHomeCssRenamingMapFile(device, mode),
-                    null);
+                    getFeedbackCssRenamingMapFile(device, mode),
+                    getFeedbackSoyMapData());
             response(resp, page);
         } else if (uri.equals(CONFIRM_EMAIL_URI)) {
             // Confirm the email
@@ -139,17 +130,12 @@ public class BaseServlet extends HttpServlet {
             String vID = req.getParameter(BaseConstants.VID);
             if (sessionKeyString != null && vID != null) {
                 try {
-                    boolean didEmailConfirm = UserManager.confirmEmail(
-                            sessionKeyString, vID);
-                    String[] soyFileList = {getBaseSoyPath(), getHomeSoyPath(),
-                                            getConfirmEmailSoyPath()};
-                    SoyMapData soyMapData = new SoyMapData(
-                            BaseConstants.DID_CONFIRM_EMAIL, didEmailConfirm);
+                    boolean didEmailConfirm = UserManager.confirmEmail(sessionKeyString, vID);
                     String page = getTemplate(
-                            soyFileList,
+                            getConfirmEmailSoyFileList(),
                             getConfirmEmailSoyMethod(device, mode),
-                            getHomeCssRenamingMapFile(device, mode),
-                            soyMapData);
+                            getConfirmEmailCssRenamingMapFile(device, mode),
+                            getConfirmEmailSoyMapData(didEmailConfirm));
                     response(resp, page);
                 } catch (EntityNotFoundException e) {
                     writeExceptionToLogger(logger, e);
@@ -169,16 +155,11 @@ public class BaseServlet extends HttpServlet {
                 Session session = UserManager.getSession(sessionKeyString,
                         Session.RESET_PASSWORD, fID);
 
-                String[] soyFileList = {getBaseSoyPath(), getHomeSoyPath(),
-                                        getResetPasswordSoyPath()};
-                SoyMapData soyMapData = new SoyMapData(
-                            BaseConstants.IS_SESSION_VALID, session != null,
-                            BaseConstants.ERR_MSG, BaseConstants.RESET_PASSWORD_FAILURE);
                 String page = getTemplate(
-                        soyFileList,
+                        getResetPasswordSoyFileList(),
                         getResetPasswordSoyMethod(device, mode),
-                        getHomeCssRenamingMapFile(device, mode),
-                        soyMapData);
+                        getResetPasswordCssRenamingMapFile(device, mode),
+                        getResetPasswordSoyMapData(session != null));
                 response(resp, page);
             } else {
                 logger.warning("doGet: : reset password url invalid " +
@@ -216,16 +197,12 @@ public class BaseServlet extends HttpServlet {
                     UserEmail userEmail = UserManager.getUserEmail(
                             user.getUserEmailGrpKey(), user.getKey());
 
-                    String[] soyFileList = {getBaseSoyPath(), getUserSoyPath()};
-                    SoyMapData soyMapData = new SoyMapData(
-                            BaseConstants.USERNAME, userUname.getUsername(),
-                            BaseConstants.EMAIL, userEmail.getKeyName(),
-                            BaseConstants.DID_CONFIRM_EMAIL, user.didComfirmEmail());
                     String page = getTemplate(
-                            soyFileList,
+                            getUserSoyFileList(),
                             getUserSoyMethod(device, mode),
                             getUserCssRenamingMapFile(device, mode),
-                            soyMapData);
+                            getUserSoyMapData(user, userUname.getUsername(),
+                                    userEmail.getKeyName(), user.didConfirmEmail()));
                     response(resp, page);
                     return;
                 } catch (EntityNotFoundException e) {
@@ -593,11 +570,6 @@ public class BaseServlet extends HttpServlet {
         return "Example admin";
     }
 
-    public String getWorkContents(User user, int mode, int device) throws JSONException,
-            IOException {
-        return "";
-    }
-
     public void deleteAllUserContents(User user) {
 
     }
@@ -634,6 +606,10 @@ public class BaseServlet extends HttpServlet {
         return "closure/wit/home/soy/home.soy";
     }
 
+    public String[] getHomeSoyFileList() {
+        return new String[]{getBaseSoyPath(), getHomeSoyPath()};
+    }
+
     public String getHomeSoyMethod(int device, int mode) {
         if (device == 1) {
             if (mode == 1) {
@@ -654,8 +630,16 @@ public class BaseServlet extends HttpServlet {
         return null;
     }
 
+    public SoyMapData getHomeSoyMapData() throws JSONException, IOException {
+        return null;
+    }
+
     public String getWorkSoyPath() {
         return "closure/wit/work/soy/work.soy";
+    }
+
+    public String[] getWorkSoyFileList() {
+        return new String[]{getBaseSoyPath(), getWorkSoyPath()};
     }
 
     public String getWorkSoyMethod(int device, int mode) {
@@ -678,8 +662,17 @@ public class BaseServlet extends HttpServlet {
         return null;
     }
 
+    public SoyMapData getWorkSoyMapData(User user, int device, int mode) throws JSONException,
+            IOException {
+        return new SoyMapData(BaseConstants.CONTENT, "");
+    }
+
     public String getAboutSoyPath() {
         return "closure/wit/home/soy/about.soy";
+    }
+
+    public String[] getAboutSoyFileList() {
+        return new String[]{getBaseSoyPath(), getHomeSoyPath(), getAboutSoyPath()};
     }
 
     public String getAboutSoyMethod(int device, int mode) {
@@ -698,8 +691,20 @@ public class BaseServlet extends HttpServlet {
         }
     }
 
+    public String getAboutCssRenamingMapFile(int device, int mode) {
+        return getHomeCssRenamingMapFile(device, mode);
+    }
+
+    public SoyMapData getAboutSoyMapData() throws JSONException, IOException {
+        return null;
+    }
+
     public String getTermsSoyPath() {
         return "closure/wit/home/soy/terms.soy";
+    }
+
+    public String[] getTermsSoyFileList() {
+        return new String[]{getBaseSoyPath(), getHomeSoyPath(), getTermsSoyPath()};
     }
 
     public String getTermsSoyMethod(int device, int mode) {
@@ -718,8 +723,20 @@ public class BaseServlet extends HttpServlet {
         }
     }
 
+    public String getTermsCssRenamingMapFile(int device, int mode) {
+        return getHomeCssRenamingMapFile(device, mode);
+    }
+
+    public SoyMapData getTermsSoyMapData() throws JSONException, IOException {
+        return null;
+    }
+
     public String getFeedbackSoyPath() {
         return "closure/wit/home/soy/feedback.soy";
+    }
+
+    public String[] getFeedbackSoyFileList() {
+        return new String[]{getBaseSoyPath(), getHomeSoyPath(), getFeedbackSoyPath()};
     }
 
     public String getFeedbackSoyMethod(int device, int mode) {
@@ -738,8 +755,20 @@ public class BaseServlet extends HttpServlet {
         }
     }
 
+    public String getFeedbackCssRenamingMapFile(int device, int mode) {
+        return getHomeCssRenamingMapFile(device, mode);
+    }
+
+    public SoyMapData getFeedbackSoyMapData() throws JSONException, IOException {
+        return null;
+    }
+
     public String getConfirmEmailSoyPath() {
         return "closure/wit/home/soy/confirmemail.soy";
+    }
+
+    public String[] getConfirmEmailSoyFileList() {
+        return new String[]{getBaseSoyPath(), getHomeSoyPath(), getConfirmEmailSoyPath()};
     }
 
     public String getConfirmEmailSoyMethod(int device, int mode) {
@@ -758,8 +787,21 @@ public class BaseServlet extends HttpServlet {
         }
     }
 
+    public String getConfirmEmailCssRenamingMapFile(int device, int mode) {
+        return getHomeCssRenamingMapFile(device, mode);
+    }
+
+    public SoyMapData getConfirmEmailSoyMapData(boolean didEmailConfirm) throws JSONException,
+            IOException {
+        return new SoyMapData(BaseConstants.DID_CONFIRM_EMAIL, didEmailConfirm);
+    }
+
     public String getResetPasswordSoyPath() {
         return "closure/wit/home/soy/resetpassword.soy";
+    }
+
+    public String[] getResetPasswordSoyFileList() {
+        return new String[]{getBaseSoyPath(), getHomeSoyPath(), getResetPasswordSoyPath()};
     }
 
     public String getResetPasswordSoyMethod(int device, int mode) {
@@ -778,8 +820,23 @@ public class BaseServlet extends HttpServlet {
         }
     }
 
+    public String getResetPasswordCssRenamingMapFile(int device, int mode) {
+        return getHomeCssRenamingMapFile(device, mode);
+    }
+
+    public SoyMapData getResetPasswordSoyMapData(boolean isSessionValid) throws JSONException,
+            IOException {
+        return new SoyMapData(
+                BaseConstants.IS_SESSION_VALID, isSessionValid,
+                BaseConstants.ERR_MSG, BaseConstants.RESET_PASSWORD_FAILURE);
+    }
+
     public String getUserSoyPath() {
         return "closure/wit/user/soy/user.soy";
+    }
+
+    public String[] getUserSoyFileList() {
+        return new String[]{getBaseSoyPath(), getUserSoyPath()};
     }
 
     public String getUserSoyMethod(int device, int mode) {
@@ -800,6 +857,14 @@ public class BaseServlet extends HttpServlet {
 
     public String getUserCssRenamingMapFile(int device, int mode) {
         return null;
+    }
+
+    public SoyMapData getUserSoyMapData(User user, String username, String email,
+            boolean didConfirmEmail) throws JSONException, IOException {
+        return new SoyMapData(
+                BaseConstants.USERNAME, username,
+                BaseConstants.EMAIL, email,
+                BaseConstants.DID_CONFIRM_EMAIL, didConfirmEmail);
     }
 
     public static int getMode(HttpServletRequest req){

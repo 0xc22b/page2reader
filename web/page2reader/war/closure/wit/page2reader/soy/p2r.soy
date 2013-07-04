@@ -40,6 +40,7 @@
 /**
  * content of page2reader
  * @param pageUrlViews
+ * @param noDataView
  * @param cursorString
  */
 {template .content}
@@ -57,6 +58,7 @@
         <div class="{css purl-views}">
           {$pageUrlViews|noAutoescape}
         </div>
+        {$noDataView|noAutoescape}
         <footer>
           <button type="button" class="{css next-btn}" data-cursor-string="{$cursorString|noAutoescape}">Next</button>
         </footer>

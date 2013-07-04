@@ -5,12 +5,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.wit.base.BaseConstants;
 import com.wit.base.BaseServlet;
 import com.wit.base.Log;
@@ -18,6 +20,7 @@ import com.wit.base.NotLoggedInException;
 import com.wit.base.UserManager;
 import com.wit.base.model.User;
 import com.wit.page2reader.P2rManager;
+import com.wit.page2reader.model.PageUrl;
 
 @SuppressWarnings("serial")
 public class P2rServlet extends HttpServlet {
@@ -88,9 +91,14 @@ public class P2rServlet extends HttpServlet {
     }
 
     public void addPageUrl(HttpServletResponse resp, User user,
-            String content) throws IOException, JSONException {
+            String content) throws IOException, JSONException, EntityNotFoundException,
+            MessagingException {
         Log log = new Log();
-        P2rManager.addPageUrl(user, content, log);
+        PageUrl pageUrl = P2rManager.addPageUrl(user, content, log);
+        if (pageUrl != null) {
+            // Create a job to fetch the url, cleanse it, embed images, and send to reader
+            P2rManager.pageToReader(user, BServlet.FROM_EMAIL, BServlet.FROM_NAME, pageUrl, log);
+        }
         BaseServlet.response(resp, log.getJSONString());
     }
 

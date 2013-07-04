@@ -6,9 +6,6 @@ import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +14,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalMailServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.wit.base.BaseConstants;
+import com.wit.LogHelper;
 import com.wit.base.Log;
 import com.wit.base.UserManager;
 import com.wit.base.model.User;
@@ -26,56 +23,6 @@ import com.wit.page2reader.model.PageUrl;
 import com.wit.page2reader.model.ReaderEmail;
 
 public class P2rManagerTest {
-
-    public static boolean isLogInfoTypeValid(Log log, String type) {
-        try {
-            String json = log.getJSONString();
-            JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-                if (type.equals(jsonObject.getString(BaseConstants.TYPE))) {
-                    return jsonObject.getBoolean(BaseConstants.IS_VALID);
-                }
-            }
-        } catch (JSONException e) {
-
-        }
-        return false;
-    }
-
-    public static String getLogInfoTypeValue(Log log, String type) {
-        try {
-            String json = log.getJSONString();
-            JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-                if (type.equals(jsonObject.getString(BaseConstants.TYPE))) {
-                    return jsonObject.getString(BaseConstants.VALUE);
-                }
-            }
-        } catch (JSONException e) {
-
-        }
-        return null;
-    }
-
-    public static String getLogInfoTypeMsg(Log log, String type, String value) {
-        try {
-            String json = log.getJSONString();
-            JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-                if (type.equals(jsonObject.getString(BaseConstants.TYPE))) {
-                    if (value.equals(jsonObject.getString(BaseConstants.VALUE))) {
-                        return jsonObject.getString(BaseConstants.MSG);
-                    }
-                }
-            }
-        } catch (JSONException e) {
-
-        }
-        return null;
-    }
 
     // By setting the unapplied job percentage to 100, we are instructing
     // the local datastore to operate with the maximum amount of eventual
@@ -135,13 +82,13 @@ public class P2rManagerTest {
         ReaderEmail readerEmail = P2rManager.getReaderEmail(user);
         assertEquals("test@mail.com", readerEmail.getREmail());
         assertEquals(true, log.isValid());
-        assertEquals(true, isLogInfoTypeValid(log, P2rConstants.UPDATE_READER_EMAIL));
+        assertEquals(true, LogHelper.isLogInfoTypeValid(log, P2rConstants.UPDATE_READER_EMAIL));
 
         P2rManager.updateReaderEmail(user, "testagain@mail.com", log);
 
         readerEmail = P2rManager.getReaderEmail(user);
         assertEquals("testagain@mail.com", readerEmail.getREmail());
         assertEquals(true, log.isValid());
-        assertEquals(true, isLogInfoTypeValid(log, P2rConstants.UPDATE_READER_EMAIL));
+        assertEquals(true, LogHelper.isLogInfoTypeValid(log, P2rConstants.UPDATE_READER_EMAIL));
     }
 }
