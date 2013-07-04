@@ -434,6 +434,23 @@
     </move>
   </target>
 
+  <target name="appengine-update-wc-only"
+          depends="appengine-compile"
+          description="Uploads the application to App Engine.">
+
+    <move todir="tmp/closure">
+      <fileset dir="war/closure">
+        <exclude name="**/*.soy"/>
+      </fileset>
+    </move>
+
+    <appcfg action="update" war="war" />
+
+    <move todir="war/closure">
+      <fileset dir="tmp/closure"></fileset>
+    </move>
+  </target>
+
   <target name="appengine-update_indexes"
           depends="appengine-compile"
           description="Uploads just the datastore index configuration to App Engine.">
