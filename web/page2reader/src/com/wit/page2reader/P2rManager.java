@@ -7,8 +7,16 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Properties;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -213,30 +221,44 @@ public class P2rManager {
         log.addLogInfo(P2rConstants.UPDATE_READER_EMAIL, false, readerEmail.getREmail(), null);
     }
 
-    public static void pageToReader(User user, String fromEmail, String fromName,
-            PageUrl pageUrl, Log log) throws UnsupportedEncodingException, EntityNotFoundException,
+    public static void pageToReader(String fromEmail, String fromName, User user, PageUrl pageUrl,
+            Log log) throws UnsupportedEncodingException, EntityNotFoundException,
             MessagingException {
 
-        // TODO: Background
-        // As it's in background, no USER log! so if errors occurred, put them in SERVER log!
+        ReaderEmail readerEmail = P2rManager.getReaderEmail(user);
+        if (readerEmail != null) {
 
-        // 1. Fetch URL
-        String urlContent = fetchPageUrl(pageUrl);
-        if (urlContent != null && !urlContent.isEmpty()) {
-            // 2. Cleanse
-            
+            UserUname userUname = UserManager.getUserUname(user.getUserUnameGrpKey(),
+                    user.getKey());
 
-            // 3. Embeded images
-            
+            String toEmail = readerEmail.getREmail();
+            String toName = userUname.getUsername();
 
-            // 4. Send to reader email
-            sendEmailCleansedPage(user, fromEmail, fromName, urlContent);
+            // TODO: Background
+            // As it's in background, no USER log! so if errors occurred, put them in SERVER log!
 
-            // 5. Update to DB
-            editPageUrl(pageUrl, "Done!", "This page was sent to your reader.", urlContent);
+            // 1. Fetch URL
+            String urlContent = fetchPageUrl(pageUrl);
+            if (urlContent != null && !urlContent.isEmpty()) {
+                // 2. Cleanse
+
+
+                // 3. Embeded images
+
+
+                // 4. Send to reader email
+                sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
+                        "A page from Page2Reader",urlContent);
+
+                // 5. Update to DB
+                editPageUrl(pageUrl, "Done!", "This page was sent to your reader.", urlContent);
+            }
+
+            // Log background task created successfully
+            log.addLogInfo(P2rConstants.SEND_TO_READER, true, null, null);
+        } else {
+            log.addLogInfo(P2rConstants.SEND_TO_READER, false, null, null);
         }
-
-        // TODO: USER log that background task created successfully?
     }
 
     private static String fetchPageUrl(PageUrl pageUrl) {
@@ -264,21 +286,37 @@ public class P2rManager {
         }
         return null;
     }
-
-    private static void sendEmailCleansedPage(User user, String fromEmail, String fromName,
-            String cleansedPage) throws EntityNotFoundException, UnsupportedEncodingException,
+    
+    private static void sendEmailCleansedPage(String fromEmail, String fromName, String toEmail,
+            String toName, String subject, String msgBody) throws UnsupportedEncodingException,
             MessagingException {
 
-        ReaderEmail readerEmail = getReaderEmail(user);
-        UserUname userUname = UserManager.getUserUname(user.getUserUnameGrpKey(),
-                user.getKey());
+        Properties props = new Properties();
+        javax.mail.Session mailSession = javax.mail.Session.getDefaultInstance(
+                props, null);
 
-        String toEmail = readerEmail.getREmail();
-        String toName = userUname.getUsername();
-        String subject = "convert";
-        String msgBody = cleansedPage;
+        MimeMessage msg = new MimeMessage(mailSession);
+        msg.setFrom(new InternetAddress(fromEmail, fromName));
+        msg.addRecipient(Message.RecipientType.TO,
+                new InternetAddress(toEmail, toName));
+        msg.setSubject("convert");
+        
+        Multipart mp = new MimeMultipart();
+        
+        MimeBodyPart htmlPart = new MimeBodyPart();
+        String sentBy = "<html><head><title>Page2Reader</title></head><body><p>"
+                + "Sent by Page2Reader</p></body></html>";
+        htmlPart.setContent(sentBy, "text/html");
+        mp.addBodyPart(htmlPart);
 
-        UserManager.sendEmail(fromEmail, fromName, toEmail, toName, subject, msgBody);
+        MimeBodyPart attachment = new MimeBodyPart();
+        attachment.setFileName(subject + ".html");
+        attachment.setContent(msgBody, "text/html");
+        mp.addBodyPart(attachment);
+
+        msg.setContent(mp);
+
+        Transport.send(msg);
     }
 
     private static void editPageUrl(PageUrl pageUrl, String title, String text,

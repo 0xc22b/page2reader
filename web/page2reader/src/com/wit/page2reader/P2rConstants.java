@@ -12,13 +12,13 @@ public class P2rConstants {
     public static final String UPDATE_READER_EMAIL = "updateReaderEmail";
     public static final String ADD_PAGE_URL = "addPageUrl";
     public static final String DELETE_PAGE_URL = "deletePageUrl";
+    public static final String SEND_TO_READER = "sendToReader";
 
     public static final String PAGE_URL_VIEWS = "pageUrlViews";
     public static final String NO_DATA_VIEW = "noDataView";
     public static final String CURSOR_STRING = "cursorString";
     public static final String TITLE = "title";
     public static final String TEXT = "text";
-
     public static final String READER_EMAIL = "readerEmail";
     
     public static final String PROCESSING_TITLE = "This page is being processing.";

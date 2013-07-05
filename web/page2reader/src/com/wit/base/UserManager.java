@@ -590,7 +590,7 @@ public class UserManager {
         return true;
     }
 
-    public static void sendEmail(String fromEmail, String fromName,
+    private static void sendEmail(String fromEmail, String fromName,
             String toEmail, String toName, String subject, String msgBody)
                     throws UnsupportedEncodingException, MessagingException {
 
