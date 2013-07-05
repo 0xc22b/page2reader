@@ -5,23 +5,15 @@ xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 
-  <servlet>
-    <servlet-name>P2r</servlet-name>
-    <servlet-class>com.wit.P2rServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>P2r</servlet-name>
-    <url-pattern>/p2r</url-pattern>
-  </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>Base</servlet-name>
-    <servlet-class>com.wit.BServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Base</servlet-name>
-    <url-pattern>/*</url-pattern>
-  </servlet-mapping>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/errors/notfound.jsp</location>
+  </error-page>
+
+  <error-page>
+    <error-code>500</error-code>
+    <location>/errors/servererror.jsp</location>
+  </error-page>
 
   <servlet>
     <servlet-name>MailHandler</servlet-name>
@@ -39,7 +31,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
       <role-name>admin</role-name>
     </auth-constraint>
   </security-constraint>
-  
+
   <servlet>
     <servlet-name>SystemServiceServlet</servlet-name>
     <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
@@ -53,13 +45,39 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
     <url-pattern>/_ah/spi/*</url-pattern>
   </servlet-mapping>
 
-  <error-page>
-    <error-code>404</error-code>
-    <location>/errors/notfound.jsp</location>
-  </error-page>
+  <servlet>
+    <servlet-name>P2rWorker</servlet-name>
+    <servlet-class>com.wit.page2reader.P2rWorkerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>P2rWorker</servlet-name>
+    <url-pattern>/worker/p2r</url-pattern>
+  </servlet-mapping>
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/worker/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
 
-  <error-page>
-    <error-code>500</error-code>
-    <location>/errors/servererror.jsp</location>
-  </error-page>
+  <servlet>
+    <servlet-name>P2r</servlet-name>
+    <servlet-class>com.wit.P2rServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>P2r</servlet-name>
+    <url-pattern>/p2r</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Base</servlet-name>
+    <servlet-class>com.wit.BServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Base</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
 </web-app>

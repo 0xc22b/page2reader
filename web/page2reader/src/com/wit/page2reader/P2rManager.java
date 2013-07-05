@@ -2,8 +2,6 @@ package com.wit.page2reader;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
@@ -33,10 +31,12 @@ import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.urlfetch.HTTPMethod;
 import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
-import com.google.appengine.api.urlfetch.ResponseTooLargeException;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import com.wit.base.BaseConstants;
 import com.wit.base.Log;
@@ -128,7 +128,8 @@ public class P2rManager {
             // you could use another backoff algorithm here rather than 100ms each time.
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
-        log.addLogInfo(P2rConstants.ADD_PAGE_URL, false, null, null);
+        log.addLogInfo(P2rConstants.ADD_PAGE_URL, false, pageUrl.getJSONObject().toString(),
+                BaseConstants.CONCURRENT_MODIFICATION_EXCEPTION);
         return null;
     }
 
@@ -145,7 +146,7 @@ public class P2rManager {
                     // if entity group was modified by other thread
                     txn.commit();
 
-                    log.addLogInfo(P2rConstants.DELETE_PAGE_URL, true, null, null);
+                    log.addLogInfo(P2rConstants.DELETE_PAGE_URL, true, keyString, null);
                     return;
                 } finally {
                     if (txn.isActive()) {
@@ -158,7 +159,21 @@ public class P2rManager {
             // you could use another backoff algorithm here rather than 100ms each time.
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
-        log.addLogInfo(P2rConstants.DELETE_PAGE_URL, false, null, null);
+        log.addLogInfo(P2rConstants.DELETE_PAGE_URL, false, keyString,
+                BaseConstants.CONCURRENT_MODIFICATION_EXCEPTION);
+    }
+
+    private static PageUrl getPageUrl(String keyString) {
+
+        Key pageUrlKey = KeyFactory.stringToKey(keyString);
+
+        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+        try {
+            Entity entity = ds.get(pageUrlKey);
+            return new PageUrl(entity);
+        } catch (EntityNotFoundException e) {
+            return null;
+        }
     }
 
     public static ReaderEmail getReaderEmail(User user) {
@@ -218,12 +233,12 @@ public class P2rManager {
             // you could use another backoff algorithm here rather than 100ms each time.
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
-        log.addLogInfo(P2rConstants.UPDATE_READER_EMAIL, false, readerEmail.getREmail(), null);
+        log.addLogInfo(P2rConstants.UPDATE_READER_EMAIL, false, readerEmail.getREmail(),
+                BaseConstants.CONCURRENT_MODIFICATION_EXCEPTION);
     }
 
-    public static void pageToReader(String fromEmail, String fromName, User user, PageUrl pageUrl,
-            Log log) throws UnsupportedEncodingException, EntityNotFoundException,
-            MessagingException {
+    public static void queuePageToReader(String fromEmail, String fromName, User user,
+            PageUrl pageUrl, Log log) throws EntityNotFoundException {
 
         ReaderEmail readerEmail = P2rManager.getReaderEmail(user);
         if (readerEmail != null) {
@@ -234,25 +249,13 @@ public class P2rManager {
             String toEmail = readerEmail.getREmail();
             String toName = userUname.getUsername();
 
-            // TODO: Background
-            // As it's in background, no USER log! so if errors occurred, put them in SERVER log!
-
-            // 1. Fetch URL
-            String urlContent = fetchPageUrl(pageUrl);
-            if (urlContent != null && !urlContent.isEmpty()) {
-                // 2. Cleanse
-
-
-                // 3. Embeded images
-
-
-                // 4. Send to reader email
-                sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
-                        "A page from Page2Reader",urlContent);
-
-                // 5. Update to DB
-                editPageUrl(pageUrl, "Done!", "This page was sent to your reader.", urlContent);
-            }
+            Queue queue = QueueFactory.getDefaultQueue();
+            queue.add(TaskOptions.Builder.withUrl("/worker/p2r")
+                    .param(P2rConstants.FROM_EMAIL, fromEmail)
+                    .param(P2rConstants.FROM_NAME, fromName)
+                    .param(P2rConstants.TO_EMAIL, toEmail)
+                    .param(P2rConstants.TO_NAME, toName)
+                    .param(P2rConstants.PAGE_URL_KEY_STRING, pageUrl.getKeyString()));
 
             // Log background task created successfully
             log.addLogInfo(P2rConstants.SEND_TO_READER, true, null, null);
@@ -261,30 +264,47 @@ public class P2rManager {
         }
     }
 
-    private static String fetchPageUrl(PageUrl pageUrl) {
+    public static void pageToReader(String fromEmail, String fromName, String toEmail,
+            String toName, String pageUrlKeyString) throws MessagingException, IOException {
+
+        // As it's in background, no USER log! so if errors occurred, put them in SERVER log!
+
+        PageUrl pageUrl = getPageUrl(pageUrlKeyString);
+        if (pageUrl == null) {
+            // Users might already delete it, do nothing.
+            return;
+        }
+
+        // 1. Fetch URL
+        String urlContent = fetchPageUrl(pageUrl);
+        if (urlContent != null && !urlContent.isEmpty()) {
+            // 2. Cleanse
+
+
+            // 3. Embeded images
+
+
+            // 4. Send to reader email
+            sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
+                    "A page from Page2Reader",urlContent);
+
+            // 5. Update to DB
+            editPageUrl(pageUrl, "Done!", "This page was sent to your reader.", urlContent);
+        }
+    }
+
+    private static String fetchPageUrl(PageUrl pageUrl) throws IOException {
         HTTPResponse res = null;
         com.google.appengine.api.urlfetch.FetchOptions fetchOptions =
                 com.google.appengine.api.urlfetch.FetchOptions.Builder
                         .allowTruncate()
                         .followRedirects()
                         .setDeadline(60.0);
-        try {
-            URL url = new URL(pageUrl.getPUrl());
-            HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
-            res = URLFetchServiceFactory.getURLFetchService().fetch(req);
-            return new String(res.getContent());
-        } catch (MalformedURLException e) {
 
-        } catch (ResponseTooLargeException e) {
-
-        } catch (SocketTimeoutException e) {
-
-        } catch (IOException e) {
-
-        } catch (Exception e) {
-
-        }
-        return null;
+        URL url = new URL(pageUrl.getPUrl());
+        HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
+        res = URLFetchServiceFactory.getURLFetchService().fetch(req);
+        return new String(res.getContent());
     }
     
     private static void sendEmailCleansedPage(String fromEmail, String fromName, String toEmail,
@@ -359,6 +379,7 @@ public class P2rManager {
             // you could use another backoff algorithm here rather than 100ms each time.
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
+        throw new ConcurrentModificationException();
     }
 
     protected static Key getP2rGrpKey(User user) {

@@ -20,7 +20,13 @@ public class P2rConstants {
     public static final String TITLE = "title";
     public static final String TEXT = "text";
     public static final String READER_EMAIL = "readerEmail";
-    
+
+    public static final String FROM_EMAIL = "fromEmail";
+    public static final String FROM_NAME = "fromName";
+    public static final String TO_EMAIL = "toEmail";
+    public static final String TO_NAME = "toName";
+    public static final String PAGE_URL_KEY_STRING = "pageUrlKeyString";
+
     public static final String PROCESSING_TITLE = "This page is being processing.";
     public static final String PROCESSING_TEXT = "The page will be sent to your reader instantly when completed.";
     public static final String PROCESSING_CLEANSED_PAGE = PROCESSING_TITLE + PROCESSING_TEXT;

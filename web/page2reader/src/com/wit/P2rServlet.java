@@ -96,8 +96,8 @@ public class P2rServlet extends HttpServlet {
         Log log = new Log();
         PageUrl pageUrl = P2rManager.addPageUrl(user, content, log);
         if (pageUrl != null) {
-            // Create a job to fetch the url, cleanse it, embed images, and send to reader
-            P2rManager.pageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
+            // Create a task to fetch the url, cleanse it, embed images, and send to reader
+            P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
                     log);
         }
         BaseServlet.response(resp, log.getJSONString());
