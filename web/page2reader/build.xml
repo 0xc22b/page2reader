@@ -416,6 +416,38 @@
     </move>
   </target>
 
+  <target name="appengine-update-only"
+          description="Uploads the application to App Engine.">
+
+    <input message="Enter email" addproperty="gae-email"/>
+    <input message="Enter password :- " addproperty="gae-password">
+        <handler type="secure"/>
+    </input>
+
+    <!-- Call dependencies here rather than with 'depends' attribute to get input first -->
+    <antcall target="appengine-compile" />
+
+    <move todir="tmp/closure">
+      <fileset dir="war/closure">
+        <exclude name="**/*.soy"/>
+      </fileset>
+    </move>
+
+    <java classname="com.google.appengine.tools.admin.AppCfg"
+          inputstring="${gae-password}"
+          classpath="${appengine-sdk.dir}/lib/appengine-tools-api.jar"
+          fork="true" failonerror="true">
+        <arg value="--email=${gae-email}" />
+        <arg value="--passin" />
+        <arg value="update" />
+        <arg value="war" />
+    </java>
+
+    <move todir="war/closure">
+      <fileset dir="tmp/closure"></fileset>
+    </move>
+  </target>
+
   <!-- The authentication credentials must be cached. -->
   <target name="appengine-update-wc"
           depends="appengine-compile, home-compile, user-compile, reset-password-compile, p2r-compile"
