@@ -17,3 +17,6 @@
 [submodule "web/page2reader/snacktory"]
 	path = web/page2reader/snacktory
 	url = https://github.com/witterk/snacktory.git
+[submodule "web/page2reader/src/com/wit/base"]
+	path = web/page2reader/src/com/wit/base
+	url = https://github.com/witterk/base.git
