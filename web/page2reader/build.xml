@@ -200,7 +200,7 @@
     </delete>
   </target>
 
-  <target name="write-deps">
+  <target name="write-deps" description="write dependencies for debugging in the browsers">
       <exec executable="python" failonerror="true" logError="true">
         <arg value="${closure-depswriter.py}" />
         <arg line='--root_with_prefix="${closure-templates.dir}/ ../../../closure-templates"' />
@@ -213,20 +213,20 @@
   <!-- all_tests.html: setBasePath of testRunner to empty string. -->
   <!-- all_tests.py: in add_test_files, use absolute paths. -->
   <!-- all_tests.py: in main, print to all_tests_.js instead.  -->
-  <target name="write-all-tests">
+  <target name="write-all-tests" description="write all javascript tests">
       <exec executable="python" failonerror="true" logError="true">
         <arg value="${wit.dir}/all_tests.py" />
         <arg line='${wit.dir}/' />
       </exec>
   </target>
 
-  <target name="base-templates">
+  <target name="base-templates" description="compile soy files for base page">
     <closure-templates-path
         inputPath="base/soy"
         outputPath="base/templates"/>
   </target>
 
-  <target name="home-stylesheets">
+  <target name="home-stylesheets" description="compile gss files for home page">
     <closure-stylesheets
       inputFiles="war/closure/wit/base/gss/base.gss war/closure/wit/home/gss/home.gss"
       outputFile="home-compiled.css"
@@ -237,20 +237,20 @@
       outputRenamingMapPropsDebug="home-debug.properties" />
   </target>
 
-  <target name="home-templates"
+  <target name="home-templates" description="compile soy files for home page"
           depends="base-templates">
     <closure-templates-path
         inputPath="home/soy"
         outputPath="home/templates"/>
   </target>
 
-  <target name="home-templates-only">
+  <target name="home-templates-only" description="only compile gss files for home page">
     <closure-templates-path
         inputPath="home/soy"
         outputPath="home/templates"/>
   </target>
 
-  <target name="home-compile"
+  <target name="home-compile" description="compile js files for home page"
           depends="home-stylesheets, home-templates">
     <closure-compile
         namespace="wit.home.Home"
@@ -258,14 +258,14 @@
         outputFile="home-compiled.js" />
   </target>
 
-  <target name="home-compile-only">
+  <target name="home-compile-only" description="only compile js files for home page">
     <closure-compile
         namespace="wit.home.Home"
         cssRenamingMap="home/cssrenamingmap/home-compiled.js"
         outputFile="home-compiled.js" />
   </target>
 
-  <target name="user-stylesheets">
+  <target name="user-stylesheets" description="compile gss files for user page">
     <closure-stylesheets
       inputFiles="war/closure/wit/base/gss/base.gss war/closure/wit/user/gss/user.gss"
       outputFile="user-compiled.css"
@@ -276,20 +276,20 @@
       outputRenamingMapPropsDebug="user-debug.properties" />
   </target>
 
-  <target name="user-templates"
+  <target name="user-templates" description="compile soy files for user page"
           depends="base-templates">
     <closure-templates-path
         inputPath="user/soy"
         outputPath="user/templates"/>
   </target>
 
-  <target name="user-templates-only">
+  <target name="user-templates-only" description="only compile soy files for user page">
     <closure-templates-path
         inputPath="user/soy"
         outputPath="user/templates"/>
   </target>
 
-  <target name="user-compile"
+  <target name="user-compile" description="compile js files for user page"
           depends="user-stylesheets, user-templates">
     <closure-compile
         namespace="wit.user.User"
@@ -297,28 +297,28 @@
         outputFile="user-compiled.js" />
   </target>
 
-  <target name="user-compile-only">
+  <target name="user-compile-only" description="only compile js files for user page">
     <closure-compile
         namespace="wit.user.User"
         cssRenamingMap="user/cssrenamingmap/user-compiled.js"
         outputFile="user-compiled.js" />
   </target>
 
-  <target name="reset-password-compile">
+  <target name="reset-password-compile" description="compile js files for reset password page">
     <closure-compile
         namespace="wit.home.ResetPassword"
         cssRenamingMap="home/cssrenamingmap/home-compiled.js"
         outputFile="resetpassword-compiled.js" />
   </target>
 
-  <target name="reset-password-compile-only">
+  <target name="reset-password-compile-only" description="only compile js files for reset password page">
     <closure-compile
         namespace="wit.home.ResetPassword"
         cssRenamingMap="home/cssrenamingmap/home-compiled.js"
         outputFile="resetpassword-compiled.js" />
   </target>
 
-  <target name="p2r-stylesheets">
+  <target name="p2r-stylesheets" description="compile gss files for p2r page">
     <closure-stylesheets
       inputFiles="war/closure/wit/base/gss/base.gss war/closure/wit/page2reader/gss/p2r.gss"
       outputFile="p2r-compiled.css"
@@ -329,27 +329,27 @@
       outputRenamingMapPropsDebug="p2r-debug.properties" />
   </target>
 
-  <target name="p2r-templates"
+  <target name="p2r-templates" description="compile soy files for p2r page"
           depends="base-templates">
     <closure-templates-path
         inputPath="page2reader/soy"
         outputPath="page2reader/templates"/>
   </target>
 
-  <target name="p2r-templates-only">
+  <target name="p2r-templates-only" description="only compile soy files for p2r page">
     <closure-templates-path
         inputPath="page2reader/soy"
         outputPath="page2reader/templates"/>
   </target>
 
   <!-- ant -DinputFiles=war/closure/wit/page2reader/soy/work.soy p2r-templates-one -->
-  <target name="p2r-templates-one">
+  <target name="p2r-templates-one" description="only compile soy one file for p2r page">
     <closure-templates
         inputFiles="${inputFiles}"
         outputPath="page2reader/templates"/>
   </target>
 
-  <target name="p2r-compile"
+  <target name="p2r-compile" description="compile js files for p2r page"
           depends="p2r-stylesheets, p2r-templates">
     <closure-compile
         namespace="wit.page2reader.P2r"
@@ -357,7 +357,7 @@
         outputFile="p2r-compiled.js" />
   </target>
 
-  <target name="p2r-compile-only">
+  <target name="p2r-compile-only" description="only compile js files for p2r page">
     <closure-compile
         namespace="wit.page2reader.P2r"
         cssRenamingMap="page2reader/cssrenamingmap/p2r-compiled.js"
@@ -489,7 +489,7 @@
     <appcfg action="update_indexes" war="war" />
   </target>
 
-  <target name="moveback">
+  <target name="moveback" description="move back files from tmp to war/closure">
     <move todir="war/closure">
       <fileset dir="tmp/closure"></fileset>
     </move>
