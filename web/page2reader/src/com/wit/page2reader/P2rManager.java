@@ -3,10 +3,15 @@ package com.wit.page2reader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -15,6 +20,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -34,6 +40,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.urlfetch.HTTPHeader;
 import com.google.appengine.api.urlfetch.HTTPMethod;
 import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
@@ -47,6 +54,9 @@ import com.wit.base.model.UserUname;
 import com.wit.page2reader.model.P2rGrp;
 import com.wit.page2reader.model.PageUrl;
 import com.wit.page2reader.model.ReaderEmail;
+
+import de.jetwick.snacktory.ArticleTextExtractor;
+import de.jetwick.snacktory.JResult;
 
 public class P2rManager {
 
@@ -265,7 +275,7 @@ public class P2rManager {
     }
 
     public static void pageToReader(String fromEmail, String fromName, String toEmail,
-            String toName, String pageUrlKeyString) throws MessagingException, IOException {
+            String toName, String pageUrlKeyString) throws Exception {
 
         // As it's in background, no USER log! so if errors occurred, put them in SERVER log!
 
@@ -276,24 +286,32 @@ public class P2rManager {
         }
 
         // 1. Fetch URL
-        String urlContent = fetchPageUrl(pageUrl);
+        String urlContent = fetchPageUrl(pageUrl.getPUrl());
         if (urlContent != null && !urlContent.isEmpty()) {
             // 2. Cleanse
+            JResult result = new JResult();
+            result.setUrl(pageUrl.getPUrl());
 
+            ArticleTextExtractor extractor = new ArticleTextExtractor();
+            extractor.extractContent(result, urlContent);
+
+            // TODO: Solve relative links
 
             // 3. Embeded images
 
+            String text = lessText(result.getText(), 350);
+            String cleansedPage = htmlTemplate(result.getTitle(), result.getCleansedHtml());
 
             // 4. Send to reader email
             sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
-                    "A page from Page2Reader",urlContent);
+                    result.getTitle(), cleansedPage);
 
             // 5. Update to DB
-            editPageUrl(pageUrl, "Done!", "This page was sent to your reader.", urlContent);
+            editPageUrl(pageUrl, result.getTitle(), text, cleansedPage);
         }
     }
 
-    private static String fetchPageUrl(PageUrl pageUrl) throws IOException {
+    private static String fetchPageUrl(String pUrl) throws IOException {
         HTTPResponse res = null;
         com.google.appengine.api.urlfetch.FetchOptions fetchOptions =
                 com.google.appengine.api.urlfetch.FetchOptions.Builder
@@ -301,12 +319,32 @@ public class P2rManager {
                         .followRedirects()
                         .setDeadline(60.0);
 
-        URL url = new URL(pageUrl.getPUrl());
+        URL url = new URL(pUrl);
         HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
         res = URLFetchServiceFactory.getURLFetchService().fetch(req);
-        return new String(res.getContent());
+
+        // Try to get charset, default to utf-8
+        // TODO: Better way to get charset from Content-Type in response header?
+        String charset = "utf-8";
+        List<HTTPHeader> httpHeaders = res.getHeadersUncombined();
+        for (HTTPHeader httpHeader : httpHeaders) {
+            if (httpHeader.getName().equals("Content-Type")) {
+                String[] values = httpHeader.getValue().split(";");
+                for (String value : values) {
+                    if (value.toLowerCase().contains("charset")) {
+                        values = value.toLowerCase().split("=");
+                        if (values[0].trim().equals("charset")) {
+                            charset = values[1].trim();
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return new String(res.getContent(), Charset.forName(charset));
     }
-    
+
     private static void sendEmailCleansedPage(String fromEmail, String fromName, String toEmail,
             String toName, String subject, String msgBody) throws UnsupportedEncodingException,
             MessagingException {
@@ -320,9 +358,9 @@ public class P2rManager {
         msg.addRecipient(Message.RecipientType.TO,
                 new InternetAddress(toEmail, toName));
         msg.setSubject("convert");
-        
+
         Multipart mp = new MimeMultipart();
-        
+
         MimeBodyPart htmlPart = new MimeBodyPart();
         String sentBy = "<html><head><title>Page2Reader</title></head><body><p>"
                 + "Sent by Page2Reader</p></body></html>";
@@ -331,12 +369,56 @@ public class P2rManager {
 
         MimeBodyPart attachment = new MimeBodyPart();
         attachment.setFileName(subject + ".html");
-        attachment.setContent(msgBody, "text/html");
+
+        // Kindle supports only ANSI or ASCII
+        // https://kdp.amazon.com/self-publishing/help?topicId=A3G4LY8RGZ9SP6
+        String asciiString = escapeForAscii(msgBody);
+        DataSource ds = new ByteArrayDataSource(asciiString.getBytes("us-ascii"),
+                "application/octet-stream");
+        attachment.setDataHandler(new DataHandler(ds));
+
         mp.addBodyPart(attachment);
 
         msg.setContent(mp);
 
         Transport.send(msg);
+    }
+
+    private static String escapeForAscii(String originalString) {
+        // Escape some characters for encoding in Ascii
+        // http://numberformat.wordpress.com/2013/02/09/convert-utf-8-unicode-to-ascii-latin-1/
+        // https://github.com/numberformat/20130209/
+
+        String str = Normalizer.normalize(originalString, Normalizer.Form.NFKD);
+ 
+        str = str.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        str = str.replaceAll("[\u00AB\u2034\u2037\u00BB\u02BA\u030B\u030E\u201C\u201D\u201E"
+                + "\u201F\u2033\u2036\u3003\u301D\u301E]", "\"");
+        str = str.replaceAll("[\u02CB\u0300\u2035]", "`");
+        str = str.replaceAll("[\u02C4\u02C6\u0302\u2038\u2303]", "^");
+        str = str.replaceAll("[\u02CD\u0331\u0332\u2017]", "_");
+        str = str.replaceAll("[\u00AD\u2010\u2011\u2012\u2013\u2014\u2212\u2015]", "-");
+        str = str.replaceAll("[\u201A]", ",");
+        str = str.replaceAll("[\u0589\u05C3\u2236]", ":");
+        str = str.replaceAll("[\u01C3\u2762]", "!");
+        str = str.replaceAll("[\u203D]", "?");
+        str = str.replaceAll("[\u00B4\u02B9\u02BC\u02C8\u0301\u200B\u2018\u2019\u201B\u2032]", "'");
+        str = str.replaceAll("[\u27E6]", "[");
+        str = str.replaceAll("[\u301B]", "]");
+        str = str.replaceAll("[\u2983]", "{");
+        str = str.replaceAll("[\u2984]", "}");
+        str = str.replaceAll("[\u066D\u204E\u2217\u2731]", "*");
+        str = str.replaceAll("[\u00F7\u0338\u2044\u2060\u2215]", "/");
+        str = str.replaceAll("[\u20E5\u2216]", "\\");
+        str = str.replaceAll("[\u266F]", "#");
+        str = str.replaceAll("[\u066A\u2052]", "%");
+        str = str.replaceAll("[\u2039\u2329\u27E8\u3008]", "<");
+        str = str.replaceAll("[\u203A\u232A\u27E9\u3009]", ">");
+        str = str.replaceAll("[\u01C0\u05C0\u2223\u2758]", "|");
+        str = str.replaceAll("[\u02DC\u0303\u2053\u223C\u301C]", "~");
+
+        return str;
     }
 
     private static void editPageUrl(PageUrl pageUrl, String title, String text,
@@ -380,6 +462,28 @@ public class P2rManager {
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
         throw new ConcurrentModificationException();
+    }
+
+    private static String htmlTemplate(String title, String text) {
+        String template = "<!DOCTYPE html>"
+                + "<head>"
+                + "<meta charset='utf-8'>"
+                + "<title>" + title + "</title>"
+                + "<style></style>"
+                + "</head>"
+                + "<body>" + text + "</body>"
+                + "</html>";
+        return template;
+    }
+
+    private static String lessText(String text, int length) {
+        if (text == null)
+            return "";
+
+        if (length >= 0 && text.length() > length)
+            return text.substring(0, length);
+
+        return text;
     }
 
     protected static Key getP2rGrpKey(User user) {

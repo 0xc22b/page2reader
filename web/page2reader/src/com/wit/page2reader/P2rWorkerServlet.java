@@ -3,7 +3,6 @@ package com.wit.page2reader;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +39,7 @@ public class P2rWorkerServlet extends HttpServlet {
         } else {
             try {
                 P2rManager.pageToReader(fromEmail, fromName, toEmail, toName, pageUrlKeyString);
-            } catch (MessagingException e) {
+            } catch (Exception e) {
                 BaseServlet.writeExceptionToLogger(logger, e);
             }
         }
