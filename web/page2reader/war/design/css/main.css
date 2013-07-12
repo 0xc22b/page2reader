@@ -1,0 +1,886 @@
+/* ==========================================================================
+   HTML5 Boilerplate styles - h5bp.com (generated via initializr.com)
+   ========================================================================== */
+
+html,
+button,
+input,
+select,
+textarea {
+  color: #222;
+  /*color: rgb(68, 68, 68);*/
+}
+
+body {
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+::-moz-selection {
+  background: #b3d4fc;
+  text-shadow: none;
+}
+
+::selection {
+  background: #b3d4fc;
+  text-shadow: none;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+img {
+  vertical-align: middle;
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.chromeframe {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+
+/* ===== Initializr Styles ==================================================
+   Author: Jonathan Verrecchia - verekia.com/initializr/responsive-template
+   ========================================================================== */
+html {
+  overflow-y: scroll;
+}
+
+body {
+  font: 16px/26px Helvetica, Helvetica Neue, Arial;
+}
+
+.wrapper {
+  width: 90%;
+  margin: 0 5%;
+}
+
+/* ===================
+   ALL: Theme
+   =================== */
+
+body {
+  /*background: rgb(238, 238, 238);*/
+}
+
+.header-container {
+  /*background: rgb(108, 198, 85);*/
+  /*background: rgb(136, 136, 136);*/
+  /*background: rgb(68, 68, 68);*/
+  background: rgb(176, 176, 176);
+}
+
+.footer-container {
+  /*background: rgb(176, 176, 176);*/
+  /*background: rgb(238, 238, 238);*/
+  /*background: rgb(238, 238, 238);*/
+  background: rgb(229, 229, 229);
+}
+
+/* ==============
+   MOBILE: Header
+   ============== */
+
+.header-container header {
+  padding: 20px 0;
+}
+
+#backBtn {
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 5px 15px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.title {
+  color: white;
+  margin: 15px 0;
+}
+
+.title h1 {
+  margin: 0;
+
+}
+
+.title h1 span {
+  display: inline-block;
+  margin: 10px 0;
+}
+
+.title p {
+  margin: 0;
+}
+
+#showLogInBtn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgb(108, 198, 85);
+  padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+#logInView {
+  padding: 10px 0;
+}
+
+#logInErrLb {
+  display: block;
+  color: red;
+}
+
+#logInUsernameTB {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#logInPasswordTB {
+  display: block;
+  width: 100%;
+  margin: 15px 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#logInBtn {
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 15px 20px;
+  font-weight: bold;
+}
+
+#forgotPasswordBtn {
+  border: 0;
+  background: transparent;
+  padding: 15px 20px;
+  font-weight: bold;
+}
+
+#forgotPasswordView {
+  padding: 10px 0;
+}
+
+#forgotUsernameErrLb {
+  display: block;
+  color: red;
+}
+
+#forgotUsernameTB {
+  display: block;
+  width: 100%;
+  margin: 0px 0 15px 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#forgotOkBtn {
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 15px 20px;
+  font-weight: bold;
+}
+
+/* ==============
+   MOBILE: Main
+   ============== */
+
+.main {
+  padding: 30px 0;
+}
+
+#showSignUpBtn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgb(108, 198, 85);
+  padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+#signUpView {
+  padding: 10px 0;
+}
+
+#signUpUsernameErrLb {
+  display: block;
+  color: red;
+}
+
+#signUpUsernameTB {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#signUpPasswordErrLb {
+  display: block;
+  color: red;
+}
+
+#signUpPasswordTB {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#signUpRepeatPasswordErrLb {
+  display: block;
+  color: red;
+}
+
+#signUpRepeatPasswordTB {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#signUpEmailErrLb {
+  display: block;
+  color: red;
+}
+
+#signUpEmailTB {
+  display: block;
+  width: 100%;
+  margin: 0 0 15px 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#signUpBtn {
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 15px 20px;
+  font-weight: bold;
+}
+
+.settings {
+  padding-bottom: 10px;
+}
+
+.settings .left-blank {
+  height: 0;
+}
+
+.settings .name {
+  font-size: 14px;
+  margin: 0 5px 0 0;
+}
+
+.settings .value {
+  font-size: 27px;
+  margin: 0 0 5px;
+}
+
+.settings .btn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgb(108, 198, 85);
+  padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+.settings .view {
+  padding: 10px 0;
+}
+
+.settings .err {
+  display: block;
+  color: red;
+}
+
+.settings .input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.settings .okBtn {
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 15px 20px;
+  margin: 15px 0 0;
+  font-weight: bold;
+}
+
+#urlView {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 15px;
+  margin-bottom: 10px;
+}
+
+#urlErrLb {
+  display: block;
+  color: red;
+}
+
+#urlTB {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+#sendToReaderBtn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgb(108, 198, 85);
+  padding: 15px 0;
+  margin-top: 10px;
+  font-weight: bold;
+  width: 100%;
+}
+
+.purl-view {
+  padding: 10px 0;
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.purl-view h2 {
+  margin: 0;
+}
+
+.purl-view p {
+  margin: 0;
+}
+
+.purl-view .resendBtn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  margin: 10px 0;
+  padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+.delView {
+
+}
+
+.delView .delBtn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+.delConfirmView {
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.delConfirmView p {
+  text-align: center;
+}
+
+.delConfirmView .delCancelBtn {
+  display: block;
+  float: left;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  margin-top: 10px;
+  padding: 10px 0;
+  font-weight: bold;
+  width: 48%;
+}
+
+.delConfirmView .delOkBtn {
+  display: block;
+  float: right;
+  border: 0;
+  color: #fff;
+  background: red;
+  margin-top: 10px;
+  padding: 10px 0;
+  font-weight: bold;
+  width: 48%;
+}
+
+#noData {
+  border: solid 1px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  margin: 10px 0;
+}
+
+#nextBtn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+/* ==============
+   MOBILE: Footer
+   ============== */
+
+.footer-container footer {
+  color: rgba(0, 0, 0, 0.45);
+  padding: 20px 0;
+}
+
+/* ==============
+   MOBILE: Footer menu
+   ============== */
+
+nav ul {
+  margin: 0;
+  padding: 0;
+}
+
+nav a {
+  display: block;
+  margin-bottom: 10px;
+  padding: 15px 0;
+
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+
+  color: white;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+nav a:hover,
+nav a:visited {
+  color: white;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* ===============
+   ALL: IE Fixes
+   =============== */
+
+.ie7 .title {
+  padding-top: 20px;
+}
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+
+@media only screen and (min-width: 480px) {
+
+  /* ============
+     INTERMEDIATE: Header
+     ============ */
+  .title h1 span {
+    margin: 5px 0;
+  }
+
+  #showLogInBtn {
+    width: 170px;
+  }
+
+  #logInUsernameTB {
+    width: 280px;
+  }
+
+  #logInPasswordTB {
+    width: 280px;
+  }
+
+  #forgotUsernameTB {
+    width: 280px;
+  }
+
+  /* ====================
+     INTERMEDIATE: Main
+     ==================== */
+
+  #showSignUpBtn {
+    width: 170px;
+  }
+
+  #signUpUsernameTB {
+    width: 280px;
+  }
+
+  #signUpPasswordTB {
+    width: 280px;
+  }
+
+  #signUpRepeatPasswordTB {
+    width: 280px;
+  }
+
+  #signUpEmailTB {
+    width: 280px;
+  }
+
+  .settings {
+    padding-top: 10px;
+  }
+
+  .settings .left {
+    float: left;
+    width: 120px;
+  }
+
+  .settings .left-blank {
+    height: auto;
+  }
+
+  .settings .name {
+    text-align: right;
+  }
+
+  .settings .right {
+    float: left;
+    width: 290px
+  }
+
+  .settings .btn {
+    width: 190px;
+  }
+
+  .settings .input {
+    width: 280px;
+  }
+
+  #urlTB {
+    float: left;
+    width: 67.5%;
+    margin-top: 8px;
+  }
+
+  #sendToReaderBtn {
+    float: left;
+    width: 30%;
+    margin: 0 0 0 10px;
+  }
+
+  .purl-view .resendBtn {
+    float: left;
+    width: 170px;
+    margin: 10px 10px 0 0;
+  }
+
+  .delView {
+    float: left;
+    width: 238px;
+  }
+
+  .delView .delBtn {
+    width: 170px;
+    margin: 10px 10px 0 0;
+  }
+
+  .delConfirmView p {
+    text-align: left;
+  }
+
+  /* ====================
+     INTERMEDIATE: Footer menu
+     ==================== */
+
+  nav a {
+    float: left;
+    margin: 0 1.7%;
+    padding: 25px 8.7%;
+    margin-bottom: 0;
+  }
+
+  nav li:first-child a {
+    margin-left: 0;
+  }
+
+  nav li:last-child a {
+    margin-right: 0;
+  }
+
+  .settings-footer nav a {
+    padding: 25px 1.5%;
+  }
+
+  /* ========================
+     intermediate: IE Fixes
+     ======================== */
+
+  nav ul li {
+    display: inline;
+  }
+
+  .oldie nav a {
+    margin: 0 0.7%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+
+  .wrapper {
+    width: 691px; /* 768px - 10% for margins */
+    margin: 0 auto;
+  }
+
+  /* ============
+     WIDE: Header
+     ============ */
+  #logInUsernameTB {
+    float: left;
+    margin: 0 0 15px 0;
+  }
+
+  #logInPasswordTB {
+    float: left;
+    width: 200px;
+    margin: 0 0 15px 10px;
+  }
+
+
+  /* ============
+     WIDE: Main
+     ============ */
+
+  .main article {
+    float: left;
+    width: 57%;
+  }
+
+  .main aside {
+    float: right;
+    width: 28%;
+  }
+
+  #urlTB {
+    width: 555px;
+  }
+
+  #sendToReaderBtn {
+    width: 126px;
+  }
+
+  /* ============
+     WIDE: Footer menu
+     ============ */
+
+  footer h3 {
+    float: left;
+  }
+
+  nav {
+    float: left;
+    width: 71.7%;
+  }
+
+  nav a {
+    padding: 25px 8.5%;
+  }
+
+  nav li:first-child a {
+    margin-left: 3.4%;
+  }
+
+  nav li:last-child a {
+    margin-right: 3.4%;
+  }
+
+  .settings-footer nav a {
+    padding: 25px 1.85%;
+  }
+}
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+.ir {
+  background-color: transparent;
+  border: 0;
+  overflow: hidden;
+  *text-indent: -9999px;
+}
+
+.ir:before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 150%;
+}
+
+.hidden {
+  display: none !important;
+  visibility: hidden;
+}
+
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+  clip: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  width: auto;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.clearfix {
+  *zoom: 1;
+}
+
+/* ==========================================================================
+   Print styles
+   ========================================================================== */
+
+@media print {
+  * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+      text-decoration: underline;
+    }
+
+    a[href]:after {
+      content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+      content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links for images, or javascript/internal links
+     */
+
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+      content: "";
+    }
+
+    pre,
+    blockquote {
+      border: 1px solid #999;
+      page-break-inside: avoid;
+    }
+
+    thead {
+      display: table-header-group; /* h5bp.com/t */
+    }
+
+    tr,
+    img {
+      page-break-inside: avoid;
+    }
+
+    img {
+      max-width: 100% !important;
+    }
+
+    @page {
+      margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+      orphans: 3;
+      widows: 3;
+    }
+
+    h2,
+    h3 {
+      page-break-after: avoid;
+    }
+}

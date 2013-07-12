@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Page2Reader</title>
+    <meta name="description" content="Send a web page to your reader">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+  </head>
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+    <div class="header-container">
+      <header class="wrapper clearfix">
+        <button id="backBtn">back</button>
+        <div class="title">
+          <h1>Settings</h1>
+        </div>
+      </header>
+    </div>
+
+    <div class="main-container">
+      <div class="main wrapper clearfix">
+        <section class="settings clearfix">
+          <div class="left">
+            <p class="name">Reader's email:</p>
+          </div>
+          <div class="right">
+            <p class="value">wit@kindle.com</p>
+            <button id="showChangeReaderEmailBtn" class="btn">Change reader's email</button>
+            <div id="changeReaderEmailView" class="view">
+              <span id="changeReaderEmailErrLb" class="err">&nbsp;</span>
+              <input id="changeReaderEmailTB" type="text" placeholder="New reader's email" class="input">
+              <button id="changeReaderEmailOkBtn" type="button" class="okBtn">OK</button>
+            </div>
+          </div>
+        </section>
+        <section class="settings clearfix">
+          <div class="left">
+            <p class="name">Username:</p>
+          </div>
+          <div class="right">
+            <p class="value">Wit</p>
+            <button id="showChangeUsernameBtn" class="btn">Change username</button>
+            <div id="changeUsernameView" class="view">
+              <span id="changeUsernameErrLb" class="err">&nbsp;</span>
+              <input id="changeUsernameTB" type="text" placeholder="New username" class="input">
+              <span id="changeUsernamePasswordErrLb" class="err">&nbsp;</span>
+              <input id="changeUsernamePasswordTB" type="password" placeholder="Password" class="input">
+              <button id="changeUsernameOkBtn" type="button" class="okBtn">OK</button>
+            </div> 
+          </div>
+        </section>
+        <section class="settings clearfix">
+          <div class="left">
+            <p class="name">Email:</p>
+          </div>
+          <div class="right">
+            <p class="value">wit@mail.com</p>
+            <button id="showChangeEmailBtn" class="btn">Change email</button>
+            <div id="changeEmailView" class="view">
+              <span id="changeEmailErrLb" class="err">&nbsp;</span>
+              <input id="changeEmailTB" type="text" placeholder="New email" class="input">
+              <span id="changeEmailPasswordErrLb" class="err">&nbsp;</span>
+              <input id="changeEmailPasswordTB" type="password" placeholder="Password" class="input">
+              <button id="changeEmailOkBtn" type="button" class="okBtn">OK</button>
+            </div> 
+          </div>
+          
+        </section>
+        <section class="settings clearfix">
+          <div class="left left-blank">
+            <p class="name">&nbsp;</p>
+          </div>
+          <div class="right">
+            <button id="showChangePasswordBtn" class="btn">Change password</button>
+            <div id="changePasswordView" class="view">
+              <span id="changeNewPasswordErrLb" class="err">&nbsp;</span>
+              <input id="changeNewPasswordTB" type="text" placeholder="New password" class="input">
+              <span id="changeRepeatPasswordErrLb" class="err">&nbsp;</span>
+              <input id="changeRepeatPasswordTB" type="text" placeholder="Repeat password" class="input">
+              <span id="changePasswordErrLb" class="err">&nbsp;</span>
+              <input id="changePasswordTB" type="password" placeholder="Password" class="input">
+              <button id="changePasswordOkBtn" type="button" class="okBtn">OK</button>
+            </div> 
+          </div>
+        </section>
+        <section class="settings">
+          <div class="left left-blank">
+            <p class="name">&nbsp;</p>
+          </div>
+          <div class="right">
+            <button id="showDeleteAccountBtn" class="btn">Delete account</button>
+            <div id="deleteAccountView" class="view">
+              <span id="deleteAccountPasswordErrLb" class="err">&nbsp;</span>
+              <input id="deleteAccountPasswordTB" type="password" placeholder="Password" class="input">
+              <button id="deleteAccountOkBtn" type="button" class="okBtn">OK</button>
+            </div> 
+          </div>
+        </section>
+      </div> <!-- #main -->
+    </div> <!-- #main-container -->
+
+    <div class="footer-container">
+      <footer class="wrapper clearfix settings-footer">
+        <h3>© 2013 Page2Reader</h3>
+        <nav>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Feedback</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Sign out</a></li>
+          </ul>
+        </nav>
+      </footer>
+    </div>
+
+    <script src="js/vendor/jquery-1.10.2.js"></script>
+    <script src="js/settings.js"></script>
+  </body>
+</html>

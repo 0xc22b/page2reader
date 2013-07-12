@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Page2Reader</title>
+    <meta name="description" content="Send a web page to your reader">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+  </head>
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+    <div class="header-container">
+      <header class="wrapper clearfix">
+        <div class="title">
+          <h1>Welcome to <span>Page2Reader</span></h1>
+          <p>Send a web page to your reader instantly!</p>
+        </div>
+        <button id="showLogInBtn">Sign in</button>
+        <div id="logInView">
+          <span id="logInErrLb">&nbsp;</span>
+          <div class="clearfix">
+          <input id="logInUsernameTB" type="text" placeholder="Username or email">
+          <input id="logInPasswordTB" type="password" placeholder="Password">
+          </div>
+          <button id="logInBtn">OK</button>
+          <button id="forgotPasswordBtn">Forget password?</button>
+          <div id="forgotPasswordView">
+            <span class="{css msg-block}"></span>
+            <span id="forgotUsernameErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="forgotUsernameTB" type="text" placeholder="Username or email." />
+            <button id="forgotOkBtn" class="{css btn} {css btn-primary}">OK</button>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <div class="main-container">
+      <div class="main wrapper clearfix">
+        <section>
+          <h2>Add a page URL</h2>
+          <p>Copy a page URL and paste it in the textbox and press Send to reader</p>
+        </section>
+        <section>
+          <h2>Bookmark</h2>
+          <p>Add a bookmark to your browser so you can send a web page to your reader on iOS.</p>
+        </section>
+        <section>
+          <h2>Extension</h2>
+          <p>Send a web page from Firefox or Chrome to your reader with Firefox extension and Chrome extension</p>
+        </section>
+        <section>
+          <h2>Android app</h2>
+          <p>Send a web page to your reader with 'Share' feature in Android</p>
+        </section>
+        <section>
+          <button id="showSignUpBtn">Create an account</button>
+          <div id="signUpView">
+            <span id="signUpUsernameErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpUsernameTB" type="text" class="{css input-block-level}" placeholder="Username">
+            <span id="signUpPasswordErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpPasswordTB" type="password" class="{css input-block-level}" placeholder="Password">
+            <span id="signUpRepeatPasswordErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpRepeatPasswordTB" type="password" class="{css input-block-level}" placeholder="Repeat password">
+            <span id="signUpEmailErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
+            <input id="signUpEmailTB" type="text" class="{css input-block-level}" placeholder="Email address">
+            <button id="signUpBtn" type="button" class="{css btn} {css btn-primary} {css btn-large}">OK</button>
+          </div> 
+        </section>
+      </div> <!-- #main -->
+    </div> <!-- #main-container -->
+
+    <div class="footer-container">
+      <footer class="wrapper clearfix">
+        <h3>© 2013 Page2Reader</h3>
+        <nav>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Feedback</a></li>
+          </ul>
+        </nav>
+      </footer>
+    </div>
+
+    <script src="js/vendor/jquery-1.10.2.js"></script>
+    <script src="js/home.js"></script>
+  </body>
+</html>
