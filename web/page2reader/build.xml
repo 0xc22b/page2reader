@@ -304,7 +304,8 @@
         outputFile="user-compiled.js" />
   </target>
 
-  <target name="reset-password-compile" description="compile js files for reset password page">
+  <target name="reset-password-compile" description="compile js files for reset password page"
+          depends="home-stylesheets, home-templates">
     <closure-compile
         namespace="wit.home.ResetPassword"
         cssRenamingMap="home/cssrenamingmap/home-compiled.js"
