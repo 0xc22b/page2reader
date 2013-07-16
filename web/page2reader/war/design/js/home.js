@@ -14,16 +14,32 @@
   });
 
   var forgotPasswordBtn = $('#forgotPasswordBtn'),
-      forgotPasswordView = $('#forgotPasswordView');
+      forgotPasswordView = $('#forgotPasswordView'),
+      forgotFormView = $('#forgotFormView'),
+      forgotResultView = $('#forgotResultView');
   forgotPasswordView.hide();
+  forgotResultView.hide();
   forgotPasswordBtn.click(function() {
     forgotPasswordView.animate({height: 'toggle', padding: 'toggle'}, 'fast');
   });
 
   var forgotOkBtn = $('#forgotOkBtn'),
-      forgotUsernameErrLb = $('#forgotUsernameErrLb');
+      forgotUsernameErrLb = $('#forgotUsernameErrLb'),
+      forgotUsernameTB = $('#forgotUsernameTB');
   forgotOkBtn.click(function() {
-    forgotUsernameErrLb.html('Username or email is incorrect');
+    var value = forgotUsernameTB.val();
+    if (value === '') {
+      forgotUsernameErrLb.html('Username or email is incorrect');
+      return;
+    }
+
+    forgotFormView.animate({height: 'toggle', padding: 'toggle'}, 'fast');
+    forgotResultView.animate({height: 'toggle', padding: 'toggle'}, 'fast');
+  });
+
+  var forgotResultOkBtn = $('#forgotResultOkBtn');
+  forgotResultOkBtn.click(function() {
+    forgotPasswordView.animate({height: 'toggle', padding: 'toggle'}, 'fast');
   });
 
   var showSignUpBtn = $('#showSignUpBtn'),

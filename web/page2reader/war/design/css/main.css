@@ -212,6 +212,14 @@ body {
   font-weight: bold;
 }
 
+#forgotResultOkBtn {
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 15px 20px;
+  font-weight: bold;
+}
+
 /* ==============
    MOBILE: Main
    ============== */
@@ -326,6 +334,17 @@ body {
   color: #fff;
   background: rgb(108, 198, 85);
   padding: 15px 0;
+  font-weight: bold;
+  width: 100%;
+}
+
+.settings .s-btn {
+  display: block;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 15px 0;
+  margin-bottom: 10px;
   font-weight: bold;
   width: 100%;
 }
@@ -603,7 +622,11 @@ nav a:hover {
   }
 
   .settings .btn {
-    width: 190px;
+    width: 220px;
+  }
+
+  .settings .s-btn {
+    width: 220px;
   }
 
   .settings .input {
