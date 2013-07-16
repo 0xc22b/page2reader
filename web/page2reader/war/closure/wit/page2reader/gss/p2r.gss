@@ -1,15 +1,169 @@
 /* =============================================================================
-   Variables
+   User defined
    ========================================================================== */
 
+/* ==============
+   MOBILE: Header
+   ============== */
 
+/* ==============
+   MOBILE: Main
+   ============== */
+#urlView {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 15px;
+  margin-bottom: 10px;
+}
 
-/* =============================================================================
-   Mixins
+#urlErrLb {
+  @mixin errBlock();
+}
+
+#urlTB {
+  @mixin initTB(100%, 0);
+}
+
+#addUrlBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, PRIMARY_BTN_BG_COLOR);
+  padding: 15px 0;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.p-url-view {
+  padding: 10px 0;
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.p-url-view h2 {
+  margin: 0 0 12px;
+}
+
+.p-url-view h2 a {
+  color: NORMAL_FONT_COLOR;
+  text-decoration: none;
+}
+.p-url-view h2 a:hover,
+.p-url-view h2 a:visited {
+  color: NORMAL_FONT_COLOR;
+}
+.p-url-view h2 a:hover {
+  text-decoration: underline;
+}
+
+.p-url-view p {
+  margin: 0;
+}
+
+.p-url-view .resend-btn {
+  @mixin initBtn(TITLE_FONT_COLOR, BTN_BG_COLOR);
+  margin: 10px 0;
+  padding: 15px 0;
+  width: 100%;
+}
+
+.del-view {
+
+}
+
+.del-view .del-btn {
+  @mixin initBtn(TITLE_FONT_COLOR, BTN_BG_COLOR);
+  padding: 15px 0;
+  width: 100%;
+}
+
+.del-confirm-view {
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.del-confirm-view p {
+  text-align: center;
+}
+
+.del-confirm-view .del-cancel-btn {
+  @mixin initBtn(TITLE_FONT_COLOR, BTN_BG_COLOR);
+  float: left;
+  margin-top: 10px;
+  padding: 10px 0;
+  width: 48%;
+}
+
+.del-confirm-view .del-ok-btn {
+  @mixin initBtn(TITLE_FONT_COLOR, CONFIRM_BTN_BG_COLOR);
+  float: right;
+  margin-top: 10px;
+  padding: 10px 0;
+  width: 48%;
+}
+
+#noData {
+  border: solid 1px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  margin: 10px 0;
+}
+
+#nextBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  width: 100%;
+  padding: 15px 0;
+  margin-top: 20px;
+}
+
+/* ==========================================================================
+   Media Queries
    ========================================================================== */
 
+@media only screen and (min-width: 480px) {
 
-/* =============================================================================
-   Custom styles
-   ========================================================================== */
+  /* ====================
+     INTERMEDIATE: Main
+     ==================== */
+  #urlTB {
+    float: left;
+    width: 67.5%;
+  }
 
+  #addUrlBtn {
+    float: left;
+    width: 30%;
+    padding: 7px 0;
+    margin: 0 0 0 10px;
+  }
+
+  .p-url-view .resend-btn {
+    float: left;
+    width: 170px;
+    margin: 10px 10px 0 0;
+  }
+
+  .del-view {
+    float: left;
+    width: 238px;
+  }
+
+  .del-view .del-btn {
+    width: 170px;
+    margin: 10px 10px 0 0;
+  }
+
+  .del-confirm-view p {
+    text-align: left;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+
+  /* ============
+     WIDE: Main
+     ============ */
+  #urlTB {
+    width: 555px;
+  }
+
+  #addUrlBtn {
+    width: 126px;
+  }
+}

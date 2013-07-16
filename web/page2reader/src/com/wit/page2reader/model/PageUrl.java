@@ -24,7 +24,7 @@ public class PageUrl {
     }
 
     public PageUrl(Key p2rGrpKey, String pUrl) {
-        if (p2rGrpKey == null) {
+        if (p2rGrpKey == null || pUrl == null || pUrl.isEmpty()) {
             throw new IllegalArgumentException();
         }
 

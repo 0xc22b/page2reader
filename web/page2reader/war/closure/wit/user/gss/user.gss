@@ -1,14 +1,123 @@
 /* =============================================================================
-   Variables
+   User defined
    ========================================================================== */
 
+/* ==============
+   MOBILE: Header
+   ============== */
 
 
-/* =============================================================================
-   Mixins
+/* ==============
+   MOBILE: Main
+   ============== */
+
+.settings {
+  padding-bottom: 10px;
+}
+
+.settings .left-blank {
+  height: 0;
+}
+
+.settings .name {
+  font-size: 14px;
+  margin: 0 5px 0 0;
+}
+
+.settings .value {
+  font-size: 27px;
+  margin: 0 0 5px;
+}
+
+.settings .btn {
+  @mixin initBtn(TITLE_FONT_COLOR, PRIMARY_BTN_BG_COLOR);
+  padding: 15px 0;
+  width: 100%;
+}
+
+.settings .second-btn {
+  @mixin initBtn(TITLE_FONT_COLOR, BTN_BG_COLOR);
+  padding: 15px 0;
+  margin-bottom: 10px; 
+  width: 100%;
+}
+
+.settings .view {
+  padding: 10px 0;
+}
+
+.settings .err {
+  @mixin errBlock();
+}
+
+.settings .input {
+  @mixin initTB(100%, 0);
+}
+
+.settings .ok-btn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  padding: 15px 20px;
+  margin: 15px 0 0;
+}
+
+/* ==========================================================================
+   Media Queries
    ========================================================================== */
 
+@media only screen and (min-width: 480px) {
 
-/* =============================================================================
-   Custom styles
-   ========================================================================== */
+  /* ====================
+     INTERMEDIATE: Main
+     ==================== */
+
+  .settings {
+    padding-top: 10px;
+  }
+
+  .settings .left {
+    float: left;
+    width: 120px;
+  }
+
+  .settings .left-blank {
+    height: auto;
+  }
+
+  .settings .name {
+    text-align: right;
+  }
+
+  .settings .right {
+    float: left;
+    width: 290px
+  }
+
+  .settings .btn {
+    width: 220px;
+  }
+
+  .settings .second-btn {
+    width: 220px;
+  }
+
+  .settings .input {
+    width: 280px;
+  }
+
+  /* ====================
+     INTERMEDIATE: Footer menu
+     ==================== */
+  .settings-footer nav a {
+    padding: 25px 1.5%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+
+  /* ============
+     WIDE: Footer menu
+     ============ */
+  .settings-footer nav a {
+    padding: 25px 1.85%;
+  }
+}

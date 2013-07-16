@@ -2,6 +2,7 @@ package com.wit.page2reader;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
@@ -106,8 +107,13 @@ public class P2rManager {
 
     public static PageUrl addPageUrl(User user, String pUrl, Log log) {
 
-        // TODO: Validate page url
-
+        // Validate page url
+        try {
+            new URL(pUrl);
+        } catch (MalformedURLException e) {
+            log.addLogInfo(P2rConstants.ADD_PAGE_URL, false, pUrl, P2rConstants.ERR_URL);
+            return null;
+        }
 
         Key p2rGrpKey = getP2rGrpKey(user);
         PageUrl pageUrl = new PageUrl(p2rGrpKey, pUrl);
@@ -138,7 +144,7 @@ public class P2rManager {
             // you could use another backoff algorithm here rather than 100ms each time.
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
-        log.addLogInfo(P2rConstants.ADD_PAGE_URL, false, pageUrl.getJSONObject().toString(),
+        log.addLogInfo(P2rConstants.ADD_PAGE_URL, false, pUrl,
                 BaseConstants.CONCURRENT_MODIFICATION_EXCEPTION);
         return null;
     }
@@ -173,7 +179,7 @@ public class P2rManager {
                 BaseConstants.CONCURRENT_MODIFICATION_EXCEPTION);
     }
 
-    private static PageUrl getPageUrl(String keyString) {
+    public static PageUrl getPageUrl(String keyString) {
 
         Key pageUrlKey = KeyFactory.stringToKey(keyString);
 

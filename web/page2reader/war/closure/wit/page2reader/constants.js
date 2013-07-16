@@ -16,6 +16,27 @@ wit.page2reader.constants.DELETE_PAGE_URL = 'deletePageUrl';
 
 
 /**
+ * @type {string} RESEND_TO_READER Resend to reader.
+ * @const
+ */
+wit.page2reader.constants.RESEND_TO_READER = 'resendToReader';
+
+
+/**
+ * @type {string} SEND_TO_READER Send to reader.
+ * @const
+ */
+wit.page2reader.constants.SEND_TO_READER = 'sendToReader';
+
+
+/**
+ * @type {string} GET_PAGING_PAGE_URLS Get pageUrls.
+ * @const
+ */
+wit.page2reader.constants.GET_PAGING_PAGE_URLS = 'getPagingPageUrls';
+
+
+/**
  * @type {string} UPDATE_READER_EMAIL Update reader email.
  * @const
  */
@@ -27,6 +48,13 @@ wit.page2reader.constants.UPDATE_READER_EMAIL = 'updateReaderEmail';
  * @const
  */
 wit.page2reader.constants.KEY_STRING = 'keyString';
+
+
+/**
+ * @type {string} PAGE_URLS Page URLs.
+ * @const
+ */
+wit.page2reader.constants.PAGE_URLS = 'pageUrls';
 
 
 /**
@@ -76,3 +104,17 @@ wit.page2reader.constants.CLEANSED_PAGE = 'cleansedPage';
  * @const
  */
 wit.page2reader.constants.SENT_COUNT = 'sentCount';
+
+
+/**
+ * @type {string} ERR_URL_EMPTY URL is empty.
+ * @const
+ */
+wit.page2reader.constants.ERR_URL_EMPTY = 'Please provide URL';
+
+
+/**
+ * @type {string} ERR_URL Error url.
+ * @const
+ */
+wit.page2reader.constants.ERR_URL = 'URL is invalid';

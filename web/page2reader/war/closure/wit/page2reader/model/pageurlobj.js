@@ -42,13 +42,12 @@ wit.page2reader.model.PageUrlObj.prototype.sentCount;
 
 
 /**
- * Set contents from JSON string.
- * @param {!string} jsonString JSON string.
+ * Set contents from JSON object.
+ * @param {!Object} jsonObj JSON object.
  */
-wit.page2reader.model.PageUrlObj.prototype.setContentsFromJSONString = function(
-    jsonString) {
+wit.page2reader.model.PageUrlObj.prototype.setContentsFromJSONObject = function(
+    jsonObj) {
 
-  var jsonObj = goog.json.unsafeParse(jsonString);
   this.keyString = jsonObj[wit.page2reader.constants.KEY_STRING];
   this.pUrl = jsonObj[wit.page2reader.constants.P_URL];
   this.serverCreateTimeMillis = jsonObj[

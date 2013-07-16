@@ -5,12 +5,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.wit.base.BaseConstants;
@@ -19,7 +20,9 @@ import com.wit.base.Log;
 import com.wit.base.NotLoggedInException;
 import com.wit.base.UserManager;
 import com.wit.base.model.User;
+import com.wit.page2reader.P2rConstants;
 import com.wit.page2reader.P2rManager;
+import com.wit.page2reader.P2rManager.PageUrlList;
 import com.wit.page2reader.model.PageUrl;
 
 @SuppressWarnings("serial")
@@ -91,8 +94,7 @@ public class P2rServlet extends HttpServlet {
     }
 
     public void addPageUrl(HttpServletResponse resp, User user,
-            String content) throws IOException, JSONException, EntityNotFoundException,
-            MessagingException {
+            String content) throws IOException, JSONException, EntityNotFoundException {
         Log log = new Log();
         PageUrl pageUrl = P2rManager.addPageUrl(user, content, log);
         if (pageUrl != null) {
@@ -110,9 +112,34 @@ public class P2rServlet extends HttpServlet {
         BaseServlet.response(resp, log.getJSONString());
     }
 
-    public void resend(HttpServletResponse resp, User user,
-            String content) throws IOException, JSONException {
+    public void resendToReader(HttpServletResponse resp, User user,
+            String content) throws IOException, JSONException, EntityNotFoundException {
 
+        Log log = new Log();
+        PageUrl pageUrl = P2rManager.getPageUrl(content);
+        P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
+                log);
+        BaseServlet.response(resp, log.getJSONString());
+    }
+
+    public void getPagingPageUrls(HttpServletResponse resp, User user, String content)
+            throws IOException {
+        
+        PageUrlList pageUrlList = P2rManager.getPagingPageUrls(user, content);
+
+        JSONArray jsonPageUrls = new JSONArray();
+        for (PageUrl pageUrl : pageUrlList) {
+            jsonPageUrls.put(pageUrl.getJSONObject());
+        }
+
+        JSONObject jsonResult = new JSONObject();
+        jsonResult.put(P2rConstants.PAGE_URLS, jsonPageUrls);
+        jsonResult.put(P2rConstants.CURSOR_STRING, pageUrlList.getCursorString());
+        
+        Log log = new Log();
+        log.addLogInfo(P2rConstants.GET_PAGING_PAGE_URLS, true, jsonResult.toString(), null);
+
+        BaseServlet.response(resp, log.getJSONString());
     }
 
     public void updateReaderEmail(HttpServletResponse resp, User user,

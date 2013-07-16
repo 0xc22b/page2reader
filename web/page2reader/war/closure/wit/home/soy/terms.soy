@@ -34,13 +34,15 @@
  */
 {template .content_}
 
-  {call wit.base.soy.base.header /}
+  {call wit.base.soy.base.headerWithHome}
+    {param title}Terms{/param}
+  {/call}
 
   <div class="{css main-container}">
     <div class="{css main} {css wrapper} {css clearfix}">
       <article>
         <header>
-          <p>Terms</p>
+          <p></p>
         </header>
         <section>
           

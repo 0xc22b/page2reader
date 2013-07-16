@@ -40,44 +40,40 @@
  */
 {template .content_}
 
-  {call wit.base.soy.base.header /}
+  {call wit.base.soy.base.headerWithSignIn /}
 
   <div class="{css main-container}">
     <div class="{css main} {css wrapper} {css clearfix}">
-      <article>
-        <header>
-          <p>Send a web page to your reader instantly!</p>
-        </header>
-        <section>
-          <h2>Sign in</h2>
-          <span id="logInErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
-          <input id="logInUsernameTB" type="text" placeholder="Username or email">
-          <input id="logInPasswordTB" type="password" placeholder="Password">
-          <button id="logInBtn" type="button" class="{css btn} {css btn-primary}">OK</button>
-          <img src="/img/loading.gif" id="logInLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-        <section>
-          <h2>Create an account</h2>
-          <span id="signUpUsernameErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
-            <input id="signUpUsernameTB" type="text" class="{css input-block-level}" placeholder="Username">
-            <span id="signUpPasswordErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
-            <input id="signUpPasswordTB" type="password" class="{css input-block-level}" placeholder="Password">
-            <span id="signUpRepeatPasswordErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
-            <input id="signUpRepeatPasswordTB" type="password" class="{css input-block-level}" placeholder="Repeat password">
-            <span id="signUpEmailErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
-            <input id="signUpEmailTB" type="text" class="{css input-block-level}" placeholder="Email address">
-            <button id="signUpBtn" type="button" class="{css btn} {css btn-primary} {css btn-large}">OK</button>
-            <img src="/img/loading.gif" id="signUpLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-        <footer>
-          <h3>Forget password?</h3>
-          <span class="{css msg-block}">Please enter your username or email.</span>
-          <span id="forgotUsernameErrLb" class="{css msg-block} {css text-error}">&nbsp;</span>
-          <input id="forgotUsernameTB" type="text" placeholder="username or email" />
-          <button id="forgotOkBtn" class="{css btn} {css btn-primary}">OK</button>
-          <img src="/img/loading.gif" id="forgotLoadingImg" class="{css loading-img}" style="display: none;" />
-        </footer>
-      </article>
+      <section>
+        <h2>Add a page URL</h2>
+        <p>Copy a page URL and paste it in the textbox and press Send to reader</p>
+      </section>
+      <section>
+        <h2>Bookmark</h2>
+        <p>Add a bookmark to your browser so you can send a web page to your reader on iOS.</p>
+      </section>
+      <section>
+        <h2>Extension</h2>
+        <p>Send a web page from Firefox or Chrome to your reader with Firefox extension and Chrome extension</p>
+      </section>
+      <section>
+        <h2>Android app</h2>
+        <p>Send a web page to your reader with 'Share' feature in Android</p>
+      </section>
+      <section>
+        <button id="showSignUpBtn" type="button">Create an account</button>
+        <div id="signUpView">
+          <span id="signUpUsernameErrLb">&nbsp;</span>
+          <input id="signUpUsernameTB" type="text" placeholder="Username">
+          <span id="signUpPasswordErrLb">&nbsp;</span>
+          <input id="signUpPasswordTB" type="password" placeholder="Password">
+          <span id="signUpRepeatPasswordErrLb">&nbsp;</span>
+          <input id="signUpRepeatPasswordTB" type="password" placeholder="Repeat password">
+          <span id="signUpEmailErrLb">&nbsp;</span>
+          <input id="signUpEmailTB" type="text" placeholder="Email address">
+          <button id="signUpBtn" type="button">OK</button>
+        </div> 
+      </section>
     </div> <!-- #main -->
   </div> <!-- #main-container -->
 

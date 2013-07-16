@@ -50,83 +50,95 @@
  */
 {template .content_}
 
-  {call wit.base.soy.base.loggedInHeader /}
+  {call wit.base.soy.base.headerWithHome}
+    {param title}Settings{/param}
+  {/call}
 
   <div class="{css main-container}">
     <div class="{css main} {css wrapper} {css clearfix}">
-      <article>
-        <header>
-          <h1>Reader settings</h1>
-        </header>
-        <section>
-          <h2>Reader email</h2>
-          <label class="{css control-label}">Reader email:</label>
-          <span id="changeReaderEmailLb">{$readerEmail}</span>
-          <span id="changeReaderEmailErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeReaderEmailTB" type="text" placeholder="New readerEmail">
-          <button id="changeReaderEmailOkBtn" type="button" class="{css btn}">OK</button>
-          <img src="/img/loading.gif" id="changeReaderEmailLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-      </article>
-      <article>
-        <header>
-          <h1>User settings</h1>
-        </header>
-        <section>
-          <h2>Change username</h2>
-          <label class="{css control-label}">Username:</label>
-          <span id="changeUsernameLb">{$username}</span>
-          <span id="changeUsernameErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeUsernameTB" type="text" placeholder="New username">
-          <span id="changeUsernamePasswordErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeUsernamePasswordTB" type="password" placeholder="Password">
-          <button id="changeUsernameOkBtn" type="button" class="{css btn}">OK</button>
-          <img src="/img/loading.gif" id="changeUsernameLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-        <section>
-          <h2>Change email</h2>
-          <label class="{css control-label}">Email:</label>
-          <span id="changeEmailLb">{$email}</span>
-          {if $didConfirmEmail == true}
-            <span id="emailVerifiedElement" class="{css text-info}">Email verified.</span>
-          {else}
-            <button id="resendEmailConfirmBtn" class="{css btn-link}">Resend email verification</button>
-          {/if}
-          <span id="changeEmailErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeEmailTB" type="text" placeholder="New email">
-          <span id="changeEmailPasswordErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeEmailPasswordTB" type="password" placeholder="Password">
-          <button id="changeEmailOkBtn" type="button" class="{css btn}">OK</button>
-          <img src="/img/loading.gif" id="changeEmailLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-        <section>
-          <h2>Change password</h2>
-          <label class="{css control-label}">Password:</label>
-          <span>********</span>
-          <span id="changeNewPasswordErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeNewPasswordTB" type="password" placeholder="New password">
-          <span id="changeRepeatPasswordErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changeRepeatPasswordTB" type="password" placeholder="Repeat new password">
-          <span id="changePasswordErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="changePasswordTB" type="password" placeholder="Password">
-          <button id="changePasswordOkBtn" type="button" class="{css btn}">OK</button>
-          <img src="/img/loading.gif" id="changePasswordLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-        <section>
-          <h2>Delete account</h2>
-          <label class="{css control-label}">Delete account:</label>
-          <span class="{css help-block}">This cannot be reversed.<br>Please be sure that you really want to do this.</span>
-          <span id="deleteAccountPasswordErrLb" class="{css text-error}">&nbsp;</span>
-          <input id="deleteAccountPasswordTB" type="password" placeholder="Password">
-          <button id="deleteAccountOkBtn" type="button" class="{css btn}">OK</button>
-          <img src="/img/loading.gif" id="deleteAccountLoadingImg" class="{css loading-img}" style="display: none;" />
-        </section>
-
-      </article>
+      <section class="{css settings} {css clearfix}">
+        <div class="{css left}">
+          <p class="{css name}">Reader's email:</p>
+        </div>
+        <div class="{css right}">
+          <p id="readerEmailLb" class="{css value}">{if $readerEmail}{$readerEmail}{else}&nbsp;{/if}</p>
+          <button id="showChangeReaderEmailBtn" class="{css btn}">Change reader's email</button>
+          <div id="changeReaderEmailView" class="{css view}">
+            <span id="changeReaderEmailErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeReaderEmailTB" type="text" placeholder="New reader's email" class="{css input}">
+            <button id="changeReaderEmailOkBtn" type="button" class="{css ok-btn}">OK</button>
+          </div>
+        </div>
+      </section>
+      <section class="{css settings} {css clearfix}">
+        <div class="{css left}">
+          <p class="{css name}">Username:</p>
+        </div>
+        <div class="{css right}">
+          <p id="usernameLb" class="{css value}">{$username}</p>
+          <button id="showChangeUsernameBtn" class="{css btn}">Change username</button>
+          <div id="changeUsernameView" class="{css view}">
+            <span id="changeUsernameErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeUsernameTB" type="text" placeholder="New username" class="{css input}">
+            <span id="changeUsernamePasswordErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeUsernamePasswordTB" type="password" placeholder="Password" class="{css input}">
+            <button id="changeUsernameOkBtn" type="button" class="{css ok-btn}">OK</button>
+          </div> 
+        </div>
+      </section>
+      <section class="{css settings} {css clearfix}">
+        <div class="{css left}">
+          <p class="{css name}">Email:</p>
+        </div>
+        <div class="{css right}">
+          <p id="emailLb" class="{css value}">{$email}</p>
+          <button id="resendEmailConfirmBtn" class="{css second-btn}" data-did-confirm-email="{$didConfirmEmail}">
+            Resend email verification
+          </button>
+          <button id="showChangeEmailBtn" class="{css btn}">Change email</button>
+          <div id="changeEmailView" class="{css view}">
+            <span id="changeEmailErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeEmailTB" type="text" placeholder="New email" class="{css input}">
+            <span id="changeEmailPasswordErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeEmailPasswordTB" type="password" placeholder="Password" class="{css input}">
+            <button id="changeEmailOkBtn" type="button" class="{css ok-btn}">OK</button>
+          </div> 
+        </div>
+      </section>
+      <section class="{css settings} {css clearfix}">
+        <div class="{css left} {css left-blank}">
+          <p class="{css name}">&nbsp;</p>
+        </div>
+        <div class="{css right}">
+          <button id="showChangePasswordBtn" class="{css btn}">Change password</button>
+          <div id="changePasswordView" class="{css view}">
+            <span id="changeNewPasswordErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeNewPasswordTB" type="password" placeholder="New password" class="{css input}">
+            <span id="changeRepeatPasswordErrLb" class="{css err}">&nbsp;</span>
+            <input id="changeRepeatPasswordTB" type="password" placeholder="Repeat password" class="{css input}">
+            <span id="changePasswordErrLb" class="{css err}">&nbsp;</span>
+            <input id="changePasswordTB" type="password" placeholder="Password" class="{css input}">
+            <button id="changePasswordOkBtn" type="button" class="{css ok-btn}">OK</button>
+          </div> 
+        </div>
+      </section>
+      <section class="{css settings}">
+        <div class="{css left} {css left-blank}">
+          <p class="{css name}">&nbsp;</p>
+        </div>
+        <div class="{css right}">
+          <button id="showDeleteAccountBtn" class="{css btn}">Delete account</button>
+          <div id="deleteAccountView" class="{css view}">
+            <span id="deleteAccountPasswordErrLb" class="{css err}">&nbsp;</span>
+            <input id="deleteAccountPasswordTB" type="password" placeholder="Password" class="{css input}">
+            <button id="deleteAccountOkBtn" type="button" class="{css ok-btn}">OK</button>
+          </div> 
+        </div>
+      </section>
     </div> <!-- #main -->
   </div> <!-- #main-container -->
 
-  {call wit.base.soy.base.footerWithMenu /}
+  {call wit.base.soy.base.loggedInFooter /}
 {/template}
 
 /**

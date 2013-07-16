@@ -1,15 +1,214 @@
 /* =============================================================================
-   Variables
+   User defined
    ========================================================================== */
 
+/* ==============
+   MOBILE: Header
+   ============== */
 
+#showLogInBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, PRIMARY_BTN_BG_COLOR);
+  padding: 15px 0;
+  width: 100%;
+}
 
-/* =============================================================================
-   Mixins
+#logInView {
+  padding: 10px 0;
+}
+
+#logInErrLb {
+  @mixin errBlock();
+}
+
+#logInUsernameTB {
+  @mixin initTB(100%, 0);
+}
+
+#logInPasswordTB {
+  @mixin initTB(100%, 15px 0);
+}
+
+#logInBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  float: left;
+  padding: 15px 20px;
+}
+
+#forgotBtn {
+  @mixin initBtn(NORMAL_FONT_COLOR, transparent);
+  padding: 15px 20px;
+}
+
+#forgotView {
+  padding: 10px 0;
+}
+
+#forgotUsernameErrLb {
+  @mixin errBlock();
+}
+
+#forgotUsernameTB {
+  @mixin initTB(100%, 0px 0 15px 0);
+}
+
+#forgotOkBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  padding: 15px 20px;
+}
+
+#forgotResultOkBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  padding: 15px 20px;
+}
+
+/* ==============
+   MOBILE: Main
+   ============== */
+
+#showSignUpBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, PRIMARY_BTN_BG_COLOR);
+  padding: 15px 0;
+  width: 100%;
+}
+
+#signUpView {
+  padding: 10px 0;
+}
+
+#signUpUsernameErrLb {
+  @mixin errBlock();
+}
+
+#signUpUsernameTB {
+  @mixin initTB(100%, 0);
+}
+
+#signUpPasswordErrLb {
+  @mixin errBlock();
+}
+
+#signUpPasswordTB {
+  @mixin initTB(100%, 0);
+}
+
+#signUpRepeatPasswordErrLb {
+  @mixin errBlock();
+}
+
+#signUpRepeatPasswordTB {
+  @mixin initTB(100%, 0);
+}
+
+#signUpEmailErrLb {
+  @mixin errBlock();
+}
+
+#signUpEmailTB {
+  @mixin initTB(100%, 0 0 15px 0);
+}
+
+#signUpBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  padding: 15px 20px;
+}
+
+#resetPasswordFormView p {
+  margin: 0;
+}
+
+#resetPasswordNewPasswordErrLb {
+  @mixin errBlock();
+}
+
+#resetPasswordNewPasswordTB {
+  @mixin initTB(100%, 0);
+}
+
+#resetPasswordRepeatPasswordErrLb {
+  @mixin errBlock();
+}
+
+#resetPasswordRepeatPasswordTB {
+  @mixin initTB(100%, 0);
+}
+
+#resetPasswordBtn {
+  @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
+  padding: 15px 20px;
+  margin-top: 15px;
+}
+
+/* ==========================================================================
+   Media Queries
    ========================================================================== */
 
+@media only screen and (min-width: 480px) {
 
-/* =============================================================================
-   Custom styles
-   ========================================================================== */
+  /* ============
+     INTERMEDIATE: Header
+     ============ */
+  #showLogInBtn {
+    width: 170px;
+  }
 
+  #logInUsernameTB {
+    width: 280px;
+  }
+
+  #logInPasswordTB {
+    width: 280px;
+  }
+
+  #forgotUsernameTB {
+    width: 280px;
+  }
+
+  /* ====================
+     INTERMEDIATE: Main
+     ==================== */
+
+  #showSignUpBtn {
+    width: 170px;
+  }
+
+  #signUpUsernameTB {
+    width: 280px;
+  }
+
+  #signUpPasswordTB {
+    width: 280px;
+  }
+
+  #signUpRepeatPasswordTB {
+    width: 280px;
+  }
+
+  #signUpEmailTB {
+    width: 280px;
+  }
+
+  #resetPasswordNewPasswordTB {
+    width: 280px;
+  }
+
+  #resetPasswordRepeatPasswordTB {
+    width: 280px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+
+  /* ============
+     WIDE: Header
+     ============ */
+  #logInUsernameTB {
+    float: left;
+    margin: 0 0 15px 0;
+  }
+
+  #logInPasswordTB {
+    float: left;
+    width: 200px;
+    margin: 0 0 15px 10px;
+  }
+}

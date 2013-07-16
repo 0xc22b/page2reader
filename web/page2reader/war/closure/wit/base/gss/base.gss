@@ -40,186 +40,6 @@
   display: inline;
 }
 
-/*
- * Standard styling for a goog.ui.DatePicker.
- *
- * @author arv@google.com (Erik Arvidsson)
- */
-
-.goog-date-picker,
-.goog-date-picker th,
-.goog-date-picker td {
-  font: 13px Arial, sans-serif;
-}
-
-.goog-date-picker {
-  -moz-user-focus: normal;
-  -moz-user-select: none;
-  /*position: relative;*/
-  position: absolute;
-  border: 1px solid #000;
-  float: left;
-  padding: 2px;
-  color: #000;
-  background: #c3d9ff;
-  cursor: default;
-}
-
-.goog-date-picker th {
-  text-align: center;
-}
-
-.goog-date-picker td {
-  text-align: center;
-  vertical-align: middle;
-  padding: 1px 3px;
-}
-
-
-.goog-date-picker-menu {
-  position: absolute;
-  background: threedface;
-  border: 1px solid gray;
-  -moz-user-focus: normal;
-  z-index: 1;
-  outline: none;
-}
-
-.goog-date-picker-menu ul {
-  list-style: none;
-  margin: 0px;
-  padding: 0px;
-}
-
-.goog-date-picker-menu ul li {
-  cursor: default;
-}
-
-.goog-date-picker-menu-selected {
-  background: #ccf;
-}
-
-.goog-date-picker th {
-  font-size: .9em;
-}
-
-.goog-date-picker td div {
-  float: left;
-}
-
-.goog-date-picker button {
-  padding: 0px;
-  margin: 1px 0;
-  border: 0;
-  color: #20c;
-  font-weight: bold;
-  background: transparent;
-}
-
-.goog-date-picker-date {
-  background: #fff;
-}
-
-.goog-date-picker-week,
-.goog-date-picker-wday {
-  padding: 1px 3px;
-  border: 0;
-  border-color: #a2bbdd;
-  border-style: solid;
-}
-
-.goog-date-picker-week {
-  border-right-width: 1px;
-}
-
-.goog-date-picker-wday {
-  border-bottom-width: 1px;
-}
-
-.goog-date-picker-head td {
-  text-align: center;
-}
-
-/** Use td.className instead of !important */
-td.goog-date-picker-today-cont {
-  text-align: center;
-}
-
-/** Use td.className instead of !important */
-td.goog-date-picker-none-cont {
-  text-align: center;
-}
-
-.goog-date-picker-month {
-  width: 12ex;
-}
-
-.goog-date-picker-year {
-  width: 6ex;
-}
-
-.goog-date-picker table {
-  border-collapse: collapse;
-}
-
-.goog-date-picker-other-month {
-  color: #888;
-}
-
-.goog-date-picker-wkend-start,
-.goog-date-picker-wkend-end {
-  background: #eee;
-}
-
-/** Use td.className instead of !important */
-td.goog-date-picker-selected {
-  background: #c3d9ff;
-}
-
-.goog-date-picker-today {
-  background: #9ab;
-  font-weight: bold !important;
-  border-color: #246 #9bd #9bd #246;
-  color: #fff;
-}
-
-/*
- * Styles for goog.ui.ac.AutoComplete and its derivatives.
- * Note: these styles need some work to get them working properly at various
- * font sizes other than the default.
- *
- * @author pupius@google.com (Daniel Pupius)
- * @author annams@google.com (Srinivas Annam)
- */
-
-
-/*
- * TODO(annams): Rename (here and in renderer.js) to specify class name as
- * goog-autocomplete-renderer
- */
-.ac-renderer {
-  font: normal 13px Arial, sans-serif;
-  position: absolute;
-  background: #fff;
-  border: 1px solid #666;
-  -moz-box-shadow: 2px 2px 2px rgba(102, 102, 102, .4);
-  -webkit-box-shadow: 2px 2px 2px rgba(102, 102, 102, .4);
-  width: 300px;
-}
-
-.ac-row {
-  cursor: pointer;
-  padding: .4em;
-}
-
-.ac-highlighted {
-  font-weight: bold;
-}
-
-.ac-active {
-  background-color: #b2b4bf;
-}
-
 /* ==========================================================================
    normalize.css v1.1.0 | MIT License | git.io/normalize
    ========================================================================== */
@@ -751,186 +571,225 @@ table {
 }
 
 /* ==========================================================================
-   HTML5 Boilerplate styles - h5bp.com (generated via initializr.com)
+   Helper classes
    ========================================================================== */
+
+.clearfix:before,
+.clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.clearfix {
+  *zoom: 1;
+}
+
+/* ==========================================================================
+   User defined
+   ========================================================================== */
+/* ==========================================================================
+   Variables
+   ========================================================================== */
+@def NORMAL_FONT_COLOR           #222;
+@def TITLE_FONT_COLOR            white;
+@def FOOTER_FONT_COLOR           rgba(0, 0, 0, 0.45);
+@def ERR_FONT_COLOR              red;
+@def DISABLED_FONT_COLOR         rgb(176, 176, 176);
+
+@def HEADER_BG_COLOR             rgb(176, 176, 176);
+@def FOOTER_BG_COLOR             rgb(229, 229, 229);
+
+@def PRIMARY_BTN_BG_COLOR        rgb(108, 198, 85);
+@def BTN_BG_COLOR                rgba(0, 0, 0, 0.45);
+@def NEXT_BTN_BG_COLOR           rgba(0, 0, 0, 0.65);
+@def CONFIRM_BTN_BG_COLOR        red;
+
+/* ==========================================================================
+   Mixins
+   ========================================================================== */
+
+@defmixin initBtn(COLOR, BG_COLOR) {
+  display: block;
+  border: 0;
+  color: COLOR;
+  background: BG_COLOR;
+  font-weight: bold;
+}
+
+@defmixin initTB(WIDTH, MARGIN) {
+  display: block;
+  width: WIDTH;
+  margin: MARGIN;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+@defmixin errBlock() {
+  display: block;
+  color: ERR_FONT_COLOR;
+}
+
+@defmixin boxSizing() {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Initialization
+   ========================================================================== */
+
+html {
+  overflow-y: scroll;
+}
 
 html,
 button,
 input,
 select,
 textarea {
-    color: #222;
+  color: NORMAL_FONT_COLOR;
+  font-family: Helvetica, Helvetica Neue, Arial, sans-serif;
 }
 
 body {
-    font-size: 1em;
-    line-height: 1.4;
+  font: 16px/26px Helvetica, Helvetica Neue, Arial, sans-serif;
+  /*line-height: 1.4;*/
 }
 
 ::-moz-selection {
-    background: #b3d4fc;
-    text-shadow: none;
+  background: #b3d4fc;
+  text-shadow: none;
 }
 
 ::selection {
-    background: #b3d4fc;
-    text-shadow: none;
+  background: #b3d4fc;
+  text-shadow: none;
 }
 
-hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
+button[disabled] {
+  color: DISABLED_FONT_COLOR !important;
 }
 
-img {
-    vertical-align: middle;
-}
-
-fieldset {
-    border: 0;
-    margin: 0;
-    padding: 0;
-}
-
-textarea {
-    resize: vertical;
-}
-
-.chromeframe {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
-}
-
-
-/* ===== Initializr Styles ==================================================
-   Author: Jonathan Verrecchia - verekia.com/initializr/responsive-template
-   ========================================================================== */
-
-body {
-    font: 16px/26px Helvetica, Helvetica Neue, Arial;
-}
-
-.wrapper {
-    width: 90%;
-    margin: 0 5%;
+html input[disabled] {
+  color: DISABLED_FONT_COLOR !important;
 }
 
 /* ===================
-    ALL: Orange Theme
+   ALL: Container
    =================== */
 
+.wrapper {
+  width: 90%;
+  margin: 0 5%;
+}
+
 .header-container {
-    border-bottom: 20px solid #e44d26;
+  background: HEADER_BG_COLOR;
 }
 
-.footer-container,
-.main aside {
-    border-top: 20px solid #e44d26;
-}
-
-.header-container,
-.footer-container,
-.main aside {
-    background: #f16529;
-}
-
-.title {
-    color: white;
+.footer-container {
+  background: FOOTER_BG_COLOR;
 }
 
 /* ==============
-    MOBILE: Menu
+   MOBILE: Header
+   ============== */
+
+.header-container header {
+  padding: 20px 0;
+}
+
+#homeBtn {
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  color: TITLE_FONT_COLOR;
+  background: BTN_BG_COLOR;
+}
+
+#homeBtn:hover,
+#homeBtn:visited {
+  color: white;
+}
+
+#homeBtn:hover {
+  text-decoration: underline;
+}
+
+.title {
+  color: TITLE_FONT_COLOR;
+  margin: 15px 0;
+}
+
+.title h1 {
+  margin: 0;
+
+}
+
+.title h1 span {
+  display: inline-block;
+  margin: 10px 0;
+}
+
+.title p {
+  margin: 0;
+}
+
+/* ==============
+   MOBILE: Main
+   ============== */
+
+.main {
+  padding: 30px 0;
+}
+
+/* ==============
+   MOBILE: Footer
+   ============== */
+
+.footer-container footer {
+  color: FOOTER_FONT_COLOR;
+  padding: 20px 0;
+}
+
+/* ==============
+   MOBILE: Footer menu
    ============== */
 
 nav ul {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 nav a {
-    display: block;
-    margin-bottom: 10px;
-    padding: 15px 0;
+  display: block;
+  margin-bottom: 10px;
+  padding: 15px 0;
 
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
 
-    color: white;
-    background: #e44d26;
+  color: TITLE_FONT_COLOR;
+  background: BTN_BG_COLOR;
 }
 
 nav a:hover,
 nav a:visited {
-    color: white;
+  color: white;
 }
 
 nav a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
-
-/* ==============
-    MOBILE: Main
-   ============== */
-
-.main {
-    padding: 30px 0;
-}
-
-.main article h1 {
-    font-size: 2em;
-}
-
-.main aside {
-    color: white;
-    padding: 0px 5% 10px;
-}
-
-.footer-container footer {
-    color: white;
-    padding: 20px 0;
-}
-
-/* ===============
-    ALL: IE Fixes
-   =============== */
-
-.ie7 .title {
-    padding-top: 20px;
-}
-
-/* ==========================================================================
-   Author's custom styles
-   ========================================================================== */
-
-h1 a {
-    text-decoration: none;
-    color: white;
-}
-
-h1 a:hover,
-h1 a:visited {
-    color: white;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ==========================================================================
    Media Queries
@@ -938,221 +797,80 @@ h1 a:visited {
 
 @media only screen and (min-width: 480px) {
 
-/* ====================
-    INTERMEDIATE: Menu
-   ==================== */
+  /* ============
+     INTERMEDIATE: Header
+     ============ */
+  .title h1 span {
+    margin: 5px 0;
+  }
 
-    nav a {
-        float: left;
-        width: 27%;
-        margin: 0 1.7%;
-        padding: 25px 2%;
-        margin-bottom: 0;
-    }
+   /* ====================
+     INTERMEDIATE: Footer menu
+     ==================== */
 
-    nav li:first-child a {
-        margin-left: 0;
-    }
+  nav a {
+    float: left;
+    margin: 0 1.7%;
+    padding: 25px 8.7%;
+    margin-bottom: 0;
+  }
 
-    nav li:last-child a {
-        margin-right: 0;
-    }
+  nav li:first-child a {
+    margin-left: 0;
+  }
 
-/* ========================
-    INTERMEDIATE: IE Fixes
-   ======================== */
+  nav li:last-child a {
+    margin-right: 0;
+  }
 
-    nav ul li {
-        display: inline;
-    }
-
-    .oldie nav a {
-        margin: 0 0.7%;
-    }
+  .settings-footer nav a {
+    padding: 25px 1.5%;
+  }
 }
 
 @media only screen and (min-width: 768px) {
 
-/* ====================
-    WIDE: CSS3 Effects
-   ==================== */
+  .wrapper {
+    width: 691px; /* 768px - 10% for margins */
+    margin: 0 auto;
+  }
 
-    .header-container,
-    .main aside {
-        -webkit-box-shadow: 0 5px 10px #aaa;
-           -moz-box-shadow: 0 5px 10px #aaa;
-                box-shadow: 0 5px 10px #aaa;
-    }
+  /* ============
+     WIDE: Main
+     ============ */
 
-/* ============
-    WIDE: Menu
-   ============ */
+  .main article {
+    float: left;
+    width: 57%;
+  }
 
-    .title {
-        float: left;
-    }
+  .main aside {
+    float: right;
+    width: 28%;
+  }
 
-    nav {
-        float: right;
-        width: 38%;
-    }
+  /* ============
+     WIDE: Footer menu
+     ============ */
 
-/* ============
-    WIDE: Main
-   ============ */
+  footer h3 {
+    float: left;
+  }
 
-    .main article {
-        float: left;
-        width: 57%;
-    }
+  nav {
+    float: left;
+    width: 71.7%;
+  }
 
-    .main aside {
-        float: right;
-        width: 28%;
-    }
-}
+  nav a {
+    padding: 25px 8.5%;
+  }
 
-@media only screen and (min-width: 1140px) {
+  nav li:first-child a {
+    margin-left: 3.4%;
+  }
 
-/* ===============
-    Maximal Width
-   =============== */
-
-    .wrapper {
-        width: 1026px; /* 1140px - 10% for margins */
-        margin: 0 auto;
-    }
-}
-
-/* ==========================================================================
-   Helper classes
-   ========================================================================== */
-
-.ir {
-    background-color: transparent;
-    border: 0;
-    overflow: hidden;
-    *text-indent: -9999px;
-}
-
-.ir:before {
-    content: "";
-    display: block;
-    width: 0;
-    height: 150%;
-}
-
-.hidden {
-    display: none !important;
-    visibility: hidden;
-}
-
-.visuallyhidden {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-}
-
-.visuallyhidden.focusable:active,
-.visuallyhidden.focusable:focus {
-    clip: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    position: static;
-    width: auto;
-}
-
-.invisible {
-    visibility: hidden;
-}
-
-.clearfix:before,
-.clearfix:after {
-    content: " ";
-    display: table;
-}
-
-.clearfix:after {
-    clear: both;
-}
-
-.clearfix {
-    *zoom: 1;
-}
-
-/* ==========================================================================
-   Print styles
-   ========================================================================== */
-
-@media print {
-    * {
-        background: transparent !important;
-        color: #000 !important; /* Black prints faster: h5bp.com/s */
-        box-shadow: none !important;
-        text-shadow: none !important;
-    }
-
-    a,
-    a:visited {
-        text-decoration: underline;
-    }
-
-    a[href]:after {
-        content: " (" attr(href) ")";
-    }
-
-    abbr[title]:after {
-        content: " (" attr(title) ")";
-    }
-
-    /*
-     * Don't show links for images, or javascript/internal links
-     */
-
-    .ir a:after,
-    a[href^="javascript:"]:after,
-    a[href^="#"]:after {
-        content: "";
-    }
-
-    pre,
-    blockquote {
-        border: 1px solid #999;
-        page-break-inside: avoid;
-    }
-
-    thead {
-        display: table-header-group; /* h5bp.com/t */
-    }
-
-    tr,
-    img {
-        page-break-inside: avoid;
-    }
-
-    img {
-        max-width: 100% !important;
-    }
-
-    @page {
-        margin: 0.5cm;
-    }
-
-    p,
-    h2,
-    h3 {
-        orphans: 3;
-        widows: 3;
-    }
-
-    h2,
-    h3 {
-        page-break-after: avoid;
-    }
+  nav li:last-child a {
+    margin-right: 3.4%;
+  }
 }

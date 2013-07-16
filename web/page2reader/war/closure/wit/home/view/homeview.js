@@ -1,10 +1,10 @@
 goog.provide('wit.home.view.HomeView');
 
 goog.require('goog.dom');
-goog.require('goog.dom.classes');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
+goog.require('wit.fx.dom');
 goog.require('wit.home.model.DataStore');
 
 
@@ -25,11 +25,24 @@ wit.home.view.HomeView.CSS_CLASS = goog.getCssName('home');
 
 
 /**
- * @type {string}
- * @const
+ * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.forgotExpandCss = goog.getCssName('forgot-expand');
+wit.home.view.HomeView.prototype.showLogInBtn;
+
+
+/**
+ * @type {Element}
+ * @protected
+ */
+wit.home.view.HomeView.prototype.logInView;
+
+
+/**
+ * @type {Element}
+ * @protected
+ */
+wit.home.view.HomeView.prototype.logInErrLb;
 
 
 /**
@@ -50,21 +63,7 @@ wit.home.view.HomeView.prototype.logInPasswordTB;
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.logInErrLb;
-
-
-/**
- * @type {Element}
- * @protected
- */
 wit.home.view.HomeView.prototype.logInBtn;
-
-
-/**
- * @type {Element}
- * @protected
- */
-wit.home.view.HomeView.prototype.logInLoadingImg;
 
 
 /**
@@ -78,21 +77,14 @@ wit.home.view.HomeView.prototype.forgotBtn;
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.forgotPanel;
+wit.home.view.HomeView.prototype.forgotView;
 
 
 /**
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.forgotResult;
-
-
-/**
- * @type {Element}
- * @protected
- */
-wit.home.view.HomeView.prototype.forgotForm;
+wit.home.view.HomeView.prototype.forgotFormView;
 
 
 /**
@@ -120,42 +112,28 @@ wit.home.view.HomeView.prototype.forgotOkBtn;
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.forgotCancelBtn;
+wit.home.view.HomeView.prototype.forgotResultView;
 
 
 /**
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.forgotLoadingImg;
+wit.home.view.HomeView.prototype.forgotResultOkBtn;
 
 
 /**
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.signUpUsernameTB;
+wit.home.view.HomeView.prototype.showSignUpBtn;
 
 
 /**
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.signUpEmailTB;
-
-
-/**
- * @type {Element}
- * @protected
- */
-wit.home.view.HomeView.prototype.signUpPasswordTB;
-
-
-/**
- * @type {Element}
- * @protected
- */
-wit.home.view.HomeView.prototype.signUpRepeatPasswordTB;
+wit.home.view.HomeView.prototype.signUpView;
 
 
 /**
@@ -169,7 +147,7 @@ wit.home.view.HomeView.prototype.signUpUsernameErrLb;
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.signUpEmailErrLb;
+wit.home.view.HomeView.prototype.signUpUsernameTB;
 
 
 /**
@@ -183,6 +161,13 @@ wit.home.view.HomeView.prototype.signUpPasswordErrLb;
  * @type {Element}
  * @protected
  */
+wit.home.view.HomeView.prototype.signUpPasswordTB;
+
+
+/**
+ * @type {Element}
+ * @protected
+ */
 wit.home.view.HomeView.prototype.signUpRepeatPasswordErrLb;
 
 
@@ -190,14 +175,28 @@ wit.home.view.HomeView.prototype.signUpRepeatPasswordErrLb;
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.signUpBtn;
+wit.home.view.HomeView.prototype.signUpRepeatPasswordTB;
 
 
 /**
  * @type {Element}
  * @protected
  */
-wit.home.view.HomeView.prototype.signUpLoadingImg;
+wit.home.view.HomeView.prototype.signUpEmailErrLb;
+
+
+/**
+ * @type {Element}
+ * @protected
+ */
+wit.home.view.HomeView.prototype.signUpEmailTB;
+
+
+/**
+ * @type {Element}
+ * @protected
+ */
+wit.home.view.HomeView.prototype.signUpBtn;
 
 
 /** @inheritDoc */
@@ -209,39 +208,47 @@ wit.home.view.HomeView.prototype.createDom = function() {
 wit.home.view.HomeView.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
 
-  // Although decorateInternal(element) expects to be called with an element
-  // that is already attached to the document and therefore may already leverage
-  // methods such as getElementByFragment(), it must be careful not to make that
-  // assumption for a component that calls decorate Internal() from createDom().
+  this.showLogInBtn = goog.dom.getElement('showLogInBtn');
+  this.logInView = goog.dom.getElement('logInView');
 
+  goog.style.setElementShown(this.logInView, false);
+
+  this.logInErrLb = goog.dom.getElement('logInErrLb');
   this.logInUsernameTB = goog.dom.getElement('logInUsernameTB');
   this.logInPasswordTB = goog.dom.getElement('logInPasswordTB');
-  this.logInErrLb = goog.dom.getElement('logInErrLb');
   this.logInBtn = goog.dom.getElement('logInBtn');
-  this.logInLoadingImg = goog.dom.getElement('logInLoadingImg');
 
   this.forgotBtn = goog.dom.getElement('forgotBtn');
+  this.forgotView = goog.dom.getElement('forgotView');
 
-  this.forgotPanel = goog.dom.getElement('forgotP');
-  this.forgotResult = goog.dom.getElement('forgotResult');
-  this.forgotForm = goog.dom.getElement('forgotForm');
+  goog.style.setElementShown(this.forgotView, false);
+
+  this.forgotFormView = goog.dom.getElement('forgotFormView');
   this.forgotUsernameErrLb = goog.dom.getElement('forgotUsernameErrLb');
   this.forgotUsernameTB = goog.dom.getElement('forgotUsernameTB');
   this.forgotOkBtn = goog.dom.getElement('forgotOkBtn');
-  this.forgotCancelBtn = goog.dom.getElement('forgotCancelBtn');
-  this.forgotLoadingImg = goog.dom.getElement('forgotLoadingImg');
 
-  this.signUpUsernameTB = goog.dom.getElement('signUpUsernameTB');
-  this.signUpEmailTB = goog.dom.getElement('signUpEmailTB');
-  this.signUpPasswordTB = goog.dom.getElement('signUpPasswordTB');
-  this.signUpRepeatPasswordTB = goog.dom.getElement('signUpRepeatPasswordTB');
+  this.forgotResultView = goog.dom.getElement('forgotResultView');
+
+  goog.style.setElementShown(this.forgotResultView, false);
+
+  this.forgotResultOkBtn = goog.dom.getElement('forgotResultOkBtn');
+
+  this.showSignUpBtn = goog.dom.getElement('showSignUpBtn');
+  this.signUpView = goog.dom.getElement('signUpView');
+
+  goog.style.setElementShown(this.signUpView, false);
+
   this.signUpUsernameErrLb = goog.dom.getElement('signUpUsernameErrLb');
-  this.signUpEmailErrLb = goog.dom.getElement('signUpEmailErrLb');
+  this.signUpUsernameTB = goog.dom.getElement('signUpUsernameTB');
   this.signUpPasswordErrLb = goog.dom.getElement('signUpPasswordErrLb');
+  this.signUpPasswordTB = goog.dom.getElement('signUpPasswordTB');
   this.signUpRepeatPasswordErrLb = goog.dom.getElement(
       'signUpRepeatPasswordErrLb');
+  this.signUpRepeatPasswordTB = goog.dom.getElement('signUpRepeatPasswordTB');
+  this.signUpEmailErrLb = goog.dom.getElement('signUpEmailErrLb');
+  this.signUpEmailTB = goog.dom.getElement('signUpEmailTB');
   this.signUpBtn = goog.dom.getElement('signUpBtn');
-  this.signUpLoadingImg = goog.dom.getElement('signUpLoadingImg');
 };
 
 
@@ -249,10 +256,31 @@ wit.home.view.HomeView.prototype.decorateInternal = function(element) {
 wit.home.view.HomeView.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
+  this.getHandler().listen(this.showLogInBtn, goog.events.EventType.CLICK,
+      function(e) {
+
+        var toggle = 'hide';
+        if (!goog.style.isElementShown(this.logInView)) {
+          this.logInErrLb.innerHTML = wit.base.constants.htmlSpace;
+          this.logInUsernameTB.value = '';
+          this.logInPasswordTB.value = '';
+
+          toggle = 'show';
+        }
+
+        wit.fx.dom.animate(
+            this.logInView,
+            {'height': toggle,
+              'padding-top': toggle,
+              'padding-bottom': toggle},
+            250);
+      });
+
   this.getHandler().listen(this.logInBtn, goog.events.EventType.CLICK,
       function(e) {
-        goog.style.setElementShown(this.logInBtn, false);
-        goog.style.setElementShown(this.logInLoadingImg, true);
+        goog.dom.setProperties(this.logInUsernameTB, {'disabled': true});
+        goog.dom.setProperties(this.logInPasswordTB, {'disabled': true});
+        goog.dom.setProperties(this.logInBtn, {'disabled': true});
 
         var dataStore = wit.home.model.DataStore.getInstance();
         var log = new wit.base.model.Log();
@@ -264,11 +292,83 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
       });
 
   this.getHandler().listen(
+      this.forgotBtn,
+      goog.events.EventType.CLICK,
+      function(e) {
+
+        var toggle = 'hide';
+
+        if (!goog.style.isElementShown(this.forgotView)) {
+          this.forgotUsernameErrLb.innerHTML = wit.base.constants.htmlSpace;
+          this.forgotUsernameTB.value = '';
+
+          toggle = 'show';
+        }
+
+        wit.fx.dom.animate(
+            this.forgotView,
+            {'height': toggle,
+              'padding-top': toggle,
+              'padding-bottom': toggle},
+            250);
+      });
+
+  this.getHandler().listen(
+      this.forgotOkBtn,
+      goog.events.EventType.CLICK,
+      function(e) {
+        goog.dom.setProperties(this.forgotUsernameTB, {'disabled': true});
+        goog.dom.setProperties(this.forgotOkBtn, {'disabled': true});
+
+        var dataStore = wit.home.model.DataStore.getInstance();
+        var log = new wit.base.model.Log();
+        dataStore.sendEmailResetPassword(
+            this.forgotUsernameTB.value,
+            log,
+            goog.bind(this.sendEmailResetPasswordCallback_, this));
+      });
+
+  this.getHandler().listen(
+      this.forgotResultOkBtn,
+      goog.events.EventType.CLICK,
+      function(e) {
+        wit.fx.dom.animate(
+            this.forgotView,
+            {'height': 'hide',
+              'padding-top': 'hide',
+              'padding-bottom': 'hide'},
+            250);
+      });
+
+  this.getHandler().listen(this.showSignUpBtn, goog.events.EventType.CLICK,
+      function(e) {
+
+        this.signUpUsernameErrLb.innerHTML = wit.base.constants.htmlSpace;
+        this.signUpUsernameTB.value = '';
+        this.signUpPasswordErrLb.innerHTML = wit.base.constants.htmlSpace;
+        this.signUpPasswordTB.value = '';
+        this.signUpRepeatPasswordErrLb.innerHTML = wit.base.constants.htmlSpace;
+        this.signUpRepeatPasswordTB.value = '';
+        this.signUpEmailErrLb.innerHTML = wit.base.constants.htmlSpace;
+        this.signUpEmailTB.value = '';
+
+        wit.fx.dom.animate(
+            this.signUpView,
+            {'height': 'toggle',
+              'padding-top': 'toggle',
+              'padding-bottom': 'toggle'},
+            250);
+      });
+
+  this.getHandler().listen(
       this.signUpBtn,
       goog.events.EventType.CLICK,
       function(e) {
-        goog.style.setElementShown(this.signUpBtn, false);
-        goog.style.setElementShown(this.signUpLoadingImg, true);
+        goog.dom.setProperties(this.signUpUsernameTB, {'disabled': true});
+        goog.dom.setProperties(this.signUpPasswordTB, {'disabled': true});
+        goog.dom.setProperties(this.signUpRepeatPasswordTB, {'disabled': true});
+        goog.dom.setProperties(this.signUpEmailTB, {'disabled': true});
+        goog.dom.setProperties(this.signUpBtn, {'disabled': true});
 
         var dataStore = wit.home.model.DataStore.getInstance();
         var log = new wit.base.model.Log();
@@ -282,50 +382,6 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
       });
 
   this.getHandler().listen(
-      this.forgotBtn,
-      goog.events.EventType.CLICK,
-      function(e) {
-        // Show forgot panel to let the user enters his/her username or email.
-        if (!goog.dom.classes.has(this.forgotPanel,
-            wit.home.view.HomeView.forgotExpandCss)) {
-          // Reset all inputs
-          goog.style.setElementShown(this.forgotResult, false);
-          goog.style.setElementShown(this.forgotForm, true);
-
-          this.forgotUsernameErrLb.innerHTML = wit.base.constants.htmlSpace;
-          this.forgotUsernameTB.value = '';
-
-          goog.dom.classes.add(this.forgotPanel,
-              wit.home.view.HomeView.forgotExpandCss);
-        }
-      });
-
-  this.getHandler().listen(
-      this.forgotOkBtn,
-      goog.events.EventType.CLICK,
-      function(e) {
-        // Hide the button, show the loading image.
-        goog.style.setElementShown(this.forgotOkBtn, false);
-        goog.style.setElementShown(this.forgotCancelBtn, false);
-        goog.style.setElementShown(this.forgotLoadingImg, true);
-
-        var dataStore = wit.home.model.DataStore.getInstance();
-        var log = new wit.base.model.Log();
-        dataStore.sendEmailResetPassword(
-            this.forgotUsernameTB.value,
-            log,
-            goog.bind(this.sendEmailResetPasswordCallback_, this));
-      });
-
-  this.getHandler().listen(
-      this.forgotCancelBtn,
-      goog.events.EventType.CLICK,
-      function(e) {
-        goog.dom.classes.remove(this.forgotPanel,
-            wit.home.view.HomeView.forgotExpandCss);
-      });
-
-  this.getHandler().listen(
       this.signUpUsernameTB,
       goog.events.EventType.BLUR,
       function(e) {
@@ -333,7 +389,7 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
         wit.user.model.UserVerifier.isUsernameValid(
             this.signUpUsernameTB.value,
             log,
-            goog.bind(this.validateUsernameCallback_, this));
+            goog.bind(this.validateSignUpUsernameCallback_, this));
       });
 
   this.getHandler().listen(
@@ -344,7 +400,7 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
         wit.user.model.UserVerifier.isEmailValid(
             this.signUpEmailTB.value,
             log,
-            goog.bind(this.validateEmailCallback_, this));
+            goog.bind(this.validateSignUpEmailCallback_, this));
       });
 
   this.getHandler().listen(
@@ -356,7 +412,7 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
             this.signUpPasswordTB.value,
             log,
             wit.base.constants.password);
-        this.validatePasswordCallback_(log);
+        this.validateSignUpPasswordCallback_(log);
       });
 
   this.getHandler().listen(
@@ -368,7 +424,7 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
             this.signUpPasswordTB.value,
             this.signUpRepeatPasswordTB.value,
             log);
-        this.validateRepeatPasswordCallback_(log);
+        this.validateSignUpRepeatPasswordCallback_(log);
       });
 };
 
@@ -440,9 +496,9 @@ wit.home.view.HomeView.prototype.logInCallback_ = function(log) {
     this.logInErrLb.innerHTML = logInfo.msg;
   }
 
-  // Show the button, hide the image.
-  goog.style.setElementShown(this.logInBtn, true);
-  goog.style.setElementShown(this.logInLoadingImg, false);
+  goog.dom.setProperties(this.logInUsernameTB, {'disabled': false});
+  goog.dom.setProperties(this.logInPasswordTB, {'disabled': false});
+  goog.dom.setProperties(this.logInBtn, {'disabled': false});
 };
 
 
@@ -502,9 +558,11 @@ wit.home.view.HomeView.prototype.signUpCallback_ = function(log) {
     this.signUpRepeatPasswordErrLb.innerHTML = logInfo.msg;
   }
 
-  // Show the button, hide the image.
-  goog.style.setElementShown(this.signUpBtn, true);
-  goog.style.setElementShown(this.signUpLoadingImg, false);
+  goog.dom.setProperties(this.signUpUsernameTB, {'disabled': false});
+  goog.dom.setProperties(this.signUpPasswordTB, {'disabled': false});
+  goog.dom.setProperties(this.signUpRepeatPasswordTB, {'disabled': false});
+  goog.dom.setProperties(this.signUpEmailTB, {'disabled': false});
+  goog.dom.setProperties(this.signUpBtn, {'disabled': false});
 };
 
 
@@ -528,8 +586,8 @@ wit.home.view.HomeView.prototype.sendEmailResetPasswordCallback_ =
 
   logInfo = log.getLogInfo(wit.base.constants.sendEmailResetPassword, true);
   if (goog.isDef(logInfo)) {
-    goog.style.setElementShown(this.forgotResult, true);
-    goog.style.setElementShown(this.forgotForm, false);
+    wit.fx.dom.swap(this.forgotView, 250);
+    return;
   }
 
   this.forgotUsernameErrLb.innerHTML = wit.base.constants.htmlSpace;
@@ -549,10 +607,8 @@ wit.home.view.HomeView.prototype.sendEmailResetPasswordCallback_ =
     this.forgotUsernameErrLb.innerHTML = logInfo.msg;
   }
 
-  // Show the button, hide the image.
-  goog.style.setElementShown(this.forgotOkBtn, true);
-  goog.style.setElementShown(this.forgotCancelBtn, true);
-  goog.style.setElementShown(this.forgotLoadingImg, false);
+  goog.dom.setProperties(this.forgotUsernameTB, {'disabled': false});
+  goog.dom.setProperties(this.forgotOkBtn, {'disabled': false});
 };
 
 
@@ -562,13 +618,20 @@ wit.home.view.HomeView.prototype.sendEmailResetPasswordCallback_ =
  * @this {wit.home.view.HomeView}
  * @private
  */
-wit.home.view.HomeView.prototype.validateUsernameCallback_ = function(log) {
-  var logInfo = log.getLogInfo(wit.base.constants.username, false);
+wit.home.view.HomeView.prototype.validateSignUpUsernameCallback_ = function(
+    log) {
+  var logInfo = log.getLogInfo(wit.base.constants.username);
   if (goog.isDef(logInfo)) {
-    this.signUpUsernameErrLb.innerHTML = logInfo.msg;
-  } else {
-    this.signUpUsernameErrLb.innerHTML = wit.base.constants.htmlSpace;
+    // Check if the value is still the same
+    if (logInfo.value === this.signUpUsernameTB.value) {
+      if (logInfo.isValid === false) {
+        this.signUpUsernameErrLb.innerHTML = logInfo.msg;
+      } else {
+        this.signUpUsernameErrLb.innerHTML = wit.base.constants.htmlSpace;
+      }
+    }
   }
+  // Else, maybe server went wrong, should be able to ignore.
 };
 
 
@@ -578,13 +641,19 @@ wit.home.view.HomeView.prototype.validateUsernameCallback_ = function(log) {
  * @this {wit.home.view.HomeView}
  * @private
  */
-wit.home.view.HomeView.prototype.validateEmailCallback_ = function(log) {
-  var logInfo = log.getLogInfo(wit.base.constants.email, false);
+wit.home.view.HomeView.prototype.validateSignUpEmailCallback_ = function(log) {
+  var logInfo = log.getLogInfo(wit.base.constants.email);
   if (goog.isDef(logInfo)) {
-    this.signUpEmailErrLb.innerHTML = logInfo.msg;
-  } else {
-    this.signUpEmailErrLb.innerHTML = wit.base.constants.htmlSpace;
+    // Check if the value is still the same
+    if (logInfo.value === this.signUpEmailTB.value) {
+      if (logInfo.isValid === false) {
+        this.signUpEmailErrLb.innerHTML = logInfo.msg;
+      } else {
+        this.signUpEmailErrLb.innerHTML = wit.base.constants.htmlSpace;
+      }
+    }
   }
+  // Else, maybe server went wrong, should be able to ignore.
 };
 
 
@@ -594,13 +663,20 @@ wit.home.view.HomeView.prototype.validateEmailCallback_ = function(log) {
  * @this {wit.home.view.HomeView}
  * @private
  */
-wit.home.view.HomeView.prototype.validatePasswordCallback_ = function(log) {
-  var logInfo = log.getLogInfo(wit.base.constants.password, false);
+wit.home.view.HomeView.prototype.validateSignUpPasswordCallback_ = function(
+    log) {
+  var logInfo = log.getLogInfo(wit.base.constants.password);
   if (goog.isDef(logInfo)) {
-    this.signUpPasswordErrLb.innerHTML = logInfo.msg;
-  } else {
-    this.signUpPasswordErrLb.innerHTML = wit.base.constants.htmlSpace;
+    // Check if the value is still the same
+    if (logInfo.value === this.signUpPasswordTB.value) {
+      if (logInfo.isValid === false) {
+        this.signUpPasswordErrLb.innerHTML = logInfo.msg;
+      } else {
+        this.signUpPasswordErrLb.innerHTML = wit.base.constants.htmlSpace;
+      }
+    }
   }
+  // Else, maybe server went wrong, should be able to ignore.
 };
 
 
@@ -611,12 +687,18 @@ wit.home.view.HomeView.prototype.validatePasswordCallback_ = function(log) {
  * @this {wit.home.view.HomeView}
  * @private
  */
-wit.home.view.HomeView.prototype.validateRepeatPasswordCallback_ = function(
-    log) {
-  var logInfo = log.getLogInfo(wit.base.constants.repeatPassword, false);
+wit.home.view.HomeView.prototype.validateSignUpRepeatPasswordCallback_ =
+    function(log) {
+  var logInfo = log.getLogInfo(wit.base.constants.repeatPassword);
   if (goog.isDef(logInfo)) {
-    this.signUpRepeatPasswordErrLb.innerHTML = logInfo.msg;
-  } else {
-    this.signUpRepeatPasswordErrLb.innerHTML = wit.base.constants.htmlSpace;
+    // Check if the value is still the same
+    if (logInfo.value === this.signUpRepeatPasswordTB.value) {
+      if (logInfo.isValid === false) {
+        this.signUpRepeatPasswordErrLb.innerHTML = logInfo.msg;
+      } else {
+        this.signUpRepeatPasswordErrLb.innerHTML = wit.base.constants.htmlSpace;
+      }
+    }
   }
+  // Else, maybe server went wrong, should be able to ignore.
 };

@@ -132,15 +132,8 @@ public class BServlet extends BaseServlet {
         SoyMapData soyMapData = null;
 
         String pageUrlViews = "";
-        String noDataView = "";
         PageUrlList pageUrls = P2rManager.getPagingPageUrls(user, null);
-        if (pageUrls.size() == 0) {
-            noDataView = BaseServlet.getTemplate(
-                    soyFileList,
-                    "wit.page2reader.soy.p2r.noEntry",
-                    getWorkCssRenamingMapFile(device, mode),
-                    soyMapData);
-        } else {
+        if (pageUrls.size() > 0) {
             for (PageUrl pageUrl : pageUrls) {
                 soyMapData = new SoyMapData(
                         P2rConstants.KEY_STRING, pageUrl.getKeyString(),
@@ -157,7 +150,6 @@ public class BServlet extends BaseServlet {
 
         soyMapData = new SoyMapData(
                         P2rConstants.PAGE_URL_VIEWS, pageUrlViews,
-                        P2rConstants.NO_DATA_VIEW, noDataView,
                         P2rConstants.CURSOR_STRING, pageUrls.getCursorString());
         String content = BaseServlet.getTemplate(
                 soyFileList,
@@ -266,7 +258,7 @@ public class BServlet extends BaseServlet {
             boolean didConfirmEmail) throws JSONException, IOException {
 
         ReaderEmail readerEmail = P2rManager.getReaderEmail(user);
-        String rEmail = readerEmail == null ? "" : readerEmail.getREmail();
+        String rEmail = readerEmail == null ? null : readerEmail.getREmail();
         return new SoyMapData(
                 P2rConstants.READER_EMAIL, rEmail,
                 BaseConstants.USERNAME, username,

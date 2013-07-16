@@ -1,13 +1,14 @@
 goog.provide('wit.home.view.ResetPasswordView');
-goog.provide('wit.home.view.ResetPasswordView.Events');
-goog.provide('wit.home.view.ResetPasswordViewEvent');
 
+goog.require('goog.Uri');
 goog.require('goog.dom');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
 goog.require('wit.base.constants');
 goog.require('wit.base.model.Log');
+goog.require('wit.fx.dom');
+goog.require('wit.home.model.DataStore');
 
 
 
@@ -22,15 +23,6 @@ wit.home.view.ResetPasswordView = function(opt_domHelper) {
 goog.inherits(wit.home.view.ResetPasswordView, goog.ui.Component);
 
 
-/**
- * Constants for event names
- * @type {Object}
- */
-wit.home.view.ResetPasswordView.Events = {
-  RESET_PASSWORD: goog.events.getUniqueId('resetPassword')
-};
-
-
 /** @type {string} */
 wit.home.view.ResetPasswordView.CSS_CLASS = goog.getCssName('resetPassword');
 
@@ -39,56 +31,56 @@ wit.home.view.ResetPasswordView.CSS_CLASS = goog.getCssName('resetPassword');
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.resultLb_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordView_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.formPanel_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordFormView_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.newPasswordErrLb_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordNewPasswordErrLb_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.newPasswordTB_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordNewPasswordTB_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.repeatPasswordErrLb_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordRepeatPasswordErrLb_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.repeatPasswordTB_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordRepeatPasswordTB_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.okBtn_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordBtn_;
 
 
 /**
  * @type {Element}
  * @private
  */
-wit.home.view.ResetPasswordView.prototype.loadingImg_;
+wit.home.view.ResetPasswordView.prototype.resetPasswordResultView_;
 
 
 /** @inheritDoc */
@@ -105,14 +97,23 @@ wit.home.view.ResetPasswordView.prototype.decorateInternal = function(element) {
   // methods such as getElementByFragment(), it must be careful not to make that
   // assumption for a component that calls decorate Internal() from createDom().
 
-  this.resultLb_ = goog.dom.getElement('resultLb');
-  this.formPanel_ = goog.dom.getElement('formPanel');
-  this.newPasswordErrLb_ = goog.dom.getElement('newPasswordErrLb');
-  this.newPasswordTB_ = goog.dom.getElement('newPasswordTB');
-  this.repeatPasswordErrLb_ = goog.dom.getElement('repeatPasswordErrLb');
-  this.repeatPasswordTB_ = goog.dom.getElement('repeatPasswordTB');
-  this.okBtn_ = goog.dom.getElement('okBtn');
-  this.loadingImg_ = goog.dom.getElement('loadingImg');
+  this.resetPasswordView_ = goog.dom.getElement('resetPasswordView');
+  if (goog.isDefAndNotNull(this.resetPasswordView_)) {
+    this.resetPasswordFormView_ = goog.dom.getElement('resetPasswordFormView');
+    this.resetPasswordNewPasswordErrLb_ = goog.dom.getElement(
+        'resetPasswordNewPasswordErrLb');
+    this.resetPasswordNewPasswordTB_ = goog.dom.getElement(
+        'resetPasswordNewPasswordTB');
+    this.resetPasswordRepeatPasswordErrLb_ = goog.dom.getElement(
+        'resetPasswordRepeatPasswordErrLb');
+    this.resetPasswordRepeatPasswordTB_ = goog.dom.getElement(
+        'resetPasswordRepeatPasswordTB');
+    this.resetPasswordBtn_ = goog.dom.getElement('resetPasswordBtn');
+    this.resetPasswordResultView_ = goog.dom.getElement(
+        'resetPasswordResultView');
+
+    goog.style.setElementShown(this.resetPasswordResultView_, false);
+  }
 };
 
 
@@ -120,18 +121,35 @@ wit.home.view.ResetPasswordView.prototype.decorateInternal = function(element) {
 wit.home.view.ResetPasswordView.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
-  this.getHandler().listen(this.okBtn_, goog.events.EventType.CLICK,
-      function(e) {
-        goog.style.setElementShown(this.okBtn_, false);
-        goog.style.setElementShown(this.loadingImg_, true);
+  if (goog.isDefAndNotNull(this.resetPasswordView_)) {
+    this.getHandler().listen(
+        this.resetPasswordBtn_,
+        goog.events.EventType.CLICK,
+        function(e) {
+          goog.dom.setProperties(this.resetPasswordNewPasswordTB_,
+              {'disabled': true});
+          goog.dom.setProperties(this.resetPasswordRepeatPasswordTB_,
+              {'disabled': true});
+          goog.dom.setProperties(this.resetPasswordBtn_, {'disabled': true});
 
-        var resetPasswordViewEvent = new wit.home.view.ResetPasswordViewEvent(
-            wit.home.view.ResetPasswordView.Events.RESET_PASSWORD,
-            this,
-            this.newPasswordTB_.value,
-            this.repeatPasswordTB_.value);
-        this.dispatchEvent(resetPasswordViewEvent);
-      });
+          var uri = new goog.Uri(window.location.href);
+          var queryData = uri.getQueryData();
+          var sSID = /** @type {string} */ (queryData.get(
+              wit.base.constants.SSID));
+          var fID = /** @type {string} */ (queryData.get(
+              wit.base.constants.FID));
+
+          var dataStore = wit.home.model.DataStore.getInstance();
+          var log = new wit.base.model.Log();
+          dataStore.resetPassword(
+              sSID,
+              fID,
+              this.resetPasswordNewPasswordTB_.value,
+              this.resetPasswordRepeatPasswordTB_.value,
+              log,
+              goog.bind(this.resetPasswordCallback_, this));
+        });
+  }
 };
 
 
@@ -159,72 +177,49 @@ wit.home.view.ResetPasswordView.prototype.exitDocument = function() {
  * Callback function to update the results of resetting password.
  * @param {wit.base.model.Log} log LogInfo array.
  * @this {wit.home.view.ResetPasswordView}
+ * @private
  */
-wit.home.view.ResetPasswordView.prototype.resetPasswordCallback =
-    function(log) {
+wit.home.view.ResetPasswordView.prototype.resetPasswordCallback_ = function(
+    log) {
   var logInfo;
 
   // If server error occurred, there's gonna be only one log info
   // type 'server status'.
   // Don't do anything, just reset the form to let users try again later.
+  if (goog.isDef(log.getLogInfo(wit.base.constants.serverStatus, false))) {
+    window.alert('Some error occurred.' +
+                 'Please wait for a bit and try again.');
+  }
 
-  this.newPasswordErrLb_.innerHTML = wit.base.constants.htmlSpace;
-  this.repeatPasswordErrLb_.innerHTML = wit.base.constants.htmlSpace;
+  goog.dom.setProperties(this.resetPasswordNewPasswordTB_,
+      {'disabled': false});
+  goog.dom.setProperties(this.resetPasswordRepeatPasswordTB_,
+      {'disabled': false});
+  goog.dom.setProperties(this.resetPasswordBtn_, {'disabled': false});
+
+  this.resetPasswordNewPasswordErrLb_.innerHTML = wit.base.constants.htmlSpace;
+  this.resetPasswordRepeatPasswordErrLb_.innerHTML =
+      wit.base.constants.htmlSpace;
 
   // Inputs invalid
   logInfo = log.getLogInfo(wit.base.constants.resetPassword, false);
   if (goog.isDef(logInfo)) {
-    this.newPasswordErrLb_.innerHTML = logInfo.msg;
+    this.resetPasswordNewPasswordErrLb_.innerHTML = logInfo.msg;
   }
 
   logInfo = log.getLogInfo(wit.base.constants.password, false);
   if (goog.isDef(logInfo)) {
-    this.newPasswordErrLb_.innerHTML = logInfo.msg;
+    this.resetPasswordNewPasswordErrLb_.innerHTML = logInfo.msg;
   }
 
   logInfo = log.getLogInfo(wit.base.constants.repeatPassword, false);
   if (goog.isDef(logInfo)) {
-    this.repeatPasswordErrLb_.innerHTML = logInfo.msg;
+    this.resetPasswordRepeatPasswordErrLb_.innerHTML = logInfo.msg;
   }
-
-  goog.style.setElementShown(this.okBtn_, true);
-  goog.style.setElementShown(this.loadingImg_, false);
 
   // Succeeded
   logInfo = log.getLogInfo(wit.base.constants.resetPassword, true);
   if (goog.isDef(logInfo)) {
-    this.resultLb_.innerHTML = logInfo.msg;
-    goog.style.setElementShown(this.formPanel_, false);
+    wit.fx.dom.swap(this.resetPasswordView_, 250);
   }
 };
-
-
-
-/**
- * Object representing a resetPassword view event.
- *
- * @param {string} type Event type.
- * @param {wit.home.view.ResetPasswordView} target ResetPasswordView widget
- *     initiating event.
- * @param {string} password Password.
- * @param {string} repeatPassword Repeat password.
- * @extends {goog.events.Event}
- * @constructor
- */
-wit.home.view.ResetPasswordViewEvent = function(type, target, password,
-    repeatPassword) {
-  goog.base(this, type, target);
-
-  /**
-   * Password.
-   * @type {string}
-   */
-  this.password = password;
-
-  /**
-   * Repeat password.
-   * @type {string}
-   */
-  this.repeatPassword = repeatPassword;
-};
-goog.inherits(wit.home.view.ResetPasswordViewEvent, goog.events.Event);

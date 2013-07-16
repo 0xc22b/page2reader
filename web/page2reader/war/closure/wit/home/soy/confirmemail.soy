@@ -37,18 +37,26 @@
  */
 {template .content_}
 
-  {call wit.base.soy.base.header /}
+  {call wit.base.soy.base.headerWithHome}
+    {param title}Email verification{/param}
+  {/call}
 
-  <h2>Email verification</h2>
-  {if $didConfirmEmail == true}
-    <p>Your email has been verified.</p><a href="/">Continue</a>
-  {else}
-    <p>We could not verify your email. Please try again.</p>
-    <ul>
-      <li>log in, go to user settings</li>
-      <li>click 'resend email verification' button.</li>
-    </ul>
-  {/if}
+  <div class="{css main-container}">
+    <div class="{css main} {css wrapper} {css clearfix}">
+      <section>
+        {if $didConfirmEmail == true}
+          <p>Your email has been verified.</p>
+          <a href="/">Continue</a>
+        {else}
+          <p>We could not verify your email. Please try again.</p>
+          <ul>
+            <li>log in, go to user settings</li>
+            <li>click 'resend email verification' button.</li>
+          </ul>
+        {/if}
+      </section>
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
 
   {call wit.base.soy.base.footer /}
 {/template}

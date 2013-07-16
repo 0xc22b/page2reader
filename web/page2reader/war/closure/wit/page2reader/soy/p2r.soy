@@ -40,33 +40,32 @@
 /**
  * content of page2reader
  * @param pageUrlViews
- * @param noDataView
  * @param cursorString
  */
 {template .content}
 
-  {call wit.base.soy.base.loggedInHeader /}
+  {call wit.base.soy.base.header /}
 
   <div class="{css main-container}">
     <div class="{css main} {css wrapper} {css clearfix}">
-      <article>
-        <header>
-          <h1>Send a web page to reader</h1>
-          <input type="text" class="{css purl-tb}" placeholder="Page URL">
-          <button type="button" class="{css add-purl-btn}">OK</button>
-        </header>
-        <div class="{css purl-views}">
-          {$pageUrlViews|noAutoescape}
-        </div>
-        {$noDataView|noAutoescape}
-        <footer>
-          <button type="button" class="{css next-btn}" data-cursor-string="{$cursorString|noAutoescape}">Next</button>
-        </footer>
-      </article>
+      <section id="urlView" class="{css clearfix}">
+        <span id="urlErrLb">&nbsp;</span>
+        <input id="urlTB" type="text" placeholder="A web page URL">
+        <button id="addUrlBtn">Send to reader</button>
+      </section>
+      <div id="pageUrlViews" class="{css clearfix}">
+        {$pageUrlViews|noAutoescape}
+      </div>
+      <section id="noData">
+        <p>No data</p>
+      </section>
+      <section>
+        <button id="nextBtn" data-cursor-string="{$cursorString}">Next</button>
+      </section>
     </div> <!-- #main -->
   </div> <!-- #main-container -->
 
-  {call wit.base.soy.base.footerWithMenu /}
+  {call wit.base.soy.base.loggedInFooter /}
 {/template}
 
 
@@ -78,23 +77,20 @@
  * @param text
  */
 {template .pageUrlView}
-  <section data-key-string="{$keyString}">
-    <a href="{$pUrl}">{$pUrl}</a>
-    <h2><a href="#">{$title}</a></h2>
+  <section data-key-string="{$keyString}" class="{css p-url-view} {css clearfix}">
+    <h2><a href="{$pUrl}" target="_blank">{$title}</a></h2>
     <p>{$text}</p>
-    <button type="button" class="{css del-btn}">Delete</button>
-    <button type="button">Resend to reader</button>
-  </section>
-{/template}
-
-
-/**
- * No entry
- */
-{template .noEntry}
-  <section>
-    <h2>No data yet!</h2>
-    <p>Add it.</p>
+    <button class="{css resend-btn}">Resend to reader</button>
+    <div class="{css del-view}">
+      <button class="{css del-btn}">Delete</button>
+      <div class="{css del-confirm-view}">
+        <p>Confirm delete?</p>
+        <div class="{css clearfix}">
+          <button class="{css del-cancel-btn}">Cancel</button>
+          <button class="{css del-ok-btn}">Confirm</button>
+        </div>
+      </div>
+    </div>
   </section>
 {/template}
 

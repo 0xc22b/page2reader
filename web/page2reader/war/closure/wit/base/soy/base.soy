@@ -8,10 +8,6 @@
  */
 {template .init}
 <!DOCTYPE html>
-  <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-  <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-  <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-  <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -22,9 +18,12 @@
     <link rel="stylesheet" href="{$css|noAutoescape}">
   </head>
   <body>
-    <!--[if lt IE 7]>
-    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-    <![endif]-->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
 
     {$content|noAutoescape}
 
@@ -37,37 +36,66 @@
 
 
 /**
- * Header for not logged-in page
+ * Header with sign in
  */
-{template .header}
+{template .headerWithSignIn}
   <div class="{css header-container}">
     <header class="{css wrapper} {css clearfix}">
-      <h1 class="{css title}"><a href="/">Page2Reader</a></h1>
-      <nav>
-        <ul>
-          <li><a href="/about">About</a></li>
-          <li><a href="/terms">Terms</a></li>
-          <li><a href="/feedback">Feedback</a></li>
-        </ul>
-      </nav>
+      <div class="{css title}">
+        <h1>Welcome to <span>Page2Reader</span></h1>
+        <p>Send a web page to your reader instantly!</p>
+      </div>
+      <button id="showLogInBtn" type="button">Sign in</button>
+      <div id="logInView">
+        <span id="logInErrLb">&nbsp;</span>
+        <div class="{css clearfix}">
+          <input id="logInUsernameTB" type="text" placeholder="Username or email">
+          <input id="logInPasswordTB" type="password" placeholder="Password">
+        </div>
+        <button id="logInBtn" type="button">OK</button>
+        <button id="forgotBtn" type="button">Forget password?</button>
+        <div id="forgotView">
+          <div id="forgotFormView">
+            <span id="forgotUsernameErrLb">&nbsp;</span>
+            <input id="forgotUsernameTB" type="text" placeholder="Username or email." />
+            <button id="forgotOkBtn" type="button">OK</button>
+          </div>
+          <div id="forgotResultView">
+            <p id="forgotResultMsg">Please check your email to accept a confirmation link for resetting your password.</p>
+            <button id="forgotResultOkBtn" type="button">OK</button>
+          </div>
+        </div>
+      </div>
     </header>
   </div>
 {/template}
 
 
 /**
- * Header for logged-in page
+ * Header
  */
-{template .loggedInHeader}
+{template .header}
   <div class="{css header-container}">
     <header class="{css wrapper} {css clearfix}">
-      <h1 class="{css title}"><a href="/">Page2Reader</a></h1>
-      <nav>
-        <ul>
-          <li><a href="/user">Settings</a></li>
-          <li><a href="/logout">Sign out</a></li>
-        </ul>
-      </nav>
+      <div class="{css title}">
+        <h1>Page2Reader</h1>
+      </div>
+    </header>
+  </div>
+{/template}
+
+
+/**
+ * Header with back button
+ * @param title
+ */
+{template .headerWithHome}
+  <div class="{css header-container}">
+    <header class="{css wrapper} {css clearfix}">
+      <a href="/" id="homeBtn">home</a>
+      <div class="{css title}">
+        <h1>{$title}</h1>
+      </div>
     </header>
   </div>
 {/template}
@@ -78,25 +106,34 @@
  */
 {template .footer}
   <div class="{css footer-container}">
-    <footer class="{css wrapper}">
-      <h3>© 2013 Page2Reader</h3>
-    </footer>
-  </div>
+      <footer class="{css wrapper} {css clearfix}">
+        <h3>© 2013 Page2Reader</h3>
+        <nav>
+          <ul>
+            <li><a href="/about">About</a></li>
+            <li><a href="/terms">Terms</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+          </ul>
+        </nav>
+      </footer>
+    </div>
 {/template}
 
 
 /**
  * Footer with menu
  */
-{template .footerWithMenu}
+{template .loggedInFooter}
   <div class="{css footer-container}">
-    <footer class="{css wrapper}">
+    <footer class="{css wrapper} {css clearfix} {css settings-footer}">
       <h3>© 2013 Page2Reader</h3>
       <nav>
         <ul>
           <li><a href="/about">About</a></li>
           <li><a href="/terms">Terms</a></li>
           <li><a href="/feedback">Feedback</a></li>
+          <li><a href="/user">Settings</a></li>
+          <li><a href="/logout">Sign out</a></li>
         </ul>
       </nav>
     </footer>
