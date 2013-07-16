@@ -22,6 +22,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.DatatypeConverter;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -58,6 +59,7 @@ import com.wit.page2reader.model.ReaderEmail;
 
 import de.jetwick.snacktory.ArticleTextExtractor;
 import de.jetwick.snacktory.JResult;
+import de.jetwick.snacktory.SHelper;
 
 public class P2rManager {
 
@@ -301,12 +303,11 @@ public class P2rManager {
             ArticleTextExtractor extractor = new ArticleTextExtractor();
             extractor.extractContent(result, urlContent);
 
-            // TODO: Solve relative links
-
             // 3. Embeded images
+            String embeddedImagesCleansedHtml = embedImages(result.getCleansedHtml(), pageUrl.getPUrl());           
 
             String text = lessText(result.getText(), 350);
-            String cleansedPage = htmlTemplate(result.getTitle(), result.getCleansedHtml());
+            String cleansedPage = htmlTemplate(result.getTitle(), embeddedImagesCleansedHtml);
 
             // 4. Send to reader email
             sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
@@ -328,6 +329,8 @@ public class P2rManager {
         URL url = new URL(pUrl);
         HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
         res = URLFetchServiceFactory.getURLFetchService().fetch(req);
+        
+        // No check the response code as send that error an email anyway.
 
         // Try to get charset, default to utf-8
         // TODO: Better way to get charset from Content-Type in response header?
@@ -349,6 +352,100 @@ public class P2rManager {
             }
         }
         return new String(res.getContent(), Charset.forName(charset));
+    }
+
+    private static String embedImages(String html, String urlForDomain) throws IOException {
+        int fromIndex = 0;
+        do {
+            fromIndex = html.indexOf("<img", fromIndex);
+            if (fromIndex < 0) {
+                break;
+            }
+
+            int srcIndex = html.indexOf("src", fromIndex);
+            int closeIndex = html.indexOf(">", fromIndex);
+            if (srcIndex < 0 || closeIndex < 0 || srcIndex >= closeIndex) {
+                break;
+            }
+
+            int startQuoteIndex = html.indexOf("'", srcIndex);
+            if (startQuoteIndex < 0 || startQuoteIndex >= closeIndex) {
+                startQuoteIndex = html.indexOf("\"", srcIndex);
+                if (startQuoteIndex < 0 || startQuoteIndex >= closeIndex) {
+                    break;
+                }
+            }
+            
+            char startQuoteChar = html.charAt(startQuoteIndex);
+            int endQuoteIndex = html.indexOf(startQuoteChar, startQuoteIndex + 1);
+            if (endQuoteIndex < 0 || endQuoteIndex >= closeIndex) {
+                break;
+            }
+            
+            String imgUrl = html.substring(startQuoteIndex + 1, endQuoteIndex);
+            // Solve relative links
+            String absoluteImgUrl = SHelper.useDomainOfFirstArg4Second(urlForDomain,
+                    imgUrl);
+
+            // Fetch image content
+            String imgContent = fetchImageUrl(absoluteImgUrl);
+            if (imgContent == null || imgContent.isEmpty()) {
+                break;
+            }
+
+            // Get image content type
+            String contentType = getImageContentType(absoluteImgUrl);
+            html = html.substring(0, startQuoteIndex + 1) + "data:" + contentType + ";base64,"
+                    + imgContent + html.substring(endQuoteIndex);
+
+            fromIndex = closeIndex + 1;
+        } while (true);
+
+        return html;
+    }
+
+    private static String fetchImageUrl(String imgUrl) throws IOException {
+        HTTPResponse res = null;
+        com.google.appengine.api.urlfetch.FetchOptions fetchOptions =
+                com.google.appengine.api.urlfetch.FetchOptions.Builder
+                        .allowTruncate()
+                        .followRedirects()
+                        .setDeadline(60.0);
+
+        URL url = new URL(imgUrl);
+        HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
+        res = URLFetchServiceFactory.getURLFetchService().fetch(req);
+
+        if (res.getResponseCode() >= 200 && res.getResponseCode() <= 299) {
+            // Convert to base64 to be embedded
+            return DatatypeConverter.printBase64Binary(res.getContent());
+        } else {
+            return null;
+        }
+    }
+    
+    private static String getImageContentType(String imgUrl) {
+        String contentType = "image/";
+
+        // Get image file extension
+        String extension = imgUrl.substring(imgUrl.length() - 3);
+        if (extension.equals("gif")) {
+            return contentType + "gif";
+        } else if (extension.equals("jpg")) {
+            return contentType + "jpeg";
+        } else if (extension.equals("png")) {
+            return contentType + "png";
+        }
+
+        extension = imgUrl.substring(imgUrl.length() - 4);
+        if (extension.equals("jpeg")) {
+            return contentType + "jpeg";
+        } else if (extension.equals("tiff")) {
+            return contentType + "tiff";
+        }
+
+        // TODO: Should raise error?
+        return contentType + "png";
     }
 
     private static void sendEmailCleansedPage(String fromEmail, String fromName, String toEmail,
