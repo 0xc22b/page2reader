@@ -7,7 +7,9 @@ goog.require('goog.soy');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
+goog.require('wit.base.constants');
 goog.require('wit.fx.dom');
+goog.require('wit.page2reader.constants');
 goog.require('wit.page2reader.model.DataStore');
 goog.require('wit.page2reader.model.PageUrlObj');
 goog.require('wit.page2reader.soy.p2r');
@@ -275,6 +277,10 @@ wit.page2reader.view.PageUrlView.prototype.resendToReaderCallback_ = function(
                  'Please wait for a bit and try again.');
   }
 
+  if (goog.isDef(log.getLogInfo(wit.base.constants.didLogIn, false))) {
+    window.alert('Please sign in first.');
+  }
+
   logInfo = log.getLogInfo(wit.page2reader.constants.SEND_TO_READER, true);
   if (goog.isDef(logInfo)) {
     this.resendBtn_.innerHTML = 'Sent';
@@ -305,6 +311,19 @@ wit.page2reader.view.PageUrlView.prototype.deletePageUrlCallback_ = function(
                  'Please wait for a bit and try again.');
   }
 
+  if (goog.isDef(log.getLogInfo(wit.base.constants.didLogIn, false))) {
+    window.alert('Please sign in first.');
+  }
+
+  goog.dom.setProperties(this.resendBtn_, {'disabled': false});
+  goog.dom.setProperties(this.delBtn_, {'disabled': false});
+
+  logInfo = log.getLogInfo(wit.page2reader.constants.DELETE_PAGE_URL, false);
+  if (goog.isDef(logInfo)) {
+    window.alert('Some error occurred.' +
+                 'Please wait for a bit and try again.');
+  }
+
   logInfo = log.getLogInfo(wit.page2reader.constants.DELETE_PAGE_URL, true);
   if (goog.isDef(logInfo)) {
     // Coundn't use helper function wit.fx.dom.animate
@@ -329,11 +348,5 @@ wit.page2reader.view.PageUrlView.prototype.deletePageUrlCallback_ = function(
         false,
         this);
     anim.play(false);
-  } else {
-    window.alert('Some error occurred.' +
-                 'Please wait for a bit and try again.');
-
-    goog.dom.setProperties(this.resendBtn_, {'disabled': false});
-    goog.dom.setProperties(this.delBtn_, {'disabled': false});
   }
 };

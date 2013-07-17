@@ -6,6 +6,7 @@ goog.require('goog.dom.dataset');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
+goog.require('wit.base.constants');
 goog.require('wit.fx.dom');
 goog.require('wit.page2reader.constants');
 goog.require('wit.page2reader.model.DataStore');
@@ -201,6 +202,10 @@ wit.page2reader.view.P2rView.prototype.addPageUrlCallback_ = function(log) {
                  'Please wait for a bit and try again.');
   }
 
+  if (goog.isDef(log.getLogInfo(wit.base.constants.didLogIn, false))) {
+    window.alert('Please sign in first.');
+  }
+
   this.urlErrLb_.innerHTML = wit.base.constants.htmlSpace;
 
   goog.dom.setProperties(this.urlTB_, {'disabled': false});
@@ -244,6 +249,10 @@ wit.page2reader.view.P2rView.prototype.getPagingPageUrlsCallback_ = function(
   if (goog.isDef(log.getLogInfo(wit.base.constants.serverStatus, false))) {
     window.alert('Some error occurred.' +
                  'Please wait for a bit and try again.');
+  }
+
+  if (goog.isDef(log.getLogInfo(wit.base.constants.didLogIn, false))) {
+    window.alert('Please sign in first.');
   }
 
   goog.dom.setProperties(this.nextBtn_, {'disabled': false});

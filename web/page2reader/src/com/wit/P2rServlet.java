@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,15 +40,32 @@ public class P2rServlet extends HttpServlet {
             throws IOException {
 
         // Check logging in from sessionID in cookies
-        String sessionKeyString = BaseServlet.getSSIDCookie(req).getValue();
-        String sessionID = BaseServlet.getSIDCookie(req).getValue();
+        Cookie sSIDCookie = BaseServlet.getSSIDCookie(req);
+        Cookie sIDCookie = BaseServlet.getSIDCookie(req);
 
         // Get contents in request parameter.
         String methodName = req.getParameter(BaseServlet.METHOD);
         String content = req.getParameter(BaseServlet.CONTENT);
 
-        if (sessionKeyString == null || sessionID == null || methodName == null
-                || content == null) {
+        if (sSIDCookie == null || sIDCookie == null) {
+            try {
+                Log log = new Log();
+                log.addLogInfo(BaseConstants.DID_LOG_IN, false, null, null);
+                BaseServlet.response(resp, log.getJSONString());
+            } catch (JSONException e) {
+                BaseServlet.writeExceptionToLogger(logger, e);
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+            return;
+        }
+
+        String sessionKeyString = sSIDCookie.getValue();
+        String sessionID = sIDCookie.getValue();
+
+        if (sessionKeyString == null || sessionKeyString.isEmpty()
+                || sessionID == null || sessionID.isEmpty()
+                || methodName == null || methodName.isEmpty()
+                || content == null || content.isEmpty()) {
             logger.severe("Request parameters missing: sessionKeyString = "
                     + sessionKeyString + ", sessionID = " + sessionID
                     + ", methodName = " + methodName + ", content = " + content);
