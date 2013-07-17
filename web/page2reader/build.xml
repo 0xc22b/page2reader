@@ -365,6 +365,16 @@
         outputFile="p2r-compiled.js" />
   </target>
 
+  <target name="send-p2r-compile" description="compile sendpage2reader.js file in bookmarklet folder.">
+    <java jar="${closure-compiler.jar}"
+          fork="true"
+          failonerror="true"
+          logError="true">
+      <arg line='--js "bookmarklet/sendp2r.js"' />
+      <arg line='--js_output_file "war/bookmarklet/sendp2r.js"' />
+    </java>
+  </target>
+
   <target name="appengine-compile"
           description="Compiles Java source and copies other source files to the WAR.">
     <mkdir dir="war/WEB-INF/classes" />
@@ -395,6 +405,7 @@
     <antcall target="user-compile" />
     <antcall target="reset-password-compile" />
     <antcall target="p2r-compile" />
+    <antcall target="send-p2r-compile" />
 
     <move todir="tmp/closure">
       <fileset dir="war/closure">
@@ -451,7 +462,7 @@
 
   <!-- The authentication credentials must be cached. -->
   <target name="appengine-update-wc"
-          depends="appengine-compile, home-compile, user-compile, reset-password-compile, p2r-compile"
+          depends="appengine-compile, home-compile, user-compile, reset-password-compile, p2r-compile, send-p2r-compile"
           description="Uploads the application to App Engine.">
 
     <move todir="tmp/closure">

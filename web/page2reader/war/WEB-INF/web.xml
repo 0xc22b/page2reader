@@ -72,6 +72,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>Submit</servlet-name>
+    <servlet-class>com.wit.SubmitServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Submit</servlet-name>
+    <url-pattern>/submit</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>Base</servlet-name>
     <servlet-class>com.wit.BServlet</servlet-class>
   </servlet>
