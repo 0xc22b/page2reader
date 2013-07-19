@@ -1,0 +1,9 @@
+When updating *.png,
+  -> chrome-extension folder
+  -> (firefox-extension)
+  -> war folder
+  -> android folder
+
+  -> Firefox addons store
+  -> Chrome web store
+  -> Android web store
