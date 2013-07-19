@@ -20,3 +20,9 @@
 [submodule "web/page2reader/src/com/wit/base"]
 	path = web/page2reader/src/com/wit/base
 	url = https://github.com/witterk/base.git
+[submodule "web/page2reader/firefox-extension/packages/vold-utils-jplib"]
+	path = web/page2reader/firefox-extension/packages/vold-utils-jplib
+	url = https://github.com/erikvold/vold-utils-jplib.git
+[submodule "web/page2reader/firefox-extension/packages/toolbarbutton-jplib"]
+	path = web/page2reader/firefox-extension/packages/toolbarbutton-jplib
+	url = https://github.com/voldsoftware/toolbarbutton-jplib.git
