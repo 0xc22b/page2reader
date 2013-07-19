@@ -8,7 +8,8 @@ exports.main = function() {
   var tbb = require('toolbarbutton').ToolbarButton({
     id: 'Page2Reader',
     label: 'Send to kindle',
-    image: self.data.url('icon.png'),
+    //image: self.data.url('icon-16x16.png'),
+    image: 'http://page2reader.appspot.com/icon-16x16.png',
     onCommand: function() {
       var actionUrl = 'javascript:((function() {' +
           'var baseUrl = \'http://page2reader.appspot.com\';' +
