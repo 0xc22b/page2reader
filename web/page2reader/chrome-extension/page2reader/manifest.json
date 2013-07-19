@@ -1,0 +1,27 @@
+{
+  "name": "Page2Reader",
+  "version": "0.1",
+  "manifest_version": 2,
+
+  "description": "Send a web page to your kindle instantly.",
+
+  "icons": { "16": "icon-16x16.png",
+             "48": "icon-48x48.png",
+             "128": "icon-128x128.png" },
+
+  "browser_action": {
+    "default_title": "Send to kindle",
+    "default_icon": "icon.png"
+  },
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "homepage_url": "http://page2reader.appspot.com",
+
+  "permissions": [
+    "activeTab"
+  ]
+}
