@@ -721,7 +721,7 @@ html input[disabled] {
 }
 
 #homeBtn:hover {
-  text-decoration: underline;
+  /*text-decoration: underline;*/
 }
 
 .title {
@@ -788,7 +788,7 @@ nav a:visited {
 }
 
 nav a:hover {
-  text-decoration: underline;
+  /*text-decoration: underline;*/
 }
 
 /* ==========================================================================

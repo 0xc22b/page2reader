@@ -32,7 +32,7 @@ public class P2rConstants {
     public static final String PAGE_URL_KEY_STRING = "pageUrlKeyString";
 
     public static final String PROCESSING_TITLE = "This page is being processing.";
-    public static final String PROCESSING_TEXT = "The page will be sent to your reader instantly when completed.";
+    public static final String PROCESSING_TEXT = "The page will be sent to your kindle instantly when completed.";
     public static final String PROCESSING_CLEANSED_PAGE = PROCESSING_TITLE + PROCESSING_TEXT;
 
     public static final String ERR_URL = "URL is invalid.";

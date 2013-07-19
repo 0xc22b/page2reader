@@ -105,7 +105,7 @@ public class SubmitServlet extends HttpServlet {
         Log log = new Log();
         PageUrl pageUrl = P2rManager.addPageUrl(user, content, log);
         if (pageUrl != null) {
-            // Create a task to fetch the url, cleanse it, embed images, and send to reader
+            // Create a task to fetch the url, cleanse it, embed images, and send to kindle
             P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
                     log);
             responseWithPostMessage(resp, SENT);

@@ -65,6 +65,12 @@
    MOBILE: Main
    ============== */
 
+#bookmarkTA {
+  width: 95%;
+  height: 120px;
+  box-sizing: border-box;
+}
+
 #showSignUpBtn {
   @mixin initBtn(TITLE_FONT_COLOR, PRIMARY_BTN_BG_COLOR);
   padding: 15px 0;
@@ -136,6 +142,10 @@
   @mixin initBtn(TITLE_FONT_COLOR, NEXT_BTN_BG_COLOR);
   padding: 15px 20px;
   margin-top: 15px;
+}
+
+.download-link {
+  color: NORMAL_FONT_COLOR;
 }
 
 /* ==========================================================================

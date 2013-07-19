@@ -46,26 +46,29 @@
     <div class="{css main} {css wrapper} {css clearfix}">
       <section>
         <h2>Add a page URL</h2>
-        <p>Copy a page URL and paste it in the textbox and press Send to reader</p>
+        <p>Copy a page URL and paste it in the textbox and press Send to kindle button</p>
       </section>
       <section>
         <h2>Bookmark</h2>
-        <p>Add a bookmark to your browser so you can send a web page to your reader on iOS.</p>
+        <p>Add a bookmark to your browser so you can send a web page to your kindle on iOS.</p>
         <p>1. Copy the code from the textbox below</p>
-        <textarea>
+        <textarea id="bookmarkTA">
           {literal}javascript:((function()%20{var%20baseUrl%20=%20%27http://page2reader.appspot.com%27;var%20s%20=%20document.createElement(%27script%27);s.setAttribute(%27type%27,%20%27text/javascript%27);s.setAttribute(%27charset%27,%20%27UTF-8%27);s.setAttribute(%27src%27,%20baseUrl%20+%20%27/bookmarklet/sendp2r.js%27);document.documentElement.appendChild(s);})());{/literal}
         </textarea>
-        <p>2. Click Add Bookmark icon, change the name to 'send page2reader', and paste the code above as URL.</p>
+        <p>2. Click Add Bookmark icon, change the name to 'send to kindle' (or whatever you want), and paste the code above as URL.</p>
         <p>3. To use, tap address bar, type the bookmark name, then select the bookmark.</p>
         <p>Warning: Do not select the bookmark through your list of bookmarks. It opens a new page and will not work.</p>
       </section>
       <section>
         <h2>Extension</h2>
-        <p>Send a web page from Firefox or Chrome to your reader with Firefox extension and Chrome extension</p>
+        <p>Send a web page from Firefox to your kindle with Firefox extension</p>
+        <a href="https://addons.mozilla.org/en-US/firefox/addon/page2reader/" target="_blank" class="{css download-link}">Download Firefox extension</a>
+        <p>Send a web page from Chrome to your kindle with Chrome extension</p>
+        <a href="#" target="_blank" class="{css download-link}">Download Chrome extension</a> (coming soon)
       </section>
       <section>
         <h2>Android app</h2>
-        <p>Send a web page to your reader with 'Share' feature in Android</p>
+        <p>Send a web page to your kindle with 'Share' feature in Android</p>
       </section>
       <section>
         <button id="showSignUpBtn" type="button">Create an account</button>

@@ -58,17 +58,20 @@
     <div class="{css main} {css wrapper} {css clearfix}">
       <section class="{css settings} {css clearfix}">
         <div class="{css left}">
-          <p class="{css name}">Reader's email:</p>
+          <p class="{css name}">Kindle email:</p>
         </div>
         <div class="{css right}">
           <p id="readerEmailLb" class="{css value}">{if $readerEmail}{$readerEmail}{else}&nbsp;{/if}</p>
-          <button id="showChangeReaderEmailBtn" class="{css btn}">Change reader's email</button>
+          <button id="showChangeReaderEmailBtn" class="{css btn}">Change kindle email</button>
           <div id="changeReaderEmailView" class="{css view}">
             <span id="changeReaderEmailErrLb" class="{css err}">&nbsp;</span>
-            <input id="changeReaderEmailTB" type="text" placeholder="New reader's email" class="{css input}">
+            <input id="changeReaderEmailTB" type="text" placeholder="New kindle email" class="{css input}">
             <button id="changeReaderEmailOkBtn" type="button" class="{css ok-btn}">OK</button>
           </div>
         </div>
+      </section>
+      <section class="{css info} {css clearfix}">
+        <p>*Add <b>admin@page2reader.appspotmail.com</b> to your <a href="https://www.amazon.com/gp/digital/fiona/manage#pdocSettings" target="_blank">approved email list</a>.&nbsp;&nbsp;<a href="http://www.amazon.com/gp/help/customer/display.html/ref=kinw_myk_wl_ln?ie=UTF8&nodeId=200767340#approvefrom" target="_blank">Learn more</a></p>
       </section>
       <section class="{css settings} {css clearfix}">
         <div class="{css left}">
