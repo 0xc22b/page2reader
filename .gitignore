@@ -9,6 +9,17 @@ Desktop.ini
 *.pyc
 *.bin
 
+# Firefox extension compiled file
+*.xpi
+
+# Chrome extension compiled file
+*.crx
+# Chrome zip package folder to upload to Chome app store
+web/page2reader/chrome-extension/page2reader.zip
+
+# Ignore generated png files from svg files (logo, icon)
+artwork/*.png
+
 # Web
 web/page2reader/test-classes/
 web/page2reader/tmp/
