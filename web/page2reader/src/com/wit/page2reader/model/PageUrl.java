@@ -45,7 +45,8 @@ public class PageUrl {
         jsonObject.put(BaseConstants.SERVER_CREATE_TIME_MILLIS, getServerCreateTimeMillis());
         jsonObject.put(P2rConstants.TITLE, getTitle());
         jsonObject.put(P2rConstants.TEXT, getText());
-        jsonObject.put(P2rConstants.CLEANSED_PAGE, getCleansedPage());
+        // Save bandwidth
+        //jsonObject.put(P2rConstants.CLEANSED_PAGE, getCleansedPage());
         jsonObject.put(P2rConstants.SENT_COUNT, getSentCount());
         return jsonObject;
     }
