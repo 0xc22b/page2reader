@@ -416,7 +416,7 @@ public class P2rManager {
         HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
         res = URLFetchServiceFactory.getURLFetchService().fetch(req);
 
-        if (res.getResponseCode() >= 200 && res.getResponseCode() <= 299) {
+        if (res.getResponseCode() / 100 == 2) {
             // Convert to base64 to be embedded
             return DatatypeConverter.printBase64Binary(res.getContent());
         } else {
