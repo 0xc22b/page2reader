@@ -36,4 +36,5 @@ public class P2rConstants {
     public static final String PROCESSING_CLEANSED_PAGE = PROCESSING_TITLE + PROCESSING_TEXT;
 
     public static final String ERR_URL = "URL is invalid.";
+    public static final String NOT_FOUND = "Not found. Please refresh the page and try again.";
 }

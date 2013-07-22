@@ -86,7 +86,7 @@ public class P2rManager {
         DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
         FetchOptions fetchOptions = FetchOptions.Builder.withLimit(PAGE_SIZE);
-        if (cursorString != null) {
+        if (cursorString != null && !cursorString.isEmpty() && !cursorString.equals("null")) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(cursorString));
         }
 
@@ -276,9 +276,9 @@ public class P2rManager {
                     .param(P2rConstants.PAGE_URL_KEY_STRING, pageUrl.getKeyString()));
 
             // Log background task created successfully
-            log.addLogInfo(P2rConstants.SEND_TO_READER, true, null, null);
+            log.addLogInfo(P2rConstants.SEND_TO_READER, true, pageUrl.getKeyString(), null);
         } else {
-            log.addLogInfo(P2rConstants.SEND_TO_READER, false, null, null);
+            log.addLogInfo(P2rConstants.SEND_TO_READER, false, pageUrl.getKeyString(), null);
         }
     }
 
