@@ -39,5 +39,5 @@ web/page2reader/war/WEB-INF/classes/
 web/page2reader/war/WEB-INF/lib/
 
 # Android
-Android/page2reader/bin/
-Android/page2reader/gen/
+android/bin/
+android/gen/

@@ -26,3 +26,9 @@
 [submodule "web/page2reader/firefox-extension/packages/toolbarbutton-jplib"]
 	path = web/page2reader/firefox-extension/packages/toolbarbutton-jplib
 	url = https://github.com/voldsoftware/toolbarbutton-jplib.git
+[submodule "android/src/org/json"]
+	path = android/src/org/json
+	url = https://github.com/douglascrockford/JSON-java.git
+[submodule "android/contribs/ActionBarSherlock"]
+	path = android/contribs/ActionBarSherlock
+	url = https://github.com/JakeWharton/ActionBarSherlock.git
