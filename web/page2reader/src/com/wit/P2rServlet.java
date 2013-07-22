@@ -135,8 +135,12 @@ public class P2rServlet extends HttpServlet {
 
         Log log = new Log();
         PageUrl pageUrl = P2rManager.getPageUrl(content);
-        P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
-                log);
+        if (pageUrl != null) {
+            P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
+                    log);
+        } else {
+            log.addLogInfo(P2rConstants.SEND_TO_READER, false, null, P2rConstants.NOT_FOUND);
+        }
         BaseServlet.response(resp, log.getJSONString());
     }
 
