@@ -16,3 +16,4 @@ path="/Users/wit/Workspace/Misc/page2reader/artwork"
 /Applications/Inkscape.app/Contents/Resources/bin/inkscape $path/logo.svg --export-png=$path/logo-96x96.png -w96 -h96
 /Applications/Inkscape.app/Contents/Resources/bin/inkscape $path/logo.svg --export-png=$path/logo-114x114.png -w114 -h114
 /Applications/Inkscape.app/Contents/Resources/bin/inkscape $path/logo.svg --export-png=$path/logo-144x144.png -w144 -h144
+/Applications/Inkscape.app/Contents/Resources/bin/inkscape $path/logo.svg --export-png=$path/logo-512x512.png -w512 -h512
