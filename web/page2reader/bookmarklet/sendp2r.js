@@ -66,7 +66,9 @@
           'border-radius: 5px;',
           'filter: alpha(opacity=97);', '-moz-opacity: .97;', 'opacity: .97;',
           'text-align: center;', 'color: white;', 'font-size: 23px;',
-          'font-family: Helvetica, Arial, sans-serif'].join('');
+          'font-family: Helvetica, Arial, sans-serif;',
+          'box-sizing: content-box;', '-moz-box-sizing: content-box;',
+          '-webkit-box-sizing: content-box;'].join('');
         document.body.appendChild(msg);
       }
 
