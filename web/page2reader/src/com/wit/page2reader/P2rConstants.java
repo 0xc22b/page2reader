@@ -37,4 +37,8 @@ public class P2rConstants {
 
     public static final String ERR_URL = "URL is invalid.";
     public static final String NOT_FOUND = "Not found. Please refresh the page and try again.";
+
+    public static final String SUBMITTED_NOT_LOGGED_IN = "page2reader:Please sign in first";
+    public static final String SUBMITTED_SENT = "page2reader:Sent";
+    public static final String SUBMITTED_ERROR = "page2reader:Error! Please try again";
 }

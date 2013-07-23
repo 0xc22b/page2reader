@@ -17,6 +17,7 @@ import com.wit.base.Log;
 import com.wit.base.NotLoggedInException;
 import com.wit.base.UserManager;
 import com.wit.base.model.User;
+import com.wit.page2reader.P2rConstants;
 import com.wit.page2reader.P2rManager;
 import com.wit.page2reader.model.PageUrl;
 
@@ -25,10 +26,6 @@ public class SubmitServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(SubmitServlet.class
             .getName());
-
-    public static final String NOT_LOGGED_IN = "page2reader:Please sign in first";
-    public static final String SENT = "page2reader:Sent";
-    public static final String ERROR = "page2reader:Error! Please try again";
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BaseServlet.response(resp, "No pain. No gain.");
@@ -46,7 +43,7 @@ public class SubmitServlet extends HttpServlet {
         String content = req.getParameter(BaseServlet.CONTENT);
 
         if (sSIDCookie == null || sIDCookie == null) {
-            responseWithPostMessage(resp, NOT_LOGGED_IN);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_NOT_LOGGED_IN);
             return;
         }
 
@@ -60,7 +57,7 @@ public class SubmitServlet extends HttpServlet {
             logger.severe("Request parameters missing: sessionKeyString = "
                     + sessionKeyString + ", sessionID = " + sessionID
                     + ", methodName = " + methodName + ", content = " + content);
-            responseWithPostMessage(resp, ERROR);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_ERROR);
             return;
         }
 
@@ -69,7 +66,7 @@ public class SubmitServlet extends HttpServlet {
             user = UserManager.checkLoggedInAndGetUser(sessionKeyString,
                     sessionID);
         } catch (NotLoggedInException e) {
-            responseWithPostMessage(resp, NOT_LOGGED_IN);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_NOT_LOGGED_IN);
             return;
         }
 
@@ -83,15 +80,15 @@ public class SubmitServlet extends HttpServlet {
             method.invoke(this, argObjects);
         } catch (NoSuchMethodException e) {
             BaseServlet.writeExceptionToLogger(logger, e);
-            responseWithPostMessage(resp, ERROR);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_ERROR);
         } catch (IllegalAccessException e) {
             BaseServlet.writeExceptionToLogger(logger, e);
-            responseWithPostMessage(resp, ERROR);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_ERROR);
         } catch (InvocationTargetException e) {
             // All exceptions thrown by invoked methods will be wrapped
             // in this exception.
             BaseServlet.writeExceptionToLogger(logger, e);
-            responseWithPostMessage(resp, ERROR);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_ERROR);
         }
     }
 
@@ -108,9 +105,9 @@ public class SubmitServlet extends HttpServlet {
             // Create a task to fetch the url, cleanse it, embed images, and send to kindle
             P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
                     log);
-            responseWithPostMessage(resp, SENT);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_SENT);
         } else {
-            responseWithPostMessage(resp, ERROR);
+            responseWithPostMessage(resp, P2rConstants.SUBMITTED_ERROR);
         }
     }
 
