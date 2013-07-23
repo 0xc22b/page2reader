@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.IntentCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -71,8 +72,9 @@ public class P2rActivity extends SherlockActivity {
                         String email) {
                     if (sSID == null || sID == null) {
                         Intent intent = new Intent(P2rActivity.this, HomeActivity.class);
-                        // TODO: Clear task
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        // Clear task
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                         P2rActivity.this.startActivity(intent);
                         return;
                     }
@@ -389,9 +391,11 @@ public class P2rActivity extends SherlockActivity {
                 dataStore.cursorString = null;
 
                 Intent intent = new Intent(P2rActivity.this, HomeActivity.class);
-                // TODO: Clear stack
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                // Clear stack
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                 P2rActivity.this.startActivity(intent);
+                P2rActivity.this.finish();
             }
         });
     }

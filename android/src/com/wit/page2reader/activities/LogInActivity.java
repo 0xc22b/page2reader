@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.IntentCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -165,63 +166,65 @@ public class LogInActivity extends SherlockActivity {
     }
 
     private LogInCallback mLogInCallback = new LogInCallback() {
+        @Override
+        public void onLogInCallback(Log log) {
 
-            @Override
-            public void onLogInCallback(Log log) {
+            mLogInTask = null;
 
-                mLogInTask = null;
-
-                if (log == null) {
-                    mUsernameView.setError(Constants.CONNECTION_FAILED);
-                    showProgress(false);
-                    return;
-                }
-
-                if (log.isValid()) {
-                    final String sSID = log.getValue(Constants.SSID, true);
-                    final String sID = log.getValue(Constants.SID, true);
-                    String username = log.getValue(Constants.USERNAME, true);
-                    String email = log.getValue(Constants.EMAIL, true);
-
-                    final DataStore dataStore = DataStore.getInstance(
-                            LogInActivity.this.getApplicationContext());
-                    dataStore.updateUser(sSID, sID, username, email, new UpdateUserCallback() {
-                        @Override
-                        public void onUpdateUserCallback(boolean success, String msg) {
-                            dataStore.sSID = sSID;
-                            dataStore.sID = sID;
-
-                            Intent intent = new Intent(LogInActivity.this, P2rActivity.class);
-                            // TODO: Clear task
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            LogInActivity.this.startActivity(intent);
-                        }
-                    });
-                } else {
-                    String msg = null;
-
-                    msg = log.getMsg(Constants.USERNAME, false, null);
-                    if (msg != null) {
-                        mUsernameView.setError(msg);
-                    }
-
-                    msg = log.getMsg(Constants.EMAIL, false, null);
-                    if (msg != null) {
-                        mUsernameView.setError(msg);
-                    }
-
-                    msg = log.getMsg(Constants.PASSWORD, false, null);
-                    if (msg != null) {
-                        mPasswordView.setError(msg);
-                    }
-
-                    msg = log.getMsg(Constants.LOG_IN, false, null);
-                    if (msg != null) {
-                        mUsernameView.setError(msg);
-                    }
-
-                    showProgress(false);
-                }
+            if (log == null) {
+                mUsernameView.setError(Constants.CONNECTION_FAILED);
+                showProgress(false);
+                return;
             }
-        };
+
+            if (log.isValid()) {
+                final String sSID = log.getValue(Constants.SSID, true);
+                final String sID = log.getValue(Constants.SID, true);
+                String username = log.getValue(Constants.USERNAME, true);
+                String email = log.getValue(Constants.EMAIL, true);
+
+                final DataStore dataStore = DataStore.getInstance(
+                        LogInActivity.this.getApplicationContext());
+                dataStore.updateUser(sSID, sID, username, email, new UpdateUserCallback() {
+                    @Override
+                    public void onUpdateUserCallback(boolean success, String msg) {
+                        dataStore.sSID = sSID;
+                        dataStore.sID = sID;
+
+                        Intent intent = new Intent(LogInActivity.this, P2rActivity.class);
+                        // Clear task
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
+                        LogInActivity.this.startActivity(intent);
+                        LogInActivity.this.finish();
+                        return;
+                    }
+                });
+            }
+
+            String msg = null;
+
+            msg = log.getMsg(Constants.USERNAME, false, null);
+            if (msg != null) {
+                mUsernameView.setError(msg);
+            }
+
+            msg = log.getMsg(Constants.EMAIL, false, null);
+            if (msg != null) {
+                mUsernameView.setError(msg);
+            }
+
+            msg = log.getMsg(Constants.PASSWORD, false, null);
+            if (msg != null) {
+                mPasswordView.setError(msg);
+            }
+
+            msg = log.getMsg(Constants.LOG_IN, false, null);
+            if (msg != null) {
+                mUsernameView.setError(msg);
+            }
+
+            showProgress(false);
+        }
+    };
 }

@@ -1,12 +1,12 @@
 package com.wit.page2reader.activities;
 
-import android.os.Bundle;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.content.IntentCompat;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-
 import com.wit.page2reader.R;
 import com.wit.page2reader.model.DataStore;
 import com.wit.page2reader.model.DataStore.FetchUserCallback;
@@ -21,7 +21,10 @@ public class HomeActivity extends SherlockActivity {
                 HomeActivity.this.getApplicationContext());
         if (dataStore.sSID != null && dataStore.sID != null) {
             Intent intent = new Intent(HomeActivity.this, P2rActivity.class);
+            // Clear task
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
             HomeActivity.this.startActivity(intent);
+            HomeActivity.this.finish();
             return;
         } else {
             dataStore.fetchUser(new FetchUserCallback() {
@@ -34,9 +37,11 @@ public class HomeActivity extends SherlockActivity {
                         dataStore.sID = sID;
 
                         Intent intent = new Intent(HomeActivity.this, P2rActivity.class);
-                        // TODO: Clear task
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        // Clear task
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                         HomeActivity.this.startActivity(intent);
+                        HomeActivity.this.finish();
                         return;
                     }
                 }
