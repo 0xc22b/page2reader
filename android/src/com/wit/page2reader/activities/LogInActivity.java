@@ -3,11 +3,10 @@ package com.wit.page2reader.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.IntentCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -46,6 +45,7 @@ public class LogInActivity extends SherlockActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setResult(Activity.RESULT_CANCELED);
         setContentView(R.layout.activity_log_in);
 
         // Set up the login form.
@@ -191,11 +191,7 @@ public class LogInActivity extends SherlockActivity {
                         dataStore.sSID = sSID;
                         dataStore.sID = sID;
 
-                        Intent intent = new Intent(LogInActivity.this, P2rActivity.class);
-                        // Clear task
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
-                        LogInActivity.this.startActivity(intent);
+                        LogInActivity.this.setResult(Activity.RESULT_OK);
                         LogInActivity.this.finish();
                         return;
                     }
