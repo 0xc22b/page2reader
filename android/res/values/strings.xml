@@ -4,7 +4,7 @@
     <string name="app_name">Page2Reader</string>
     <string name="title_activity_p2r"></string>
     <string name="title_activity_log_in">Sign in</string>
-    <string name="title_activity_editor">EditorActivity</string>
+    <string name="title_activity_editor">Add</string>
     <string name="title_activity_receive_url">Send to kindle</string>
 
     <string name="log_in">Sign in</string>
@@ -22,13 +22,27 @@
     <string name="no_data">No data</string>
     <string name="sending">Sending&#8230;</string>
     <string name="sent">Sent</string>
+    <string name="signing_out">Signing out&#8230;</string>
 
-    <string name="prompt_email">Email</string>
+    <string name="prompt_url">A web page URL</string>
+
+    <string name="no_network">No network connection available.</string>
+    <string name="connection_failed">Could not connect to the server.</string>
+    
+    <string name="not_logged_in">Please sign in first</string>
+    <string name="external_not_logged_in">Please go to the app and sign in first</string>
+
+    <string name="error_invalid_url">This URL is invalid</string>
+
+    <string name="prompt_username">Username or Email</string>
     <string name="prompt_password">Password</string>
-    <string name="login_progress_signing_in">Signing in&#8230;</string>
-    <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
+    <string name="welcome">Welcome to Page2Reader</string>
+    <string name="desc">Send a web page to your kindle instantly.</string>
+    <string name="info">You can send a web page to your kindle with our website, bookmarklet, Chrome extension, Firefox extension, and Android application.</string>
+    <string name="to_the_web">To learn more and create an account, Please go to</string>
+    <string name="web_name">page2reader.appspot.com</string>
 </resources>

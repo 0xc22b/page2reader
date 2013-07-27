@@ -1,17 +1,33 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".EditorActivity" >
-
-    <EditText
-        android:id="@+id/editText"
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:inputType="textUri" />
+        android:layout_height="match_parent" >
 
-</RelativeLayout>
+    <LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingBottom="@dimen/margin"
+	    android:paddingLeft="@dimen/padding"
+	    android:paddingRight="@dimen/padding"
+	    android:paddingTop="@dimen/margin"
+	    android:orientation="vertical" >
+
+	    <TextView
+	        android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/err_text"
+            android:textSize="@dimen/normal_text_size" />
+
+	    <EditText
+	        android:id="@+id/editText"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="top|left"
+	        android:inputType="textMultiLine|textUri"
+	        android:hint="@string/prompt_url"
+	        android:focusableInTouchMode="true" />
+	
+	</LinearLayout>
+</ScrollView>

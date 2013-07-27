@@ -9,12 +9,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -22,9 +22,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
+import android.text.TextUtils;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.wit.page2reader.Constants;
+import com.wit.page2reader.Constants.NextBtnStatus;
+import com.wit.page2reader.Constants.RefreshBtnStatus;
+import com.wit.page2reader.R;
 
 public class DataStore {
 
@@ -90,10 +99,74 @@ public class DataStore {
     public ArrayList<PageUrlObj> pageUrls = new ArrayList<PageUrlObj>();
     public String cursorString;
 
+    public boolean didGetPageUrls;
+    public String msg;
+    public RefreshBtnStatus refreshBtnStatus = RefreshBtnStatus.NORMAL;
+    public NextBtnStatus nextBtnStatus = NextBtnStatus.NORMAL;
+
     private DatabaseHelper databaseHelper;
 
     private DataStore(Context context) {
         databaseHelper = new DatabaseHelper(context);
+    }
+
+    /**
+     * issue 14944: initLoader() nor restartLoader() actually starts the loader
+     * http://code.google.com/p/android/issues/detail?id=14944
+     */
+    public static abstract class DataStoreLoader<D> extends AsyncTaskLoader<D> {
+
+        D mD;
+
+        public DataStoreLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void deliverResult(D d) {
+            if (isReset()) {
+                return;
+            }
+
+            mD = d;
+
+            super.deliverResult(d);
+
+            // After delivery the result, stop reporting for updates
+            stopLoading();
+        }
+
+        @Override
+        protected void onStartLoading() {
+            super.onStartLoading();
+            if (mD != null) {
+                deliverResult(mD);
+            }
+
+            if (takeContentChanged() || mD == null) {
+                forceLoad();
+            }
+        }
+
+        @Override
+        protected void onStopLoading() {
+            super.onStopLoading();
+            cancelLoad();
+        }
+
+        @Override
+        public void onCanceled(D d) {
+            super.onCanceled(d);
+        }
+
+        @Override
+        protected void onReset() {
+            super.onReset();
+
+            onStopLoading();
+
+            mD = null;
+        }
     }
 
     public interface FetchUserCallback {
@@ -101,11 +174,85 @@ public class DataStore {
                 String username, String email);
     }
 
-    public interface UpdateUserCallback {
-        public void onUpdateUserCallback(boolean success, String msg);
+    public boolean reconnectFetchUser(final SherlockFragmentActivity activity, int loaderID,
+            final FetchUserCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            FetchUserLoaderCallbacks loaderCallbacks = new FetchUserLoaderCallbacks(activity,
+                    callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private UserObj fetchUser() {
+    public void fetchUser(final SherlockFragmentActivity activity, int loaderID,
+            final FetchUserCallback callback) {
+        fetchUser(activity, loaderID, callback, false);
+    }
+
+    public void fetchUserWithNoAsync(final FetchUserCallback callback) {
+        fetchUser(null, 0, callback, true);
+    }
+
+    private void fetchUser(final SherlockFragmentActivity activity, int loaderID,
+            final FetchUserCallback callback, boolean withNoAsync) {
+
+        // Caveat: if withNoAsync == true, activity is null as it's called from a service.
+
+        if (withNoAsync) {
+            UserObj userObj = fetchUserInBackground();
+            if (userObj == null) {
+                callback.onFetchUserCallback(null, null, null, null);
+            } else {
+                callback.onFetchUserCallback(userObj.sSID, userObj.sID,
+                        userObj.username, userObj.email);
+            }
+        } else {
+            FetchUserLoaderCallbacks loaderCallbacks = new FetchUserLoaderCallbacks(activity,
+                    callback);
+            activity.getSupportLoaderManager().restartLoader(loaderID, null, loaderCallbacks);
+        }
+    }
+
+    private class FetchUserLoaderCallbacks implements LoaderCallbacks<UserObj> {
+        private Context mContext;
+        private FetchUserCallback mCallback;
+
+        public FetchUserLoaderCallbacks(Context context, FetchUserCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<UserObj> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<UserObj> loader = new DataStoreLoader<UserObj>(mContext) {
+                @Override
+                public UserObj loadInBackground() {
+                    return fetchUserInBackground();
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<UserObj> loader, UserObj data) {
+            if (data == null) {
+                mCallback.onFetchUserCallback(null, null, null, null);
+            } else {
+                mCallback.onFetchUserCallback(data.sSID, data.sID,
+                        data.username, data.email);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<UserObj> loader) {
+        }
+    }
+
+    private UserObj fetchUserInBackground() {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(Constants.USER, null, null, null, null, null, null);
         try {
@@ -124,19 +271,80 @@ public class DataStore {
         }
     }
 
-    public void fetchUser(FetchUserCallback callback) {
-        UserObj userObj = fetchUser();
-        if (userObj == null) {
-            callback.onFetchUserCallback(null, null, null, null);
+    public interface UpdateUserCallback {
+        public void onUpdateUserCallback(boolean success, String msg);
+    }
+
+    public boolean reconnectUpdateUser(final SherlockFragmentActivity activity, int loaderID,
+            final UpdateUserCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            UpdateUserLoaderCallbacks loaderCallbacks = new UpdateUserLoaderCallbacks(activity,
+                    callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
         } else {
-            callback.onFetchUserCallback(userObj.sSID, userObj.sID,
-                    userObj.username, userObj.email);
+            return false;
         }
     }
 
-    public void updateUser(String sSID, String sID, String username, String email,
-            UpdateUserCallback callback) {
-        deleteUser();
+    public void updateUser(final SherlockFragmentActivity activity, int loaderID, String sSID,
+            String sID, String username, String email, final UpdateUserCallback callback) {
+
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.SSID, sSID);
+        bundle.putString(Constants.SID, sID);
+        bundle.putString(Constants.USERNAME, username);
+        bundle.putString(Constants.EMAIL, email);
+
+        UpdateUserLoaderCallbacks loaderCallbacks = new UpdateUserLoaderCallbacks(activity,
+                callback);
+        activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
+    }
+
+    private class UpdateUserLoaderCallbacks implements LoaderCallbacks<Long> {
+        private Context mContext;
+        private UpdateUserCallback mCallback;
+
+        public UpdateUserLoaderCallbacks(Context context, UpdateUserCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Long> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Long> loader = new DataStoreLoader<Long>(mContext) {
+                @Override
+                public Long loadInBackground() {
+                    return updateUserInBackground(
+                            bundle.getString(Constants.SSID),
+                            bundle.getString(Constants.SID),
+                            bundle.getString(Constants.USERNAME),
+                            bundle.getString(Constants.EMAIL));
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Long> loader, Long data) {
+            if (data > 0) {
+                mCallback.onUpdateUserCallback(true, null);
+            } else {
+                // If the insert didn't succeed, then the rowID is <= 0. Throws
+                // an exception.
+                throw new SQLException("Failed to insert a new user.");
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Long> loader) {
+        }
+    }
+
+    private long updateUserInBackground(String sSID, String sID, String username, String email) {
+        deleteUserInBackground();
 
         UserObj userObj = new UserObj();
         userObj.sSID = sSID;
@@ -145,17 +353,15 @@ public class DataStore {
         userObj.email = email;
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        long rowId = db.insert(Constants.USER, null, userObj.getContentValues());
-        if (rowId > 0) {
-            callback.onUpdateUserCallback(true, null);
-        } else {
-            // If the insert didn't succeed, then the rowID is <= 0. Throws
-            // an exception.
-            throw new SQLException("Failed to insert a new user.");
-        }
+        return db.insert(Constants.USER, null, userObj.getContentValues());
     }
 
     public void deleteUser() {
+        // TODO: In background please.
+        deleteUserInBackground();
+    }
+
+    private void deleteUserInBackground() {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         db.delete(Constants.USER, null, null);
     }
@@ -164,43 +370,94 @@ public class DataStore {
         public void onLogInCallback(Log log);
     }
 
-    public AsyncTask<String, Void, Log> logIn(Activity activity, String username, String password,
+    public boolean reconnectLogIn(final SherlockFragmentActivity activity, int loaderID,
             final LogInCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            LogInLoaderCallbacks loaderCallbacks = new LogInLoaderCallbacks(activity, callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-        // TODO: Validate the inputs
+    public void logIn(final SherlockFragmentActivity activity, int loaderID,
+            String username, String password, final LogInCallback callback) {
 
+        // Validate the inputs. Let all the hard work to the server
+        Log log = new Log();
+        if (TextUtils.isEmpty(username)) {
+            log.addLogInfo(Constants.USERNAME, false, username,
+                    activity.getString(R.string.error_field_required));
+        }
+        if (TextUtils.isEmpty(password)) {
+            log.addLogInfo(Constants.PASSWORD, false, password,
+                    activity.getString(R.string.error_field_required));
+        } else if (password.length() < 7) {
+            log.addLogInfo(Constants.PASSWORD, false, password,
+                    activity.getString(R.string.error_invalid_password));
+        }
+        if (!log.isValid()) {
+            callback.onLogInCallback(log);
+            return;
+        }
 
         if (isNetworkConnected(activity)) {
 
             String urlString = Constants.URL(activity.getApplicationContext());
 
-            return new AsyncTask<String, Void, Log>() {
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.URL_STRING, urlString);
+            bundle.putString(Constants.USERNAME, username);
+            bundle.putString(Constants.PASSWORD, password);
 
+            LogInLoaderCallbacks loaderCallbacks = new LogInLoaderCallbacks(activity, callback);
+
+            activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
+        } else {
+            log = new Log();
+            log.addLogInfo(Constants.LOG_IN, false, null, activity.getString(R.string.no_network));
+            callback.onLogInCallback(log);
+        }
+    }
+
+    private class LogInLoaderCallbacks implements LoaderCallbacks<Log> {
+
+        private Context mContext;
+        private LogInCallback mCallback;
+
+        public LogInLoaderCallbacks(Context context, LogInCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
                 @Override
-                protected Log doInBackground(String... params) {
+                public Log loadInBackground() {
                     try {
-                        return logInInBackground(params[0], params[1], params[2]);
+                        return logInInBackground(bundle.getString(Constants.URL_STRING),
+                                bundle.getString(Constants.USERNAME),
+                                bundle.getString(Constants.PASSWORD));
                     } catch (IOException e) {
                         e.printStackTrace();
-                        return null;
                     }
+                    return null;
                 }
+            };
+            return loader;
+        }
 
-                @Override
-                protected void onPostExecute(Log log) {
-                    callback.onLogInCallback(log);
-                }
+        @Override
+        public void onLoadFinished(Loader<Log> loader, Log data) {
+            mCallback.onLogInCallback(data);
+        }
 
-                @Override
-                protected void onCancelled() {
-                    callback.onLogInCallback(null);
-                }
-            }.execute(urlString, username, password);
-        } else {
-            Log log = new Log();
-            log.addLogInfo(Constants.LOG_IN, false, null, Constants.NO_NETWORK);
-            callback.onLogInCallback(log);
-            return null;
+        @Override
+        public void onLoaderReset(Loader<Log> loader) {
         }
     }
 
@@ -229,38 +486,76 @@ public class DataStore {
         public void onLogOutCallback(Log log);
     }
 
-    public AsyncTask<String, Void, Log> logOut(Activity activity, String sSID, String sID,
+    public boolean reconnectLogOut(final SherlockFragmentActivity activity, int loaderID,
+            final LogOutCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            LogOutLoaderCallbacks loaderCallbacks = new LogOutLoaderCallbacks(activity, callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void logOut(SherlockFragmentActivity activity, int loaderID, String sSID, String sID,
             final LogOutCallback callback) {
         if (isNetworkConnected(activity)) {
             String urlString = Constants.URL(activity.getApplicationContext())
                     + Constants.LOG_OUT_PATH;
-            return new AsyncTask<String, Void, Log>() {
 
-                @Override
-                protected Log doInBackground(String... params) {
-                    try {
-                        return logOutInBackground(params[0], params[1], params[2]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.URL_STRING, urlString);
+            bundle.putString(Constants.SSID, sSID);
+            bundle.putString(Constants.SID, sID);
 
-                @Override
-                protected void onPostExecute(Log log) {
-                    callback.onLogOutCallback(log);
-                }
+            LogOutLoaderCallbacks loaderCallbacks = new LogOutLoaderCallbacks(activity, callback);
 
-                @Override
-                protected void onCancelled() {
-                    callback.onLogOutCallback(null);
-                }
-            }.execute(urlString, sSID, sID);
+            activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.LOG_OUT, false, null, Constants.NO_NETWORK);
+            log.addLogInfo(Constants.LOG_OUT, false, null, activity.getString(R.string.no_network));
             callback.onLogOutCallback(log);
-            return null;
+        }
+    }
+
+    private class LogOutLoaderCallbacks implements LoaderCallbacks<Log> {
+
+        private Context mContext;
+        private LogOutCallback mCallback;
+
+        public LogOutLoaderCallbacks(Context context, LogOutCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
+                @Override
+                public Log loadInBackground() {
+                    try {
+                        return logOutInBackground(
+                                bundle.getString(Constants.URL_STRING),
+                                bundle.getString(Constants.SSID),
+                                bundle.getString(Constants.SID));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Log> loader, Log data) {
+            mCallback.onLogOutCallback(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Log> loader) {
         }
     }
 
@@ -299,41 +594,83 @@ public class DataStore {
         public void onGetPagingPageUrlsCallback(Log log);
     }
 
-    public AsyncTask<String, Void, Log> getPagingPageUrls(Activity activity, String sSID,
+    public boolean reconnectGetPagingPageUrls(final SherlockFragmentActivity activity, int loaderID,
+            final GetPagingPageUrlsCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            GetPagingPageUrlsLoaderCallbacks loaderCallbacks = new GetPagingPageUrlsLoaderCallbacks(
+                    activity, callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void getPagingPageUrls(SherlockFragmentActivity activity, int loaderID, String sSID,
             String sID, String cursorString, final GetPagingPageUrlsCallback callback) {
 
         if (isNetworkConnected(activity)) {
 
             String urlString = Constants.URL(activity.getApplicationContext()) + Constants.P2R_PATH;
 
-            return new AsyncTask<String, Void, Log>() {
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.URL_STRING, urlString);
+            bundle.putString(Constants.SSID, sSID);
+            bundle.putString(Constants.SID, sID);
+            bundle.putString(Constants.CURSOR_STRING, cursorString);
 
-                @Override
-                protected Log doInBackground(String... params) {
-                    try {
-                        return getPagingPageUrlsInBackground(params[0], params[1], params[2],
-                                params[3]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
+            GetPagingPageUrlsLoaderCallbacks loaderCallbacks = new GetPagingPageUrlsLoaderCallbacks(
+                    activity, callback);
 
-                @Override
-                protected void onPostExecute(Log log) {
-                    callback.onGetPagingPageUrlsCallback(log);
-                }
-
-                @Override
-                protected void onCancelled() {
-                    callback.onGetPagingPageUrlsCallback(null);
-                }
-            }.execute(urlString, sSID, sID, cursorString);
+            activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.GET_PAGING_PAGE_URLS, false, null, Constants.NO_NETWORK);
+            log.addLogInfo(Constants.GET_PAGING_PAGE_URLS, false, null,
+                    activity.getString(R.string.no_network));
             callback.onGetPagingPageUrlsCallback(log);
-            return null;
+        }
+    }
+
+    private class GetPagingPageUrlsLoaderCallbacks implements LoaderCallbacks<Log> {
+
+        private Context mContext;
+        private GetPagingPageUrlsCallback mCallback;
+
+        public GetPagingPageUrlsLoaderCallbacks(Context context,
+                GetPagingPageUrlsCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
+                @Override
+                public Log loadInBackground() {
+                    try {
+                        return getPagingPageUrlsInBackground(
+                                bundle.getString(Constants.URL_STRING),
+                                bundle.getString(Constants.SSID),
+                                bundle.getString(Constants.SID),
+                                bundle.getString(Constants.CURSOR_STRING));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Log> loader, Log data) {
+            mCallback.onGetPagingPageUrlsCallback(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Log> loader) {
         }
     }
 
@@ -363,41 +700,131 @@ public class DataStore {
         public void onAddPageUrlCallback(Log log);
     }
 
-    public AsyncTask<String, Void, Log> addPageUrl(Context applicationContext, String sSID,
+    public boolean reconnectAddPageUrl(final SherlockFragmentActivity activity, int loaderID,
+            final AddPageUrlCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            AddPageUrlLoaderCallbacks loaderCallbacks = new AddPageUrlLoaderCallbacks(activity,
+                    callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void addPageUrl(SherlockFragmentActivity activity, int loaderID, String sSID, String sID,
+            String pUrl, final AddPageUrlCallback callback) {
+        addPageUrl(activity.getApplicationContext(), activity, loaderID, sSID, sID, pUrl,
+                callback, false);
+    }
+
+    public void addPageUrlWithNoAsync(Context applicationContext, String sSID,
             String sID, String pUrl, final AddPageUrlCallback callback) {
+        addPageUrl(applicationContext, null, 0, sSID, sID, pUrl, callback, true);
+    }
+
+    private void addPageUrl(Context applicationContext, SherlockFragmentActivity activity,
+            int loaderID, String sSID, String sID, String pUrl, final AddPageUrlCallback callback,
+            boolean withNoAsync) {
+
+        // Caveat: if withNoAsync == true, activity is null as it's called from a service.
+
+        // Put http:// if needed
+        if (!pUrl.startsWith("http://") &&
+            !pUrl.startsWith("https://")) {
+          pUrl = "http://" + pUrl;
+        }
+
+        // Validate pUrl
+        if (TextUtils.isEmpty(pUrl)) {
+            Log log = new Log();
+            log.addLogInfo(Constants.ADD_PAGE_URL, false, pUrl,
+                    applicationContext.getResources().getString(R.string.error_field_required));
+            callback.onAddPageUrlCallback(log);
+            return;
+        }
+
+        try {
+            new URL(pUrl);
+        } catch(MalformedURLException e) {
+            Log log = new Log();
+            log.addLogInfo(Constants.ADD_PAGE_URL, false, pUrl,
+                    applicationContext.getResources().getString(R.string.error_invalid_url));
+            callback.onAddPageUrlCallback(log);
+            return;
+        }
 
         if (isNetworkConnected(applicationContext)) {
 
             String urlString = Constants.URL(applicationContext) + Constants.P2R_PATH;
 
-            return new AsyncTask<String, Void, Log>() {
-
-                @Override
-                protected Log doInBackground(String... params) {
-                    try {
-                        return addPageUrlInBackground(params[0], params[1], params[2],
-                                params[3]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
+            if (withNoAsync) {
+                Log log = null;
+                try {
+                    log = addPageUrlInBackground(urlString, sSID, sID, pUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                callback.onAddPageUrlCallback(log);
+            } else {
+                Bundle bundle = new Bundle();
+                bundle.putString(Constants.URL_STRING, urlString);
+                bundle.putString(Constants.SSID, sSID);
+                bundle.putString(Constants.SID, sID);
+                bundle.putString(Constants.P_URL, pUrl);
 
-                @Override
-                protected void onPostExecute(Log log) {
-                    callback.onAddPageUrlCallback(log);
-                }
+                AddPageUrlLoaderCallbacks loaderCallbacks = new AddPageUrlLoaderCallbacks(
+                        activity, callback);
 
-                @Override
-                protected void onCancelled() {
-                    callback.onAddPageUrlCallback(null);
-                }
-            }.execute(urlString, sSID, sID, pUrl);
+                activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
+            }
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.ADD_PAGE_URL, false, null, Constants.NO_NETWORK);
+            log.addLogInfo(Constants.ADD_PAGE_URL, false, null,
+                    applicationContext.getString(R.string.no_network));
             callback.onAddPageUrlCallback(log);
-            return null;
+        }
+    }
+
+    private class AddPageUrlLoaderCallbacks implements LoaderCallbacks<Log> {
+
+        private Context mContext;
+        private AddPageUrlCallback mCallback;
+
+        public AddPageUrlLoaderCallbacks(Context context, AddPageUrlCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
+                @Override
+                public Log loadInBackground() {
+                    try {
+                        return addPageUrlInBackground(
+                                bundle.getString(Constants.URL_STRING),
+                                bundle.getString(Constants.SSID),
+                                bundle.getString(Constants.SID),
+                                bundle.getString(Constants.P_URL));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Log> loader, Log data) {
+            mCallback.onAddPageUrlCallback(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Log> loader) {
         }
     }
 
@@ -426,41 +853,82 @@ public class DataStore {
         public void onDeletePageUrlCallback(Log log);
     }
 
-    public AsyncTask<String, Void, Log> deletePageUrl(Activity activity, String sSID,
+    public boolean reconnectDeletePageUrl(final SherlockFragmentActivity activity, int loaderID,
+            final DeletePageUrlCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            DeletePageUrlLoaderCallbacks loaderCallbacks = new DeletePageUrlLoaderCallbacks(
+                    activity, callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void deletePageUrl(SherlockFragmentActivity activity, int loaderID, String sSID,
             String sID, String keyString, final DeletePageUrlCallback callback) {
 
         if (isNetworkConnected(activity)) {
 
             String urlString = Constants.URL(activity.getApplicationContext()) + Constants.P2R_PATH;
 
-            return new AsyncTask<String, Void, Log>() {
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.URL_STRING, urlString);
+            bundle.putString(Constants.SSID, sSID);
+            bundle.putString(Constants.SID, sID);
+            bundle.putString(Constants.KEY_STRING, keyString);
 
-                @Override
-                protected Log doInBackground(String... params) {
-                    try {
-                        return deletePageUrlInBackground(params[0], params[1], params[2],
-                                params[3]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
+            DeletePageUrlLoaderCallbacks loaderCallbacks = new DeletePageUrlLoaderCallbacks(
+                    activity, callback);
 
-                @Override
-                protected void onPostExecute(Log log) {
-                    callback.onDeletePageUrlCallback(log);
-                }
-
-                @Override
-                protected void onCancelled() {
-                    callback.onDeletePageUrlCallback(null);
-                }
-            }.execute(urlString, sSID, sID, keyString);
+            activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.DELETE_PAGE_URL, false, null, Constants.NO_NETWORK);
+            log.addLogInfo(Constants.DELETE_PAGE_URL, false, null,
+                    activity.getString(R.string.no_network));
             callback.onDeletePageUrlCallback(log);
-            return null;
+        }
+    }
+
+    private class DeletePageUrlLoaderCallbacks implements LoaderCallbacks<Log> {
+
+        private Context mContext;
+        private DeletePageUrlCallback mCallback;
+
+        public DeletePageUrlLoaderCallbacks(Context context, DeletePageUrlCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
+                @Override
+                public Log loadInBackground() {
+                    try {
+                        return deletePageUrlInBackground(
+                                bundle.getString(Constants.URL_STRING),
+                                bundle.getString(Constants.SSID),
+                                bundle.getString(Constants.SID),
+                                bundle.getString(Constants.KEY_STRING));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Log> loader, Log data) {
+            mCallback.onDeletePageUrlCallback(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Log> loader) {
         }
     }
 
@@ -489,41 +957,82 @@ public class DataStore {
         public void onResendToReaderCallback(Log log);
     }
 
-    public AsyncTask<String, Void, Log> resendToReader(Activity activity, String sSID,
+    public boolean reconnectResendToReader(final SherlockFragmentActivity activity, int loaderID,
+            final ResendToReaderCallback callback) {
+        LoaderManager loaderManager = activity.getSupportLoaderManager();
+        Loader<Object> loader = loaderManager.getLoader(loaderID);
+        if (loader != null && loader.isStarted()) {
+            ResendToReaderLoaderCallbacks loaderCallbacks = new ResendToReaderLoaderCallbacks(
+                    activity, callback);
+            loaderManager.initLoader(loaderID, null, loaderCallbacks);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void resendToReader(SherlockFragmentActivity activity, int loaderID, String sSID,
             String sID, String keyString, final ResendToReaderCallback callback) {
 
         if (isNetworkConnected(activity)) {
 
             String urlString = Constants.URL(activity.getApplicationContext()) + Constants.P2R_PATH;
 
-            return new AsyncTask<String, Void, Log>() {
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.URL_STRING, urlString);
+            bundle.putString(Constants.SSID, sSID);
+            bundle.putString(Constants.SID, sID);
+            bundle.putString(Constants.KEY_STRING, keyString);
 
-                @Override
-                protected Log doInBackground(String... params) {
-                    try {
-                        return resendToReaderInBackground(params[0], params[1], params[2],
-                                params[3]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
+            ResendToReaderLoaderCallbacks loaderCallbacks = new ResendToReaderLoaderCallbacks(
+                    activity, callback);
 
-                @Override
-                protected void onPostExecute(Log log) {
-                    callback.onResendToReaderCallback(log);
-                }
-
-                @Override
-                protected void onCancelled() {
-                    callback.onResendToReaderCallback(null);
-                }
-            }.execute(urlString, sSID, sID, keyString);
+            activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.SEND_TO_READER, false, null, Constants.NO_NETWORK);
+            log.addLogInfo(Constants.SEND_TO_READER, false, null,
+                    activity.getString(R.string.no_network));
             callback.onResendToReaderCallback(log);
-            return null;
+        }
+    }
+
+    private class ResendToReaderLoaderCallbacks implements LoaderCallbacks<Log> {
+
+        private Context mContext;
+        private ResendToReaderCallback mCallback;
+
+        public ResendToReaderLoaderCallbacks(Context context, ResendToReaderCallback callback) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+            DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
+                @Override
+                public Log loadInBackground() {
+                    try {
+                        return resendToReaderInBackground(
+                                bundle.getString(Constants.URL_STRING),
+                                bundle.getString(Constants.SSID),
+                                bundle.getString(Constants.SID),
+                                bundle.getString(Constants.KEY_STRING));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Log> loader, Log data) {
+            mCallback.onResendToReaderCallback(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Log> loader) {
         }
     }
 

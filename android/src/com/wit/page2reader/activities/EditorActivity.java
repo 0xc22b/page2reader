@@ -2,14 +2,14 @@ package com.wit.page2reader.activities;
 
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.v4.content.IntentCompat;
 import android.widget.EditText;
+import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.wit.page2reader.Constants;
@@ -20,36 +20,71 @@ import com.wit.page2reader.model.DataStore.FetchUserCallback;
 import com.wit.page2reader.model.Log;
 import com.wit.page2reader.model.PageUrlObj;
 
-public class EditorActivity extends SherlockActivity {
+public class EditorActivity extends SherlockFragmentActivity implements FetchUserCallback,
+        AddPageUrlCallback {
 
+    // Reference for convenience
+    private DataStore mDataStore;
+
+    private TextView mTextView;
     private EditText mEditText;
+
+    private boolean mIsConnecting;
+
+    // Needs splash screen as sometimes all data is clear
+    // but the system remembers the last activity and go directly to it.
+    // So needs to load data.
+    private ProgressDialog mSplashScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final DataStore dataStore = DataStore.getInstance(this.getApplicationContext());
-        if (dataStore.sSID == null || dataStore.sID == null) {
-            dataStore.fetchUser(new FetchUserCallback() {
-                @Override
-                public void onFetchUserCallback(String sSID, String sID, String username,
-                        String email) {
-                    if (sSID == null || sID == null) {
-                        Intent intent = new Intent(EditorActivity.this, HomeActivity.class);
-                        // TODO: Clear task
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        EditorActivity.this.startActivity(intent);
-                        return;
-                    }
+        mDataStore = DataStore.getInstance(this.getApplicationContext());
 
-                    dataStore.sSID = sSID;
-                    dataStore.sID = sID;
-                }
-            });
+        if (mDataStore.sSID == null || mDataStore.sID == null) {
+            mSplashScreen = new ProgressDialog(this);
+            mSplashScreen.setMessage(getResources().getString(R.string.loading));
+            mSplashScreen.setCancelable(false);
+            mSplashScreen.show();
+
+            boolean reconnect = mDataStore.reconnectFetchUser(this,
+                    Constants.P2R_FETCH_USER_LOADER_ID, this);
+            if (!reconnect) {
+                mDataStore.fetchUser(this, Constants.P2R_FETCH_USER_LOADER_ID, this);
+            }
         }
 
         setContentView(R.layout.activity_editor);
+        mTextView = (TextView) findViewById(R.id.textView);
         mEditText = (EditText) findViewById(R.id.editText);
+
+        if (savedInstanceState != null) {
+            mTextView.setText(savedInstanceState.getString(Constants.MSG));
+        }
+
+        if (mDataStore.reconnectAddPageUrl(this, Constants.ADD_PAGE_URL_LOADER_ID, this)) {
+            mIsConnecting = true;
+            mEditText.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void onFetchUserCallback(String sSID, String sID, String username, String email) {
+
+        mSplashScreen.dismiss();
+
+        if (sSID == null || sID == null) {
+            Intent intent = new Intent(EditorActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
+            EditorActivity.this.startActivity(intent);
+            EditorActivity.this.finish();
+            return;
+        }
+
+        mDataStore.sSID = sSID;
+        mDataStore.sID = sID;
     }
 
     @Override
@@ -57,6 +92,30 @@ public class EditorActivity extends SherlockActivity {
         super.onCreateOptionsMenu(menu);
         getSupportMenuInflater().inflate(R.menu.editor, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem okMenuItem = menu.findItem(R.id.action_ok);
+        okMenuItem.setEnabled(!mIsConnecting);
+
+        return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(Constants.MSG, mTextView.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mSplashScreen != null && mSplashScreen.isShowing()) {
+            mSplashScreen.dismiss();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -69,53 +128,44 @@ public class EditorActivity extends SherlockActivity {
     }
 
     private void onOkBtnClick() {
-        // TODO: Check for a valid url.
         String pUrl = mEditText.getText().toString();
-        if (TextUtils.isEmpty(pUrl)) {
-            
-            return;
-        }
 
-        final DataStore dataStore = DataStore.getInstance(this.getApplicationContext());
-        dataStore.addPageUrl(this.getApplicationContext(), dataStore.sSID, dataStore.sID, pUrl,
-                new AddPageUrlCallback() {
-            @Override
-            public void onAddPageUrlCallback(Log log) {
-                if (log == null) {
-                    showAlertDialog(Constants.CONNECTION_FAILED);
-                    return;
-                }
+        mIsConnecting = true;
+        this.supportInvalidateOptionsMenu();
 
-                String value = log.getValue(Constants.ADD_PAGE_URL, true);
-                if (value != null) {
-                    JSONObject jsonPageUrl = new JSONObject(value);
-                    PageUrlObj pageUrl = new PageUrlObj(jsonPageUrl);
-                    dataStore.pageUrls.add(0, pageUrl);
+        mEditText.setEnabled(false);
 
-                    onBackPressed();
-                    return;
-                }
-
-                String msg = null;
-
-                msg = log.getMsg(Constants.ADD_PAGE_URL, false, null);
-                if (msg != null) {
-                    showAlertDialog(msg);
-                }
-            }
-        });
+        mDataStore.addPageUrl(this, Constants.ADD_PAGE_URL_LOADER_ID, mDataStore.sSID,
+                mDataStore.sID, pUrl, this);
     }
 
-    private void showAlertDialog(String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(msg);
-        builder.setCancelable(true);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+    @Override
+    public void onAddPageUrlCallback(Log log) {
 
+        mTextView.setText("");
+
+        if (log == null) {
+            mTextView.setText(getString(R.string.connection_failed));
+        } else {
+            String value = log.getValue(Constants.ADD_PAGE_URL, true);
+            if (value != null) {
+                JSONObject jsonPageUrl = new JSONObject(value);
+                PageUrlObj pageUrl = new PageUrlObj(jsonPageUrl);
+                mDataStore.pageUrls.add(0, pageUrl);
+
+                this.finish();
+                return;
+            } else {
+                String msg = log.getMsg(Constants.ADD_PAGE_URL, false, null);
+                if (msg != null) {
+                    mTextView.setText(msg);
+                }
             }
-        });
-        builder.create().show();
+        }
+
+        mIsConnecting = false;
+        this.supportInvalidateOptionsMenu();
+
+        mEditText.setEnabled(true);
     }
 }

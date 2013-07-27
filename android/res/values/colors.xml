@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    
+    <color name="lighter_gray">#ffe5e5e5</color>
+    <color name="light_gray">#ffb0b0b0</color>
+    <color name="gray">#ff808080</color>
+    <color name="dark_gray">#ff7d7d7d</color>
+    <color name="darker_gray">#ff585858</color>
+
+    <color name="green">#ff6cc655</color>
+    <color name="red">#ffff0000</color>
+    <color name="blue_bright">#ff00ddff</color>
+
+    <color name="normal_text">#ff222222</color>
+    <color name="title_text">#ff222222</color>
+    <color name="footer_text">@color/gray</color>
+    <color name="err_text">@color/red</color>
+
+    <color name="btn_text">@color/white</color>
+    <color name="disabled_btn_text">@color/light_gray</color>
+
+    <color name="header_bg">@color/light_gray</color>
+    <color name="footer_bg">@color/lighter_gray</color>
+
+    <color name="primary_btn_bg">@color/green</color>
+    <color name="btn_bg">@color/dark_gray</color>
+    <color name="next_btn_bg">@color/darker_gray</color>
+    <color name="confirm_btn_bg">@color/red</color>
+
+    <color name="list_border">#ffdddddd</color>
+    <color name="list_bg">@color/white</color>
+    <color name="list_highlight">@color/blue_bright</color>
+</resources>

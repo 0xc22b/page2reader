@@ -5,6 +5,44 @@ import android.content.pm.ApplicationInfo;
 
 public class Constants {
 
+    public enum RefreshBtnStatus {
+        NORMAL,
+        REFRESHING
+    }
+
+    public enum DelBtnStatus {
+        NORMAL,
+        DELETING
+    }
+
+    public enum ResendBtnStatus {
+        NORMAL,
+        RESENDING,
+        DISABLED,
+        SENT
+    }
+
+    public enum NextBtnStatus {
+        NORMAL,
+        GETTING,
+        HIDE
+    }
+
+    public static final int LOG_IN_LOADER_ID = 1;
+    public static final int UPDATE_USER_LOADER_ID = 2;
+    public static final int LOG_OUT_LOADER_ID = 3;
+
+    public static final int HOME_FETCH_USER_LOADER_ID = 4;
+    public static final int P2R_FETCH_USER_LOADER_ID = 5;
+
+    public static final int FT_GET_PAGE_URLS_LOADER_ID = 6;
+    public static final int RF_GET_PAGE_URLS_LOADER_ID = 7;
+    public static final int NE_GET_PAGE_URLS_LOADER_ID = 8;
+
+    public static final int ADD_PAGE_URL_LOADER_ID = 9;
+    public static final int DELETE_PAGE_URL_LOADER_ID = 10;
+    public static final int RESEND_TO_READER_LOADER_ID = 11;
+
     public static final String USER = "user";
 
     public static final String KEY_STRING = "keyString";
@@ -14,6 +52,8 @@ public class Constants {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
+
+    public static final String PAGE_URLS = "pageUrls";
 
     public static final String P_URL = "pUrl";
     public static final String TITLE = "title";
@@ -30,12 +70,15 @@ public class Constants {
     public static final String VALUE = "value";
     public static final String MSG = "msg";
 
+    public static final String URL_STRING = "urlString";
+
     public static final String URL(Context context) {
         boolean isDebug = (context.getApplicationInfo().flags &
                 ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         if (isDebug) {
-            //return "http://10.0.2.2:8888";  // localhost
-            return "http://192.168.1.36:8888";
+            return "http://10.0.2.2:8888";  // localhost
+            //return "http://192.168.1.38:8888";
+            //return "http://192.168.43.43:8888";
         } else {
             return "http://page2reader.appspot.com";
         }
@@ -54,9 +97,6 @@ public class Constants {
     public static final String SEND_TO_READER = "sendToReader";
     public static final String RESEND_TO_READER = "resendToReader";
 
-    public static final String PAGE_URLS = "pageUrls";
-
-    public static final String NO_NETWORK = "No network connection available.";
-    public static final String CONNECTION_FAILED = "Could not connect to the server.";
-    public static final String NOT_LOGGED_IN = "Please go to the app and log in first.";
+    public static final String DID_GET_SESSION = "didGetSession";
+    public static final String BEING_DELETED_POSITION = "beingDeletedPosition";
 }
