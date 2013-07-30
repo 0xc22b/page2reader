@@ -43,6 +43,7 @@
     <string name="welcome">Welcome to Page2Reader</string>
     <string name="desc">Send a web page to your kindle instantly.</string>
     <string name="info">You can send a web page to your kindle with our website, bookmarklet, Chrome extension, Firefox extension, and Android application.</string>
+    <string name="share">On Android, to send a web page to your kindle, click on Share&#8230;, then select Send to kindle.</string>
     <string name="to_the_web">To learn more and create an account, Please go to</string>
     <string name="web_name">page2reader.appspot.com</string>
 </resources>
