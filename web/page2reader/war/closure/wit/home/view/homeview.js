@@ -1,6 +1,7 @@
 goog.provide('wit.home.view.HomeView');
 
 goog.require('goog.dom');
+goog.require('goog.events.KeyCodes');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
@@ -276,19 +277,16 @@ wit.home.view.HomeView.prototype.enterDocument = function() {
             250);
       });
 
+  this.getHandler().listen(this.logInPasswordTB, goog.events.EventType.KEYUP,
+      function(e) {
+        if (e.keyCode === goog.events.KeyCodes.ENTER) {
+          this.logIn_();
+        }
+      });
+
   this.getHandler().listen(this.logInBtn, goog.events.EventType.CLICK,
       function(e) {
-        goog.dom.setProperties(this.logInUsernameTB, {'disabled': true});
-        goog.dom.setProperties(this.logInPasswordTB, {'disabled': true});
-        goog.dom.setProperties(this.logInBtn, {'disabled': true});
-
-        var dataStore = wit.home.model.DataStore.getInstance();
-        var log = new wit.base.model.Log();
-        dataStore.logIn(
-            this.logInUsernameTB.value,
-            this.logInPasswordTB.value,
-            log,
-            goog.bind(this.logInCallback_, this));
+        this.logIn_();
       });
 
   this.getHandler().listen(
@@ -446,6 +444,25 @@ wit.home.view.HomeView.prototype.disposeInternal = function() {
 /** @inheritDoc */
 wit.home.view.HomeView.prototype.exitDocument = function() {
   goog.base(this, 'exitDocument');
+};
+
+
+/**
+ * Log in
+ * @private
+ */
+wit.home.view.HomeView.prototype.logIn_ = function() {
+  goog.dom.setProperties(this.logInUsernameTB, {'disabled': true});
+  goog.dom.setProperties(this.logInPasswordTB, {'disabled': true});
+  goog.dom.setProperties(this.logInBtn, {'disabled': true});
+
+  var dataStore = wit.home.model.DataStore.getInstance();
+  var log = new wit.base.model.Log();
+  dataStore.logIn(
+      this.logInUsernameTB.value,
+      this.logInPasswordTB.value,
+      log,
+      goog.bind(this.logInCallback_, this));
 };
 
 

@@ -3,6 +3,7 @@ goog.provide('wit.page2reader.view.P2rView');
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.dataset');
+goog.require('goog.events.KeyCodes');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
@@ -118,18 +119,16 @@ wit.page2reader.view.P2rView.prototype.decorateInternal = function(element) {
 wit.page2reader.view.P2rView.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
+  this.getHandler().listen(this.urlTB_, goog.events.EventType.KEYUP,
+      function(e) {
+        if (e.keyCode === goog.events.KeyCodes.ENTER) {
+          this.addPageUrl_();
+        }
+      });
+
   this.getHandler().listen(this.addUrlBtn_, goog.events.EventType.CLICK,
       function(e) {
-
-        goog.dom.setProperties(this.urlTB_, {'disabled': true});
-        goog.dom.setProperties(this.addUrlBtn_, {'disabled': true});
-
-        var dataStore = wit.page2reader.model.DataStore.getInstance();
-        var log = new wit.base.model.Log();
-        dataStore.addPageUrl(
-            this.urlTB_.value,
-            log,
-            goog.bind(this.addPageUrlCallback_, this));
+        this.addPageUrl_();
       });
 
   this.getHandler().listen(this.nextBtn_, goog.events.EventType.CLICK,
@@ -181,6 +180,23 @@ wit.page2reader.view.P2rView.prototype.exitDocument = function() {
 /** @inheritDoc */
 wit.page2reader.view.P2rView.prototype.getContentElement = function() {
   return this.pageUrlViews_;
+};
+
+
+/**
+ * Add a page URL.
+ * @private
+ */
+wit.page2reader.view.P2rView.prototype.addPageUrl_ = function() {
+  goog.dom.setProperties(this.urlTB_, {'disabled': true});
+  goog.dom.setProperties(this.addUrlBtn_, {'disabled': true});
+
+  var dataStore = wit.page2reader.model.DataStore.getInstance();
+  var log = new wit.base.model.Log();
+  dataStore.addPageUrl(
+      this.urlTB_.value,
+      log,
+      goog.bind(this.addPageUrlCallback_, this));
 };
 
 
