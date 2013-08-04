@@ -73,6 +73,7 @@
 
 #showSignUpBtn {
   @mixin initBtn(TITLE_FONT_COLOR, PRIMARY_BTN_BG_COLOR);
+  margin-top: 25px;
   padding: 15px 0;
   width: 100%;
 }
