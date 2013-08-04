@@ -7,8 +7,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/soy.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jsoup-1.7.2.jar" sourcepath="/Applications/eclipse-jee-indigo/plugins/jsoup-1.7.2-sources.jar"/>
-	<classpathentry kind="lib" path="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.1.1/appengine-java-sdk-1.8.1.1/lib/impl/appengine-api-stubs.jar"/>
-	<classpathentry kind="lib" path="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.1.1/appengine-java-sdk-1.8.1.1/lib/testing/appengine-testing.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.2/appengine-java-sdk-1.8.2/lib/impl/appengine-api-stubs.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.2/appengine-java-sdk-1.8.2/lib/testing/appengine-testing.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

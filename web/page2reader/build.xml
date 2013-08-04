@@ -31,7 +31,7 @@
   <property name="cssrenamingmapprops.dir" value="war/cssrenamingmap" />
 
   <property name="appengine-sdk.dir"
-            value="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.1.1/appengine-java-sdk-1.8.1.1" />
+            value="/Applications/eclipse-jee-indigo/plugins/com.google.appengine.eclipse.sdkbundle_1.8.2/appengine-java-sdk-1.8.2" />
 
   <import file="${appengine-sdk.dir}/config/user/ant-macros.xml" />
 
