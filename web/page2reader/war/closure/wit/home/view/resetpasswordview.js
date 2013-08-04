@@ -5,8 +5,6 @@ goog.require('goog.dom');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 
-goog.require('wit.base.constants');
-goog.require('wit.base.model.Log');
 goog.require('wit.fx.dom');
 goog.require('wit.home.model.DataStore');
 
