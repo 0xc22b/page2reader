@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.wit.page2reader.Constants.DelBtnStatus;
 import com.wit.page2reader.Constants.NextBtnStatus;
 import com.wit.page2reader.Constants.ResendBtnStatus;
+import com.wit.page2reader.Constants;
 import com.wit.page2reader.R;
 import com.wit.page2reader.model.DataStore;
 import com.wit.page2reader.model.PageUrlObj;
@@ -94,6 +95,25 @@ public class P2rAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public String getItemKey(int position) {
+        if (mDataStore.msg != null) {
+            // Message view
+            return Constants.MSG;
+        }
+        if (mDataStore.nextBtnStatus == NextBtnStatus.HIDE) {
+            return mDataStore.pageUrls.get(position).keyString;
+        } else {
+            if (position == mDataStore.pageUrls.size()) {
+                // Next view
+                return Constants.NEXT;
+            } else if (position < mDataStore.pageUrls.size()) {
+                return mDataStore.pageUrls.get(position).keyString;
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
     }
 
     @Override

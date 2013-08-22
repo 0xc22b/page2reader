@@ -70,14 +70,16 @@ public class Constants {
     public static final String VALUE = "value";
     public static final String MSG = "msg";
 
+    public static final String NEXT = "next";
+
     public static final String URL_STRING = "urlString";
 
     public static final String URL(Context context) {
         boolean isDebug = (context.getApplicationInfo().flags &
                 ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         if (isDebug) {
-            return "http://10.0.2.2:8888";  // localhost
-            //return "http://192.168.1.38:8888";
+            //return "http://10.0.2.2:8888";  // localhost
+            return "http://192.168.1.37:8888";
             //return "http://192.168.43.43:8888";
         } else {
             return "http://page2reader.appspot.com";

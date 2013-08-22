@@ -1,5 +1,7 @@
 package com.wit.page2reader.activities;
 
+import java.util.HashMap;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -12,6 +14,10 @@ import android.os.Bundle;
 import android.support.v4.content.IntentCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -77,6 +83,9 @@ public class P2rActivity extends SherlockFragmentActivity {
     private AlertDialog mConfirmDeleteDialog;
     private ProgressDialog mLogOutDialog;
     private AlertDialog mAlertDialog;
+
+    private HashMap<String, Integer> mItemTopMap = new HashMap<String, Integer>();
+    private static final int MOVE_DURATION = 250;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -357,6 +366,81 @@ public class P2rActivity extends SherlockFragmentActivity {
                 String keyString = log.getValue(Constants.DELETE_PAGE_URL, true);
                 if (keyString != null) {
                     if (keyString.equals(pageUrl.keyString)) {
+                        int firstVisiblePosition = mListView.getFirstVisiblePosition();
+                        int deletedPosition = mDataStore.pageUrls.indexOf(pageUrl) -
+                                firstVisiblePosition;
+                        if (deletedPosition >= 0
+                                && deletedPosition < mListView.getChildCount()) {
+                            // If still on screen, animate it
+
+                            mListView.setEnabled(false);
+
+                            for (int i = 0; i < mListView.getChildCount(); ++i) {
+                                View child = mListView.getChildAt(i);
+                                int position = firstVisiblePosition + i;
+                                String key = mAdapter.getItemKey(position);
+                                if (position != deletedPosition) {
+                                    mItemTopMap.put(key, child.getTop());
+                                }
+                            }
+
+                            View deletedChild = mListView.getChildAt(deletedPosition);
+                            final int deletedChildHeight = deletedChild.getHeight()
+                                    + mListView.getDividerHeight();
+
+                            final ViewTreeObserver observer = mListView.getViewTreeObserver();
+                            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                                public boolean onPreDraw() {
+                                    observer.removeOnPreDrawListener(this);
+
+                                    boolean firstAnimation = true;
+                                    int firstVisiblePosition = mListView.getFirstVisiblePosition();
+                                    for (int i = 0; i < mListView.getChildCount(); ++i) {
+                                        View child = mListView.getChildAt(i);
+                                        int position = firstVisiblePosition + i;
+                                        String key = mAdapter.getItemKey(position);
+                                        if (key.equals(Constants.MSG)) {
+                                            // No animatin on MsgView
+                                            continue;
+                                        }
+                                        int top = child.getTop();
+                                        Integer startTop = mItemTopMap.get(key);
+                                        if (startTop == null) {
+                                            startTop = top + (i > 0 ? deletedChildHeight
+                                                    : -deletedChildHeight);
+                                        }
+                                        int delta = startTop - top;
+                                        if (delta != 0) {
+                                            final Runnable endAction = firstAnimation ?
+                                                    new Runnable() {
+                                                        public void run() {
+                                                            mListView.setEnabled(true);
+                                                        }
+                                                    } :
+                                                    null;
+                                            firstAnimation = false;
+                                            TranslateAnimation translator = new TranslateAnimation(
+                                                    0, 0, delta, 0);
+                                            translator.setDuration(MOVE_DURATION);
+                                            child.startAnimation(translator);
+                                            if (endAction != null) {
+                                                child.getAnimation().setAnimationListener(
+                                                        new AnimationListenerAdapter() {
+                                                    @Override
+                                                    public void onAnimationEnd(
+                                                            Animation animation) {
+                                                        endAction.run();
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                    mItemTopMap.clear();
+                                    return true;
+                                }
+                            });
+                        }
+
                         mDataStore.pageUrls.remove(pageUrl);
 
                         if (mDataStore.pageUrls.isEmpty()
@@ -594,7 +678,6 @@ public class P2rActivity extends SherlockFragmentActivity {
 
                                 mConfirmDeleteDialog.getButton(
                                         DialogInterface.BUTTON_POSITIVE).setTag(-1);
-                                
                             }
                         });
             mConfirmDeleteDialog = builder.create();
@@ -631,5 +714,24 @@ public class P2rActivity extends SherlockFragmentActivity {
 
         // Make sure the dialog is created.
         mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTag(msg);
+    }
+
+    /**
+     * Utility, to avoid having to implement every method in AnimationListener in
+     * every implementation class
+     */
+    static class AnimationListenerAdapter implements AnimationListener {
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+        }
+
+        @Override
+        public void onAnimationStart(Animation animation) {
+        }
     }
 }
