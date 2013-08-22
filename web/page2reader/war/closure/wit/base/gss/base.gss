@@ -681,6 +681,10 @@ html input[disabled] {
   color: DISABLED_FONT_COLOR !important;
 }
 
+textarea {
+  resize: vertical;
+}
+
 /* ===================
    ALL: Container
    =================== */
