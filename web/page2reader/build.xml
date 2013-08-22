@@ -4,7 +4,7 @@
             value="war/closure/closure-library" />
 
   <property name="closure-builder.py"
-            value="${closure-library.dir}/closure/bin/build/closurebuilder-modified.py" />
+            value="war/closure/closurebuilder-modified.py" />
 
   <property name="closure-depswriter.py"
             value="${closure-library.dir}/closure/bin/build/depswriter.py" />
