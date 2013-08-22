@@ -26,6 +26,8 @@ artwork/*.png
 web/page2reader/test-classes/
 web/page2reader/tmp/
 
+web/page2reader/war/closure/closure-templates/
+
 web/page2reader/war/closure/wit/**/cssrenamingmap/
 web/page2reader/war/closure/wit/**/templates/
 
