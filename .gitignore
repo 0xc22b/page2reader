@@ -16,6 +16,8 @@ Desktop.ini
 *.crx
 # Chrome zip package folder to upload to Chome app store
 web/page2reader/chrome-extension/page2reader.zip
+# Chrome key store
+*.pem
 
 # Ignore generated png files from svg files (logo, icon)
 artwork/*.png
