@@ -212,8 +212,6 @@ wit.home.view.HomeView.prototype.decorateInternal = function(element) {
   this.showLogInBtn = goog.dom.getElement('showLogInBtn');
   this.logInView = goog.dom.getElement('logInView');
 
-  goog.style.setElementShown(this.logInView, false);
-
   this.logInErrLb = goog.dom.getElement('logInErrLb');
   this.logInUsernameTB = goog.dom.getElement('logInUsernameTB');
   this.logInPasswordTB = goog.dom.getElement('logInPasswordTB');
@@ -222,8 +220,6 @@ wit.home.view.HomeView.prototype.decorateInternal = function(element) {
   this.forgotBtn = goog.dom.getElement('forgotBtn');
   this.forgotView = goog.dom.getElement('forgotView');
 
-  goog.style.setElementShown(this.forgotView, false);
-
   this.forgotFormView = goog.dom.getElement('forgotFormView');
   this.forgotUsernameErrLb = goog.dom.getElement('forgotUsernameErrLb');
   this.forgotUsernameTB = goog.dom.getElement('forgotUsernameTB');
@@ -231,14 +227,10 @@ wit.home.view.HomeView.prototype.decorateInternal = function(element) {
 
   this.forgotResultView = goog.dom.getElement('forgotResultView');
 
-  goog.style.setElementShown(this.forgotResultView, false);
-
   this.forgotResultOkBtn = goog.dom.getElement('forgotResultOkBtn');
 
   this.showSignUpBtn = goog.dom.getElement('showSignUpBtn');
   this.signUpView = goog.dom.getElement('signUpView');
-
-  goog.style.setElementShown(this.signUpView, false);
 
   this.signUpUsernameErrLb = goog.dom.getElement('signUpUsernameErrLb');
   this.signUpUsernameTB = goog.dom.getElement('signUpUsernameTB');

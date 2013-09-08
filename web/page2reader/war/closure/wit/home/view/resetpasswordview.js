@@ -109,8 +109,6 @@ wit.home.view.ResetPasswordView.prototype.decorateInternal = function(element) {
     this.resetPasswordBtn_ = goog.dom.getElement('resetPasswordBtn');
     this.resetPasswordResultView_ = goog.dom.getElement(
         'resetPasswordResultView');
-
-    goog.style.setElementShown(this.resetPasswordResultView_, false);
   }
 };
 

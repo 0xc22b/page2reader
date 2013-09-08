@@ -63,7 +63,7 @@
         <div class="{css right}">
           <p id="readerEmailLb" class="{css value}">{if $readerEmail}{$readerEmail}{else}&nbsp;{/if}</p>
           <button id="showChangeReaderEmailBtn" class="{css btn}">Change kindle email</button>
-          <div id="changeReaderEmailView" class="{css view}">
+          <div id="changeReaderEmailView" class="{css view}" style="display: none;">
             <span id="changeReaderEmailErrLb" class="{css err}">&nbsp;</span>
             <input id="changeReaderEmailTB" type="text" placeholder="New kindle email" class="{css input}">
             <button id="changeReaderEmailOkBtn" type="button" class="{css ok-btn}">OK</button>
@@ -80,7 +80,7 @@
         <div class="{css right}">
           <p id="usernameLb" class="{css value}">{$username}</p>
           <button id="showChangeUsernameBtn" class="{css btn}">Change username</button>
-          <div id="changeUsernameView" class="{css view}">
+          <div id="changeUsernameView" class="{css view}" style="display: none;">
             <span id="changeUsernameErrLb" class="{css err}">&nbsp;</span>
             <input id="changeUsernameTB" type="text" placeholder="New username" class="{css input}">
             <span id="changeUsernamePasswordErrLb" class="{css err}">&nbsp;</span>
@@ -95,11 +95,11 @@
         </div>
         <div class="{css right}">
           <p id="emailLb" class="{css value}">{$email}</p>
-          <button id="resendEmailConfirmBtn" class="{css second-btn}" data-did-confirm-email="{$didConfirmEmail}">
+          <button id="resendEmailConfirmBtn" class="{css second-btn}" data-did-confirm-email="{$didConfirmEmail}" style="display: none;">
             Resend email verification
           </button>
           <button id="showChangeEmailBtn" class="{css btn}">Change email</button>
-          <div id="changeEmailView" class="{css view}">
+          <div id="changeEmailView" class="{css view}" style="display: none;">
             <span id="changeEmailErrLb" class="{css err}">&nbsp;</span>
             <input id="changeEmailTB" type="text" placeholder="New email" class="{css input}">
             <span id="changeEmailPasswordErrLb" class="{css err}">&nbsp;</span>
@@ -114,7 +114,7 @@
         </div>
         <div class="{css right}">
           <button id="showChangePasswordBtn" class="{css btn}">Change password</button>
-          <div id="changePasswordView" class="{css view}">
+          <div id="changePasswordView" class="{css view}" style="display: none;">
             <span id="changeNewPasswordErrLb" class="{css err}">&nbsp;</span>
             <input id="changeNewPasswordTB" type="password" placeholder="New password" class="{css input}">
             <span id="changeRepeatPasswordErrLb" class="{css err}">&nbsp;</span>
@@ -131,7 +131,7 @@
         </div>
         <div class="{css right}">
           <button id="showDeleteAccountBtn" class="{css btn}">Delete account</button>
-          <div id="deleteAccountView" class="{css view}">
+          <div id="deleteAccountView" class="{css view}" style="display: none;">
             <span id="deleteAccountPasswordErrLb" class="{css err}">&nbsp;</span>
             <input id="deleteAccountPasswordTB" type="password" placeholder="Password" class="{css input}">
             <button id="deleteAccountOkBtn" type="button" class="{css ok-btn}">OK</button>

@@ -162,8 +162,6 @@ wit.page2reader.view.PageUrlView.prototype.prepareDom_ = function(element) {
   this.delConfirmView_ = goog.dom.getElementsByTagNameAndClass('div',
       wit.page2reader.view.PageUrlView.DEL_CONFIRM_VIEW_CSS_CLASS, element)[0];
 
-  goog.style.setElementShown(this.delConfirmView_, false);
-
   this.delCancelBtn_ = goog.dom.getElementsByTagNameAndClass('button',
       wit.page2reader.view.PageUrlView.DEL_CANCEL_BTN_CSS_CLASS, element)[0];
   this.delOkBtn_ = goog.dom.getElementsByTagNameAndClass('button',

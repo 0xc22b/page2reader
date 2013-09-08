@@ -56,11 +56,11 @@
       <div id="pageUrlViews" class="{css clearfix}">
         {$pageUrlViews|noAutoescape}
       </div>
-      <section id="noData">
+      <section id="noData" style="display: none;">
         <p>No data</p>
       </section>
       <section>
-        <button id="nextBtn" data-cursor-string="{$cursorString}">Next</button>
+        <button id="nextBtn" data-cursor-string="{$cursorString}" style="display: none;">Next</button>
       </section>
     </div> <!-- #main -->
   </div> <!-- #main-container -->
@@ -83,7 +83,7 @@
     <button class="{css resend-btn}">Resend to kindle</button>
     <div class="{css del-view}">
       <button class="{css del-btn}">Delete</button>
-      <div class="{css del-confirm-view}">
+      <div class="{css del-confirm-view}" style="display: none;">
         <p>Confirm delete?</p>
         <div class="{css clearfix}">
           <button class="{css del-cancel-btn}">Cancel</button>

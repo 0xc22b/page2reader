@@ -97,9 +97,9 @@ wit.page2reader.view.P2rView.prototype.decorateInternal = function(element) {
   this.nextBtn_ = goog.dom.getElement('nextBtn');
 
   if (goog.dom.getChildren(this.pageUrlViews_).length > 0) {
-    goog.style.setElementShown(this.noData_, false);
+    goog.style.setElementShown(this.nextBtn_, true);
   } else {
-    goog.style.setElementShown(this.nextBtn_, false);
+    goog.style.setElementShown(this.noData_, true);
   }
 
   this.cursorString_ = goog.dom.dataset.get(this.nextBtn_, 'cursorString');

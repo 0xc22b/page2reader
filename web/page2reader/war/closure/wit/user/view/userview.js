@@ -305,8 +305,6 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
       'showChangeReaderEmailBtn');
   this.changeReaderEmailView_ = goog.dom.getElement('changeReaderEmailView');
 
-  goog.style.setElementShown(this.changeReaderEmailView_, false);
-
   this.changeReaderEmailErrLb_ = goog.dom.getElement('changeReaderEmailErrLb');
   this.changeReaderEmailTB_ = goog.dom.getElement('changeReaderEmailTB');
   this.changeReaderEmailOkBtn_ = goog.dom.getElement('changeReaderEmailOkBtn');
@@ -314,8 +312,6 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
   this.usernameLb_ = goog.dom.getElement('usernameLb');
   this.showChangeUsernameBtn_ = goog.dom.getElement('showChangeUsernameBtn');
   this.changeUsernameView_ = goog.dom.getElement('changeUsernameView');
-
-  goog.style.setElementShown(this.changeUsernameView_, false);
 
   this.changeUsernameErrLb_ = goog.dom.getElement('changeUsernameErrLb');
   this.changeUsernameTB_ = goog.dom.getElement('changeUsernameTB');
@@ -331,14 +327,12 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
   // If already verified, hide resendEmailConfirmBtn
   var didConfirmEmail = goog.dom.dataset.get(this.resendEmailConfirmBtn_,
       'didConfirmEmail');
-  if (didConfirmEmail === 'true') {
-    goog.style.setElementShown(this.resendEmailConfirmBtn_, false);
+  if (didConfirmEmail === 'false') {
+    goog.style.setElementShown(this.resendEmailConfirmBtn_, true);
   }
 
   this.showChangeEmailBtn_ = goog.dom.getElement('showChangeEmailBtn');
   this.changeEmailView_ = goog.dom.getElement('changeEmailView');
-
-  goog.style.setElementShown(this.changeEmailView_, false);
 
   this.changeEmailErrLb_ = goog.dom.getElement('changeEmailErrLb');
   this.changeEmailTB_ = goog.dom.getElement('changeEmailTB');
@@ -349,8 +343,6 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
 
   this.showChangePasswordBtn_ = goog.dom.getElement('showChangePasswordBtn');
   this.changePasswordView_ = goog.dom.getElement('changePasswordView');
-
-  goog.style.setElementShown(this.changePasswordView_, false);
 
   this.changeNewPasswordErrLb_ = goog.dom.getElement('changeNewPasswordErrLb');
   this.changeNewPasswordTB_ = goog.dom.getElement('changeNewPasswordTB');
@@ -363,8 +355,6 @@ wit.user.view.UserView.prototype.decorateInternal = function(element) {
 
   this.showDeleteAccountBtn_ = goog.dom.getElement('showDeleteAccountBtn');
   this.deleteAccountView_ = goog.dom.getElement('deleteAccountView');
-
-  goog.style.setElementShown(this.deleteAccountView_, false);
 
   this.deleteAccountPasswordErrLb_ = goog.dom.getElement(
       'deleteAccountPasswordErrLb');

@@ -46,7 +46,7 @@
         <p>Send a web page to your kindle instantly!</p>
       </div>
       <button id="showLogInBtn" type="button">Sign in</button>
-      <div id="logInView">
+      <div id="logInView" style="display: none;">
         <span id="logInErrLb">&nbsp;</span>
         <div class="{css clearfix}">
           <input id="logInUsernameTB" type="text" placeholder="Username or email">
@@ -54,13 +54,13 @@
         </div>
         <button id="logInBtn" type="button">OK</button>
         <button id="forgotBtn" type="button">Forget password?</button>
-        <div id="forgotView">
+        <div id="forgotView" style="display: none;">
           <div id="forgotFormView">
             <span id="forgotUsernameErrLb">&nbsp;</span>
             <input id="forgotUsernameTB" type="text" placeholder="Username or email." />
             <button id="forgotOkBtn" type="button">OK</button>
           </div>
-          <div id="forgotResultView">
+          <div id="forgotResultView" style="display: none;">
             <p id="forgotResultMsg">Please check your email to accept a confirmation link for resetting your password.</p>
             <button id="forgotResultOkBtn" type="button">OK</button>
           </div>
