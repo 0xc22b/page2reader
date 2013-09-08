@@ -58,17 +58,19 @@
       if (!msg) {
         msg = document.createElement('div');
         msg.setAttribute('id', 'page2reader-msg');
-        msg.style.cssText = ['display: block;', 'height: 54px;',
-          'left: 50%;', 'margin-left: -129px;', 'padding: 22px 0 0;',
-          'position: fixed;', 'top: 10%;', 'width: 258px;',
+        msg.style.cssText = ['display: block;',
+          'box-sizing: content-box;', '-moz-box-sizing: content-box;',
+          '-webkit-box-sizing: content-box;', 'width: 258px;', 'height: 54px;',
+          'position: fixed;', 'top: 10%;', 'left: 50%;',
+          'margin: 0 0 0 -129px;', 'padding: 22px 0 0 0;', 'border: 0;',
+          'line-height: 33px;',
           'z-index: 100000;', 'background-color: #7d7d7d;',
           '-moz-border-radius: 5px;', '-webkit-border-radius: 5px;',
           'border-radius: 5px;',
           'filter: alpha(opacity=97);', '-moz-opacity: .97;', 'opacity: .97;',
           'text-align: center;', 'color: white;', 'font-size: 23px;',
           'font-family: Helvetica, Arial, sans-serif;',
-          'box-sizing: content-box;', '-moz-box-sizing: content-box;',
-          '-webkit-box-sizing: content-box;'].join('');
+          'font-weight: normal;'].join('');
         document.body.appendChild(msg);
       }
 
