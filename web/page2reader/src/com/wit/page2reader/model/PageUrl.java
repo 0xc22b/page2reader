@@ -34,7 +34,7 @@ public class PageUrl {
 
         setTitle(P2rConstants.PROCESSING_TITLE);
         setText(P2rConstants.PROCESSING_TEXT);
-        setCleansedPage(P2rConstants.PROCESSING_CLEANSED_PAGE);
+        setCleansedPage("");
         setSentCount(0);
     }
 

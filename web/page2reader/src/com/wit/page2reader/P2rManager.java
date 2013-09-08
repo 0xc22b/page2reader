@@ -3,13 +3,17 @@ package com.wit.page2reader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -48,6 +52,7 @@ import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import com.wit.base.BaseConstants;
+import com.wit.base.BaseServlet;
 import com.wit.base.Log;
 import com.wit.base.UserManager;
 import com.wit.base.UserVerifier;
@@ -278,14 +283,20 @@ public class P2rManager {
             // Log background task created successfully
             log.addLogInfo(P2rConstants.SEND_TO_READER, true, pageUrl.getKeyString(), null);
         } else {
-            log.addLogInfo(P2rConstants.SEND_TO_READER, false, pageUrl.getKeyString(), null);
+            // Update to DB
+            editPageUrl(pageUrl, P2rConstants.PROCESSING_ERR_TITLE,
+                    P2rConstants.READER_EMAIL_NOT_FOUND, "");
+
+            log.addLogInfo(P2rConstants.SEND_TO_READER, false, pageUrl.getKeyString(),
+                    P2rConstants.READER_EMAIL_NOT_FOUND);
         }
     }
 
     public static void pageToReader(String fromEmail, String fromName, String toEmail,
-            String toName, String pageUrlKeyString) throws Exception {
+            String toName, String pageUrlKeyString, Logger logger) {
 
-        // As it's in background, no USER log! so if errors occurred, put them in SERVER log!
+        // As it's in background, no USER log! so if errors occurred, put them in SERVER log
+        //     and update pageUrl accordingly!
 
         PageUrl pageUrl = getPageUrl(pageUrlKeyString);
         if (pageUrl == null) {
@@ -293,32 +304,55 @@ public class P2rManager {
             return;
         }
 
-        // 1. Fetch URL
-        String urlContent = fetchPageUrl(pageUrl.getPUrl());
-        if (urlContent != null && !urlContent.isEmpty()) {
-            // 2. Cleanse
-            JResult result = new JResult();
-            result.setUrl(pageUrl.getPUrl());
+        if (fromEmail == null || fromName == null || toEmail == null
+                || toName == null || pageUrlKeyString == null) {
+            // Update to DB
+            editPageUrl(pageUrl, P2rConstants.PROCESSING_ERR_TITLE,
+                    P2rConstants.PROCESSING_ERR_TEXT, "");
 
-            ArticleTextExtractor extractor = new ArticleTextExtractor();
-            extractor.extractContent(result, urlContent);
+            logger.severe("Request parameters missing: fromEmail = " + fromEmail
+                    + ", fromName = " + fromName
+                    + ", toEmail = " + toEmail
+                    + ", toName = " + toName
+                    + ", pageUrlKeyString = " + pageUrlKeyString);            
+            return;
+        }
 
-            // 3. Embeded images
-            String embeddedImagesCleansedHtml = embedImages(result.getCleansedHtml(), pageUrl.getPUrl());           
+        try {
+            // 1. Fetch URL
+            String urlContent = fetchPageUrl(pageUrl.getPUrl());
+            if (urlContent != null && !urlContent.isEmpty()) {
+                // 2. Cleanse
+                JResult result = new JResult();
+                result.setUrl(pageUrl.getPUrl());
 
-            String text = lessText(result.getText(), 350);
-            String cleansedPage = htmlTemplate(result.getTitle(), embeddedImagesCleansedHtml);
+                ArticleTextExtractor extractor = new ArticleTextExtractor();
+                extractor.extractContent(result, urlContent);
+    
+                // 3. Embeded images
+                String embeddedImagesCleansedHtml = embedImages(result.getCleansedHtml(),
+                        pageUrl.getPUrl());           
+    
+                String text = lessText(result.getText(), 350);
+                String cleansedPage = htmlTemplate(result.getTitle(), embeddedImagesCleansedHtml);
+    
+                // 4. Send to reader email
+                sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
+                        result.getTitle(), cleansedPage);
+    
+                // 5. Update to DB
+                editPageUrl(pageUrl, result.getTitle(), text, cleansedPage);
+            }
+        } catch (Exception e) { 
+            // Update to DB
+            editPageUrl(pageUrl, P2rConstants.PROCESSING_ERR_TITLE,
+                    P2rConstants.PROCESSING_ERR_TEXT, "");
 
-            // 4. Send to reader email
-            sendEmailCleansedPage(fromEmail, fromName, toEmail, toName,
-                    result.getTitle(), cleansedPage);
-
-            // 5. Update to DB
-            editPageUrl(pageUrl, result.getTitle(), text, cleansedPage);
+            BaseServlet.writeExceptionToLogger(logger, e);
         }
     }
 
-    private static String fetchPageUrl(String pUrl) throws IOException {
+    private static String fetchPageUrl(String pUrl) throws IOException, URISyntaxException {
         HTTPResponse res = null;
         com.google.appengine.api.urlfetch.FetchOptions fetchOptions =
                 com.google.appengine.api.urlfetch.FetchOptions.Builder
@@ -326,7 +360,12 @@ public class P2rManager {
                         .followRedirects()
                         .setDeadline(60.0);
 
-        URL url = new URL(pUrl);
+        String decodedUrl = URLDecoder.decode(pUrl, "UTF-8");
+        URL url = new URL(decodedUrl);
+        URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+                url.getPath(), url.getQuery(), url.getRef());
+        url = uri.toURL();
+
         HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
         res = URLFetchServiceFactory.getURLFetchService().fetch(req);
         
@@ -389,14 +428,12 @@ public class P2rManager {
 
             // Fetch image content
             String imgContent = fetchImageUrl(absoluteImgUrl);
-            if (imgContent == null || imgContent.isEmpty()) {
-                break;
+            if (imgContent != null && !imgContent.isEmpty()) {
+                // Get image content type
+                String contentType = getImageContentType(absoluteImgUrl);
+                html = html.substring(0, startQuoteIndex + 1) + "data:" + contentType + ";base64,"
+                        + imgContent + html.substring(endQuoteIndex);
             }
-
-            // Get image content type
-            String contentType = getImageContentType(absoluteImgUrl);
-            html = html.substring(0, startQuoteIndex + 1) + "data:" + contentType + ";base64,"
-                    + imgContent + html.substring(endQuoteIndex);
 
             fromIndex = closeIndex + 1;
         } while (true);
@@ -412,7 +449,19 @@ public class P2rManager {
                         .followRedirects()
                         .setDeadline(60.0);
 
-        URL url = new URL(imgUrl);
+        URL url = null;
+        try {
+            String decodedUrl = URLDecoder.decode(imgUrl, "UTF-8");
+            url = new URL(decodedUrl);
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+                    url.getPath(), url.getQuery(), url.getRef());
+            url = uri.toURL();
+        } catch (MalformedURLException e) {
+            return null;
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
         HTTPRequest req = new HTTPRequest(url, HTTPMethod.GET, fetchOptions);
         res = URLFetchServiceFactory.getURLFetchService().fetch(req);
 

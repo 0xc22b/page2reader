@@ -32,6 +32,8 @@ public class P2rServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(P2rServlet.class
             .getName());
 
+    public static final String FROM_NAME = "";
+
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BaseServlet.response(resp, "No pain. No gain.");
     }
@@ -117,7 +119,7 @@ public class P2rServlet extends HttpServlet {
         PageUrl pageUrl = P2rManager.addPageUrl(user, content, log);
         if (pageUrl != null) {
             // Create a task to fetch the url, cleanse it, embed images, and send to reader
-            P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
+            P2rManager.queuePageToReader(BServlet.FROM_EMAIL, FROM_NAME, user, pageUrl,
                     log);
         }
         BaseServlet.response(resp, log.getJSONString());
@@ -136,7 +138,7 @@ public class P2rServlet extends HttpServlet {
         Log log = new Log();
         PageUrl pageUrl = P2rManager.getPageUrl(content);
         if (pageUrl != null) {
-            P2rManager.queuePageToReader(BServlet.FROM_EMAIL, BServlet.FROM_NAME, user, pageUrl,
+            P2rManager.queuePageToReader(BServlet.FROM_EMAIL, FROM_NAME, user, pageUrl,
                     log);
         } else {
             log.addLogInfo(P2rConstants.SEND_TO_READER, false, null, P2rConstants.NOT_FOUND);

@@ -29,20 +29,8 @@ public class P2rWorkerServlet extends HttpServlet {
         String toName = req.getParameter(P2rConstants.TO_NAME);
         String pageUrlKeyString = req.getParameter(P2rConstants.PAGE_URL_KEY_STRING);
 
-        if (fromEmail == null || fromName == null || toEmail == null
-                || toName == null || pageUrlKeyString == null) {
-            logger.severe("Request parameters missing: fromEmail = " + fromEmail
-                    + ", fromName = " + fromName
-                    + ", toEmail = " + toEmail
-                    + ", toName = " + toName
-                    + ", pageUrlKeyString = " + pageUrlKeyString);
-        } else {
-            try {
-                P2rManager.pageToReader(fromEmail, fromName, toEmail, toName, pageUrlKeyString);
-            } catch (Exception e) {
-                BaseServlet.writeExceptionToLogger(logger, e);
-            }
-        }
+        P2rManager.pageToReader(fromEmail, fromName, toEmail, toName, pageUrlKeyString,
+                    logger);
 
         resp.setStatus(HttpServletResponse.SC_OK);
     }
