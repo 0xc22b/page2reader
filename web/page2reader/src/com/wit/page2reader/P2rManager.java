@@ -618,9 +618,12 @@ public class P2rManager {
 
     private static String htmlTemplate(String title, String text) {
         String template = "<!DOCTYPE html>"
+                + "<html>"
                 + "<head>"
                 + "<meta charset='utf-8'>"
                 + "<title>" + title + "</title>"
+                + "<meta name='author' content=''>"
+                + "<meta name='cover' content=''>"
                 + "<style></style>"
                 + "</head>"
                 + "<body>" + text + "</body>"
