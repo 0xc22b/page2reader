@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.IntentCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -47,8 +46,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FetchUserC
 
             if (mDataStore.sSID != null && mDataStore.sID != null) {
                 Intent intent = new Intent(HomeActivity.this, P2rActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                 this.startActivity(intent);
 
                 mSplashScreen.dismiss();
@@ -76,8 +73,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FetchUserC
             mDataStore.sID = sID;
 
             Intent intent = new Intent(HomeActivity.this, P2rActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
             HomeActivity.this.startActivity(intent);
 
             mSplashScreen.dismiss();
@@ -102,9 +97,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FetchUserC
 
         if (requestCode == LOG_IN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Intent intent = new Intent(HomeActivity.this, P2rActivity.class);
-            // Clear task
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
             this.startActivity(intent);
             this.finish();
         }

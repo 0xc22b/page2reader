@@ -5,13 +5,13 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.IntentCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
@@ -41,6 +41,8 @@ import com.wit.page2reader.model.Log;
 import com.wit.page2reader.model.PageUrlObj;
 
 public class P2rActivity extends SherlockFragmentActivity {
+
+    public static final int EDITOR_REQUEST_CODE = 1;
 
     private DataStore mDataStore;
 
@@ -159,8 +161,6 @@ public class P2rActivity extends SherlockFragmentActivity {
             if (sSID == null || sID == null) {
                 Intent intent = new Intent(P2rActivity.this,
                         HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                 P2rActivity.this.startActivity(intent);
                 P2rActivity.this.finish();
                 return;
@@ -249,6 +249,17 @@ public class P2rActivity extends SherlockFragmentActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EDITOR_REQUEST_CODE && resultCode == Activity.RESULT_FIRST_USER) {
+            Intent intent = new Intent(P2rActivity.this, HomeActivity.class);
+            this.startActivity(intent);
+            this.finish();
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -295,7 +306,7 @@ public class P2rActivity extends SherlockFragmentActivity {
             return true;
         } else if (item.getItemId() == R.id.action_add) {
             Intent intent = new Intent(P2rActivity.this, EditorActivity.class);
-            P2rActivity.this.startActivity(intent);
+            P2rActivity.this.startActivityForResult(intent, EDITOR_REQUEST_CODE);
             return true;
         } else if (item.getItemId() == R.id.action_settings) {
             String urlString = Constants.URL(this.getApplicationContext()) + Constants.USER_PATH;
@@ -651,9 +662,6 @@ public class P2rActivity extends SherlockFragmentActivity {
             mLogOutDialog.dismiss();
 
             Intent intent = new Intent(P2rActivity.this, HomeActivity.class);
-            // Clear stack
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
             P2rActivity.this.startActivity(intent);
             P2rActivity.this.finish();
         }

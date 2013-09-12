@@ -2,10 +2,9 @@ package com.wit.page2reader.activities;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.IntentCompat;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -55,6 +54,7 @@ public class EditorActivity extends SherlockFragmentActivity implements FetchUse
             }
         }
 
+        setResult(Activity.RESULT_CANCELED);
         setContentView(R.layout.activity_editor);
         mTextView = (TextView) findViewById(R.id.textView);
         mEditText = (EditText) findViewById(R.id.editText);
@@ -75,10 +75,7 @@ public class EditorActivity extends SherlockFragmentActivity implements FetchUse
         mSplashScreen.dismiss();
 
         if (sSID == null || sID == null) {
-            Intent intent = new Intent(EditorActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
-            EditorActivity.this.startActivity(intent);
+            EditorActivity.this.setResult(Activity.RESULT_FIRST_USER);
             EditorActivity.this.finish();
             return;
         }
@@ -153,6 +150,7 @@ public class EditorActivity extends SherlockFragmentActivity implements FetchUse
                 PageUrlObj pageUrl = new PageUrlObj(jsonPageUrl);
                 mDataStore.pageUrls.add(0, pageUrl);
 
+                this.setResult(Activity.RESULT_OK);
                 this.finish();
                 return;
             } else {
