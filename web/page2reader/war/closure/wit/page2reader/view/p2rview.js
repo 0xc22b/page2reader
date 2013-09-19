@@ -12,6 +12,7 @@ goog.require('wit.fx.dom');
 goog.require('wit.page2reader.constants');
 goog.require('wit.page2reader.model.DataStore');
 goog.require('wit.page2reader.model.PageUrlObj');
+goog.require('wit.page2reader.view.BannerView');
 goog.require('wit.page2reader.view.PageUrlView');
 
 
@@ -80,6 +81,13 @@ wit.page2reader.view.P2rView.prototype.nextBtn_;
 wit.page2reader.view.P2rView.prototype.cursorString_;
 
 
+/**
+ * @type {wit.page2reader.view.BannerView}
+ * @private
+ */
+wit.page2reader.view.P2rView.prototype.bannerView_;
+
+
 /** @inheritDoc */
 wit.page2reader.view.P2rView.prototype.createDom = function() {
 };
@@ -112,6 +120,9 @@ wit.page2reader.view.P2rView.prototype.decorateInternal = function(element) {
         pageUrlView.decorate(el);
       },
       this);
+
+  this.bannerView_ = new wit.page2reader.view.BannerView();
+  this.bannerView_.render(element);
 };
 
 
@@ -152,6 +163,55 @@ wit.page2reader.view.P2rView.prototype.enterDocument = function() {
         if (this.getChildCount() === 0 &&
             !goog.style.isElementShown(this.nextBtn_)) {
           goog.style.setElementShown(this.noData_, true);
+        }
+      });
+
+  this.getHandler().listen(
+      this.bannerView_,
+      wit.page2reader.view.BannerView.Events.TO_ERR,
+      function(e) {
+        var childCount = this.getChildCount();
+        for (var i = 0; i < childCount; i = i + 1) {
+          var child = /** @type {wit.page2reader.view.PageUrlView} */ (
+              this.getChildAt(i));
+          if (child.didDelGetError()) {
+            var elem = child.getElement();
+            var elemTop = goog.style.getPageOffsetTop(elem);
+            var elemBottom = elemTop + goog.style.getSize(elem).height;
+
+            var documentTop = goog.dom.getDocumentScroll().y;
+            var documentBottom = documentTop +
+                goog.dom.getViewportSize().height;
+
+            if (!(elemTop > documentTop && elemBottom < documentBottom)) {
+              var scrollTo = documentTop - (documentTop - elemTop + 40);
+              var scrollElem = goog.dom.getDocumentScrollElement();
+              var anim = new goog.fx.Animation(
+                  [documentTop],
+                  [scrollTo],
+                  250);
+              goog.events.listen(
+                  anim,
+                  [goog.fx.Transition.EventType.BEGIN,
+                    goog.fx.Animation.EventType.ANIMATE,
+                    goog.fx.Transition.EventType.END],
+                  function(e) {
+                    scrollElem.scrollTop = e.x;
+                  },
+                  false,
+                  this);
+              goog.events.listen(
+                  anim,
+                  goog.fx.Transition.EventType.END,
+                  function() {
+                    goog.events.removeAll(anim);
+                  },
+                  false,
+                  this);
+              anim.play(false);
+            }
+            break;
+          }
         }
       });
 };

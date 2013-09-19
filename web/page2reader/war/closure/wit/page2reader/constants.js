@@ -44,6 +44,34 @@ wit.page2reader.constants.UPDATE_READER_EMAIL = 'updateReaderEmail';
 
 
 /**
+ * @type {string} Add working.
+ * @const
+ */
+wit.page2reader.constants.ADD_WORKING = 'addWorking';
+
+
+/**
+ * @type {string} Minus working.
+ * @const
+ */
+wit.page2reader.constants.MINUS_WORKING = 'minusWorking';
+
+
+/**
+ * @type {string} Add Error.
+ * @const
+ */
+wit.page2reader.constants.ADD_ERROR = 'addError';
+
+
+/**
+ * @type {string} Minus Error.
+ * @const
+ */
+wit.page2reader.constants.MINUS_ERROR = 'minusEror';
+
+
+/**
  * @type {string} KEY_STRING Key string.
  * @const
  */
@@ -118,3 +146,32 @@ wit.page2reader.constants.ERR_URL_EMPTY = 'Please provide URL';
  * @const
  */
 wit.page2reader.constants.ERR_URL = 'URL is invalid';
+
+
+/**
+ * @type {string} ERR
+ * @const
+ */
+wit.page2reader.constants.ERR = 'Some error occurred. ' +
+    'Please wait for a bit and try again.';
+
+
+/**
+ * @type {string} ERR_NOT_LOGGED_IN
+ * @const
+ */
+wit.page2reader.constants.ERR_NOT_LOGGED_IN = 'Please sign in first.';
+
+
+/**
+ * @type {string} Deleting...
+ * @const
+ */
+wit.page2reader.constants.DELETING = 'Deleting...';
+
+
+/**
+ * @type {string} Deleted.
+ * @const
+ */
+wit.page2reader.constants.DELETED = 'Deleted.';

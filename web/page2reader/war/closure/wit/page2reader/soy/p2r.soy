@@ -78,20 +78,40 @@
  */
 {template .pageUrlView}
   <section data-key-string="{$keyString}" class="{css p-url-view} {css clearfix}">
-    <h2><a href="{$pUrl}" target="_blank">{$title}</a></h2>
-    <p>{$text}</p>
-    <button class="{css resend-btn}">Resend to kindle</button>
-    <div class="{css del-view}">
-      <button class="{css del-btn}">Delete</button>
-      <div class="{css del-confirm-view}" style="display: none;">
-        <p>Confirm delete?</p>
-        <div class="{css clearfix}">
-          <button class="{css del-cancel-btn}">Cancel</button>
-          <button class="{css del-ok-btn}">Confirm</button>
+    <div class="{css main-view}">
+      <h2><a href="{$pUrl}" target="_blank">{$title}</a></h2>
+      <p>{$text}</p>
+      <button class="{css resend-btn}">Resend to kindle</button>
+      <div class="{css del-view}">
+        <button class="{css del-btn}">Delete</button>
+        <div class="{css del-confirm-view}" style="display: none;">
+          <p>Confirm delete?</p>
+          <div class="{css clearfix}">
+            <button class="{css del-cancel-btn}">Cancel</button>
+            <button class="{css del-ok-btn}">Confirm</button>
+          </div>
         </div>
       </div>
     </div>
+    <div class="{css del-msg-view}" style="display: none;">
+      <button class="{css del-close-btn}" style="display: none;">Close</button>
+      <button class="{css del-retry-btn}" style="display: none;">Retry</button>
+      <button class="{css del-no-retry-btn}" style="display: none;">Cancel</button>
+      <button class="{css del-show-msg-btn}" style="display: none;">...</button>
+      <p class="{css del-msg}"></p>
+    </div>
   </section>
+{/template}
+
+
+/**
+ * Banner view
+ */
+{template .bannerView}
+  <div class="{css banner-view}">
+    <p class="{css working-lb}" style="display: none;">Working...</p>
+    <button class="{css to-err-btn}" style="display: none;">Error!</button>
+  </div>
 {/template}
 
 
