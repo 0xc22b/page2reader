@@ -11,7 +11,6 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
 import org.json.JSONObject;
 
@@ -96,7 +95,7 @@ public class DataStore {
 
     public String sSID;
     public String sID;
-    public ArrayList<PageUrlObj> pageUrls = new ArrayList<PageUrlObj>();
+    public PageUrlArrayList pageUrls = new PageUrlArrayList();
     public String cursorString;
 
     public boolean didGetPageUrls;
@@ -116,7 +115,8 @@ public class DataStore {
      */
     public static abstract class DataStoreLoader<D> extends AsyncTaskLoader<D> {
 
-        D mD;
+        private D mD;
+        private String mKeyString;
 
         public DataStoreLoader(Context context) {
             super(context);
@@ -166,6 +166,14 @@ public class DataStore {
             onStopLoading();
 
             mD = null;
+        }
+
+        public String getKeyString() {
+            return mKeyString;
+        }
+
+        public void setKeyString(String keyString) {
+            mKeyString = keyString;
         }
     }
 
@@ -850,7 +858,7 @@ public class DataStore {
     }
 
     public interface DeletePageUrlCallback {
-        public void onDeletePageUrlCallback(Log log);
+        public void onDeletePageUrlCallback(int loaderID, String keyString, Log log);
     }
 
     public boolean reconnectDeletePageUrl(final SherlockFragmentActivity activity, int loaderID,
@@ -886,9 +894,9 @@ public class DataStore {
             activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.DELETE_PAGE_URL, false, null,
+            log.addLogInfo(Constants.DELETE_PAGE_URL, false, keyString,
                     activity.getString(R.string.no_network));
-            callback.onDeletePageUrlCallback(log);
+            callback.onDeletePageUrlCallback(loaderID, keyString, log);
         }
     }
 
@@ -904,27 +912,31 @@ public class DataStore {
 
         @Override
         public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+
+            final String urlString = bundle.getString(Constants.URL_STRING);
+            final String sSID = bundle.getString(Constants.SSID);
+            final String sID = bundle.getString(Constants.SID);
+            final String keyString = bundle.getString(Constants.KEY_STRING);
+
             DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
                 @Override
                 public Log loadInBackground() {
                     try {
-                        return deletePageUrlInBackground(
-                                bundle.getString(Constants.URL_STRING),
-                                bundle.getString(Constants.SSID),
-                                bundle.getString(Constants.SID),
-                                bundle.getString(Constants.KEY_STRING));
+                        return deletePageUrlInBackground(urlString, sSID, sID, keyString);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     return null;
                 }
             };
+            loader.setKeyString(keyString);
             return loader;
         }
 
         @Override
         public void onLoadFinished(Loader<Log> loader, Log data) {
-            mCallback.onDeletePageUrlCallback(data);
+            mCallback.onDeletePageUrlCallback(loader.getId(),
+                    ((DataStoreLoader<Log>)loader).getKeyString(), data);
         }
 
         @Override
@@ -954,7 +966,7 @@ public class DataStore {
     }
 
     public interface ResendToReaderCallback {
-        public void onResendToReaderCallback(Log log);
+        public void onResendToReaderCallback(int loaderID, String keyString, Log log);
     }
 
     public boolean reconnectResendToReader(final SherlockFragmentActivity activity, int loaderID,
@@ -990,9 +1002,9 @@ public class DataStore {
             activity.getSupportLoaderManager().restartLoader(loaderID, bundle, loaderCallbacks);
         } else {
             Log log = new Log();
-            log.addLogInfo(Constants.SEND_TO_READER, false, null,
+            log.addLogInfo(Constants.SEND_TO_READER, false, keyString,
                     activity.getString(R.string.no_network));
-            callback.onResendToReaderCallback(log);
+            callback.onResendToReaderCallback(loaderID, keyString, log);
         }
     }
 
@@ -1008,27 +1020,31 @@ public class DataStore {
 
         @Override
         public Loader<Log> onCreateLoader(int id, final Bundle bundle) {
+
+            final String urlString = bundle.getString(Constants.URL_STRING);
+            final String sSID = bundle.getString(Constants.SSID);
+            final String sID = bundle.getString(Constants.SID);
+            final String keyString = bundle.getString(Constants.KEY_STRING);
+
             DataStoreLoader<Log> loader = new DataStoreLoader<Log>(mContext) {
                 @Override
                 public Log loadInBackground() {
                     try {
-                        return resendToReaderInBackground(
-                                bundle.getString(Constants.URL_STRING),
-                                bundle.getString(Constants.SSID),
-                                bundle.getString(Constants.SID),
-                                bundle.getString(Constants.KEY_STRING));
+                        return resendToReaderInBackground(urlString, sSID, sID, keyString);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     return null;
                 }
             };
+            loader.setKeyString(keyString);
             return loader;
         }
 
         @Override
         public void onLoadFinished(Loader<Log> loader, Log data) {
-            mCallback.onResendToReaderCallback(data);
+            mCallback.onResendToReaderCallback(loader.getId(),
+                    ((DataStoreLoader<Log>)loader).getKeyString(), data);
         }
 
         @Override

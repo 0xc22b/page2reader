@@ -9,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.wit.page2reader.Constants.DelBtnStatus;
 import com.wit.page2reader.Constants.NextBtnStatus;
 import com.wit.page2reader.Constants.ResendBtnStatus;
 import com.wit.page2reader.Constants;
@@ -68,8 +67,9 @@ public class P2rAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         if (mDataStore.msg != null) return 1;
-        return mDataStore.nextBtnStatus == NextBtnStatus.HIDE ? mDataStore.pageUrls.size()
-                : mDataStore.pageUrls.size() + 1;
+        return mDataStore.nextBtnStatus == NextBtnStatus.HIDE
+                ? mDataStore.pageUrls.sizeWithNormalStatus()
+                : mDataStore.pageUrls.sizeWithNormalStatus() + 1;
     }
 
     @Override
@@ -79,13 +79,14 @@ public class P2rAdapter extends BaseAdapter {
             return null;
         }
         if (mDataStore.nextBtnStatus == NextBtnStatus.HIDE) {
-            return mDataStore.pageUrls.get(position);
+            return mDataStore.pageUrls.getWithNormalStatus(position);
         } else {
-            if (position == mDataStore.pageUrls.size()) {
+            int size = mDataStore.pageUrls.sizeWithNormalStatus();
+            if (position == size) {
                 // Next view
                 return null;
-            } else if (position < mDataStore.pageUrls.size()) {
-                return mDataStore.pageUrls.get(position);
+            } else if (position < size) {
+                return mDataStore.pageUrls.getWithNormalStatus(position);
             } else {
                 throw new IllegalArgumentException();
             }
@@ -103,13 +104,14 @@ public class P2rAdapter extends BaseAdapter {
             return Constants.MSG;
         }
         if (mDataStore.nextBtnStatus == NextBtnStatus.HIDE) {
-            return mDataStore.pageUrls.get(position).keyString;
+            return mDataStore.pageUrls.getWithNormalStatus(position).keyString;
         } else {
-            if (position == mDataStore.pageUrls.size()) {
+            int size = mDataStore.pageUrls.sizeWithNormalStatus();
+            if (position == size) {
                 // Next view
                 return Constants.NEXT;
-            } else if (position < mDataStore.pageUrls.size()) {
-                return mDataStore.pageUrls.get(position).keyString;
+            } else if (position < size) {
+                return mDataStore.pageUrls.getWithNormalStatus(position).keyString;
             } else {
                 throw new IllegalArgumentException();
             }
@@ -145,8 +147,8 @@ public class P2rAdapter extends BaseAdapter {
         }
 
         if (mDataStore.nextBtnStatus != NextBtnStatus.HIDE
-                && position >= mDataStore.pageUrls.size()) {
-            if (position == mDataStore.pageUrls.size()) {
+                && position >= mDataStore.pageUrls.sizeWithNormalStatus()) {
+            if (position == mDataStore.pageUrls.sizeWithNormalStatus()) {
                 // Next view
                 if (convertView == null || holder.type != 2) {
                     convertView = mInflater.inflate(mLayouts[2], parent, false);
@@ -198,24 +200,17 @@ public class P2rAdapter extends BaseAdapter {
             convertView.setTag(holder);
         }
 
-        PageUrlObj pageUrlObj = mDataStore.pageUrls.get(position);
+        PageUrlObj pageUrlObj = mDataStore.pageUrls.getWithNormalStatus(position);
         holder.title.setText(pageUrlObj.title);
         holder.title.setTag(position);
         holder.text.setText(pageUrlObj.text);
-        holder.btn1.setTag(position);
-        holder.btn2.setTag(position);
 
-        if (pageUrlObj.delBtnStatus == DelBtnStatus.NORMAL) {
-            holder.btn1.setClickable(true);
-            holder.btn1.setTextColor(mContext.getResources().getColor(
-                    R.color.btn_text));
-        } else if (pageUrlObj.delBtnStatus == DelBtnStatus.DELETING) {
-            holder.btn1.setClickable(false);
-            holder.btn1.setTextColor(mContext.getResources().getColor(
-                    R.color.disabled_btn_text));
-        } else {
-            throw new IllegalArgumentException();
-        }
+        holder.btn1.setTag(position);
+        holder.btn1.setClickable(true);
+        holder.btn1.setTextColor(mContext.getResources().getColor(
+                R.color.btn_text));
+
+        holder.btn2.setTag(position);
 
         if (pageUrlObj.resendBtnStatus == ResendBtnStatus.NORMAL) {
             holder.btn2.setClickable(true);

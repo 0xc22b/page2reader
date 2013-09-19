@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.json.JSONObject;
 
 import com.wit.page2reader.Constants;
-import com.wit.page2reader.Constants.DelBtnStatus;
+import com.wit.page2reader.Constants.PageUrlObjStatus;
 import com.wit.page2reader.Constants.ResendBtnStatus;
 
 public class PageUrlObj {
@@ -17,7 +17,7 @@ public class PageUrlObj {
     public String text;
     public int sentCount;
 
-    public DelBtnStatus delBtnStatus = DelBtnStatus.NORMAL;
+    public PageUrlObjStatus status = PageUrlObjStatus.NORMAL;
     public ResendBtnStatus resendBtnStatus = ResendBtnStatus.NORMAL;
 
     public PageUrlObj(JSONObject jsonObject) {

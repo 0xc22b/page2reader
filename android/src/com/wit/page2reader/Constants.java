@@ -9,10 +9,11 @@ public class Constants {
         NORMAL,
         REFRESHING
     }
-
-    public enum DelBtnStatus {
+    
+    public enum NextBtnStatus {
         NORMAL,
-        DELETING
+        GETTING,
+        HIDE
     }
 
     public enum ResendBtnStatus {
@@ -22,10 +23,9 @@ public class Constants {
         SENT
     }
 
-    public enum NextBtnStatus {
+    public enum PageUrlObjStatus {
         NORMAL,
-        GETTING,
-        HIDE
+        BEING_DELETED
     }
 
     public static final int LOG_IN_LOADER_ID = 1;
@@ -40,8 +40,8 @@ public class Constants {
     public static final int NE_GET_PAGE_URLS_LOADER_ID = 8;
 
     public static final int ADD_PAGE_URL_LOADER_ID = 9;
-    public static final int DELETE_PAGE_URL_LOADER_ID = 10;
-    public static final int RESEND_TO_READER_LOADER_ID = 11;
+    public static final int DELETE_PAGE_URL_LOADER_ID = 19700;
+    public static final int RESEND_TO_READER_LOADER_ID = 19800;
 
     public static final String USER = "user";
 
@@ -79,7 +79,8 @@ public class Constants {
                 ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         if (isDebug) {
             //return "http://10.0.2.2:8888";  // localhost
-            return "http://192.168.1.37:8888";
+            //return "http://192.168.1.37:8888";
+            return "http://page2reader.appspot.com";
             //return "http://192.168.43.43:8888";
         } else {
             return "http://page2reader.appspot.com";
@@ -101,4 +102,6 @@ public class Constants {
 
     public static final String DID_GET_SESSION = "didGetSession";
     public static final String BEING_DELETED_POSITION = "beingDeletedPosition";
+    public static final String DELETE_QUEUE = "deleteQueue";
+    public static final String RESEND_QUEUE = "resendQueue";
 }

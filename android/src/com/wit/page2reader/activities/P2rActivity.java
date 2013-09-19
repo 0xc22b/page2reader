@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
@@ -25,8 +26,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.wit.page2reader.Constants;
-import com.wit.page2reader.Constants.DelBtnStatus;
 import com.wit.page2reader.Constants.NextBtnStatus;
+import com.wit.page2reader.Constants.PageUrlObjStatus;
 import com.wit.page2reader.Constants.RefreshBtnStatus;
 import com.wit.page2reader.Constants.ResendBtnStatus;
 import com.wit.page2reader.R;
@@ -38,6 +39,7 @@ import com.wit.page2reader.model.DataStore.GetPagingPageUrlsCallback;
 import com.wit.page2reader.model.DataStore.LogOutCallback;
 import com.wit.page2reader.model.DataStore.ResendToReaderCallback;
 import com.wit.page2reader.model.Log;
+import com.wit.page2reader.model.Log.LogInfo;
 import com.wit.page2reader.model.PageUrlObj;
 
 public class P2rActivity extends SherlockFragmentActivity {
@@ -50,7 +52,7 @@ public class P2rActivity extends SherlockFragmentActivity {
         @Override
         public void onClick(View v) {
             int position = (Integer)v.getTag();
-            String urlString = mDataStore.pageUrls.get(position).pUrl;
+            String urlString = mDataStore.pageUrls.getWithNormalStatus(position).pUrl;
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(urlString));
@@ -86,8 +88,10 @@ public class P2rActivity extends SherlockFragmentActivity {
     private ProgressDialog mLogOutDialog;
     private AlertDialog mAlertDialog;
 
+    private int[] mDeleteQueue = new int[7];
+    private int[] mResendQueue = new int[7];
+
     private HashMap<String, Integer> mItemTopMap = new HashMap<String, Integer>();
-    private static final int MOVE_DURATION = 250;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,14 +137,6 @@ public class P2rActivity extends SherlockFragmentActivity {
                 showLogOutDialog();
             }
 
-            // Delete button's status was kept in DataStore already
-            mDataStore.reconnectDeletePageUrl(this, Constants.DELETE_PAGE_URL_LOADER_ID,
-                    mDeletePageUrlCallback);
-
-            // Resend button's status was kept in DataStore already
-            mDataStore.reconnectResendToReader(this, Constants.RESEND_TO_READER_LOADER_ID,
-                    mResendToReaderCallback);
-
             if (savedInstanceState != null) {
                 String alertDialogMessage = savedInstanceState.getString(Constants.MSG);
                 if (alertDialogMessage != null) {
@@ -150,6 +146,24 @@ public class P2rActivity extends SherlockFragmentActivity {
                         Constants.BEING_DELETED_POSITION, -1);
                 if (beingDeletedPosition != -1) {
                     showConfirmDeleteDialog(beingDeletedPosition);
+                }
+
+                // Delete button's status was kept in DataStore already
+                mDeleteQueue = savedInstanceState.getIntArray(Constants.DELETE_QUEUE);
+                for (int i = 0; i < mDeleteQueue.length; i++) {
+                    if (mDeleteQueue[i] == 1) {
+                        int loaderID = Constants.DELETE_PAGE_URL_LOADER_ID + i;
+                        mDataStore.reconnectDeletePageUrl(this, loaderID, mDeletePageUrlCallback);
+                    }
+                }
+
+                // Resend button's status was kept in DataStore already
+                mResendQueue = savedInstanceState.getIntArray(Constants.RESEND_QUEUE);
+                for (int i = 0; i < mResendQueue.length; i++) {
+                    if (mResendQueue[i] == 1) {
+                        int loaderID = Constants.RESEND_TO_READER_LOADER_ID + i;
+                        mDataStore.reconnectResendToReader(this, loaderID, mResendToReaderCallback);
+                    }
                 }
             }
         }
@@ -204,7 +218,7 @@ public class P2rActivity extends SherlockFragmentActivity {
 
                     mDataStore.cursorString = jsonObj.getString(Constants.CURSOR_STRING);
 
-                    if (mDataStore.pageUrls.isEmpty()) {
+                    if (mDataStore.pageUrls.isEmptyWithNormalStatus()) {
                         mDataStore.msg = getResources().getString(R.string.no_data);
                         mDataStore.nextBtnStatus = NextBtnStatus.HIDE;
                     } else {
@@ -263,7 +277,7 @@ public class P2rActivity extends SherlockFragmentActivity {
     protected void onStart() {
         super.onStart();
 
-        if (!mDataStore.pageUrls.isEmpty()) {
+        if (!mDataStore.pageUrls.isEmptyWithNormalStatus()) {
             mDataStore.msg = null;
         }
         mAdapter.notifyDataSetChanged();
@@ -281,6 +295,8 @@ public class P2rActivity extends SherlockFragmentActivity {
                     DialogInterface.BUTTON_POSITIVE).getTag();
             outState.putString(Constants.MSG, alertDialogMessage);
         }
+        outState.putIntArray(Constants.DELETE_QUEUE, mDeleteQueue);
+        outState.putIntArray(Constants.RESEND_QUEUE, mResendQueue);
         super.onSaveInstanceState(outState);
     }
 
@@ -295,7 +311,7 @@ public class P2rActivity extends SherlockFragmentActivity {
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
             mAlertDialog.dismiss();
         }
-        
+
         super.onDestroy();
     }
 
@@ -322,44 +338,133 @@ public class P2rActivity extends SherlockFragmentActivity {
     }
 
     private void onDelBtnClick(final int position) {
+        showConfirmDeleteDialog(position);
+    }
 
-        // One at a time for now
-        // TODO: Implement queue for deletion
-        boolean foundDeleting = false;
-        for (PageUrlObj pageUrl : mDataStore.pageUrls) {
-            if (pageUrl.delBtnStatus == DelBtnStatus.DELETING) {
-                foundDeleting = true;
+    private void onConfirmDelBtnClick(int deletedPosition) {
+
+        int queueIndex;
+        for (queueIndex = 0; queueIndex < mDeleteQueue.length; queueIndex++) {
+            if (mDeleteQueue[queueIndex] == 0) {
+                mDeleteQueue[queueIndex] = 1;
                 break;
             }
         }
 
-        if (foundDeleting) {
-            showAlertDialog("Queue is too long. "
+        if (queueIndex >= mDeleteQueue.length) {
+            showAlertDialog("Network is too busy. "
                     + "Please wait until the deletion of others completes.");
             return;
         }
 
-        showConfirmDeleteDialog(position);
-    }
+        // Freeze the screen for animation on deletion
+        mListView.setEnabled(false);
 
-    private void onConfirmDelBtnClick(int position) {
-        PageUrlObj pageUrl = mDataStore.pageUrls.get(position);
-        pageUrl.delBtnStatus = DelBtnStatus.DELETING;
-        pageUrl.resendBtnStatus = ResendBtnStatus.DISABLED;
+        final PageUrlObj pageUrl = mDataStore.pageUrls.getWithNormalStatus(deletedPosition);
+
+        // Prepare for an animation
+        int firstVisiblePosition = mListView.getFirstVisiblePosition();
+
+        for (int i = 0; i < mListView.getChildCount(); i++) {
+            int position = firstVisiblePosition + i;
+            if (position == deletedPosition) {
+                continue;
+            }
+
+            View child = mListView.getChildAt(i);
+            String key = mAdapter.getItemKey(position);
+            mItemTopMap.put(key, child.getTop());
+        }
+
+        int visibleDeletedPosition = deletedPosition - firstVisiblePosition;
+        View deletedChild = mListView.getChildAt(visibleDeletedPosition);
+        final int deletedChildHeight = deletedChild.getHeight() + mListView.getDividerHeight();
+
+        final int loaderID = Constants.DELETE_PAGE_URL_LOADER_ID + queueIndex;
+
+        final Runnable onAnimationEnd = new Runnable() {
+            public void run() {
+                mListView.setEnabled(true);
+
+                mDataStore.deletePageUrl(P2rActivity.this,
+                                         loaderID,
+                                         mDataStore.sSID,
+                                         mDataStore.sID,
+                                         pageUrl.keyString,
+                                         mDeletePageUrlCallback);
+            }
+        };
+
+        final ViewTreeObserver observer = mListView.getViewTreeObserver();
+        observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+                observer.removeOnPreDrawListener(this);
+
+                boolean firstAnimation = true;
+                int firstVisiblePosition = mListView.getFirstVisiblePosition();
+                for (int i = 0; i < mListView.getChildCount(); ++i) {
+                    View child = mListView.getChildAt(i);
+                    int position = firstVisiblePosition + i;
+                    String key = mAdapter.getItemKey(position);
+                    if (key.equals(Constants.MSG)) {
+                        // No animatin on MsgView
+                        continue;
+                    }
+                    int top = child.getTop();
+                    Integer startTop = mItemTopMap.get(key);
+                    if (startTop == null) {
+                        startTop = top + (i > 0 ? deletedChildHeight
+                                : -deletedChildHeight);
+                    }
+                    int delta = startTop - top;
+                    if (delta != 0) {
+                        final Runnable endAction = firstAnimation ? onAnimationEnd: null;
+                        firstAnimation = false;
+
+                        TranslateAnimation translator = new TranslateAnimation(0, 0, delta, 0);
+
+                        // Duration depends on height in dp
+                        DisplayMetrics metrics = getResources().getDisplayMetrics();
+                        int duration = (int)((deletedChildHeight / metrics.density) * 1);
+                        translator.setDuration(duration);
+
+                        child.startAnimation(translator);
+                        if (endAction != null) {
+                            child.getAnimation().setAnimationListener(
+                                    new AnimationListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animation animation) {
+                                    endAction.run();
+                                }
+                            });
+                        }
+                    }
+                }
+                mItemTopMap.clear();
+                return true;
+            }
+        });
+
+        // Be careful, don't change the status before preparing for animation
+        //     indexes might get wrong.
+        pageUrl.status = PageUrlObjStatus.BEING_DELETED;
+
+        if (mDataStore.pageUrls.isEmptyWithNormalStatus()
+                && mDataStore.nextBtnStatus == NextBtnStatus.HIDE) {
+            mDataStore.msg = getResources().getString(R.string.no_data);
+        }
+
         mAdapter.notifyDataSetChanged();
-
-        mDataStore.deletePageUrl(this, Constants.DELETE_PAGE_URL_LOADER_ID,
-                mDataStore.sSID, mDataStore.sID, pageUrl.keyString, mDeletePageUrlCallback);
     }
 
     private DeletePageUrlCallback mDeletePageUrlCallback = new DeletePageUrlCallback() {
         @Override
-        public void onDeletePageUrlCallback(Log log) {
+        public void onDeletePageUrlCallback(int loaderID, String keyString, Log log) {
 
             // Find the one being deleted
             PageUrlObj pageUrl = null;
             for (PageUrlObj p : mDataStore.pageUrls) {
-                if (p.delBtnStatus == DelBtnStatus.DELETING) {
+                if (p.keyString.equals(keyString)) {
                     pageUrl = p;
                     break;
                 }
@@ -368,150 +473,82 @@ public class P2rActivity extends SherlockFragmentActivity {
                 throw new IllegalArgumentException();
             }
 
-            pageUrl.delBtnStatus = DelBtnStatus.NORMAL;
-            pageUrl.resendBtnStatus = ResendBtnStatus.NORMAL;
-
             if (log == null) {
                 showAlertDialog(getString(R.string.connection_failed));
-            } else {
-                String keyString = log.getValue(Constants.DELETE_PAGE_URL, true);
-                if (keyString != null) {
-                    if (keyString.equals(pageUrl.keyString)) {
-                        int firstVisiblePosition = mListView.getFirstVisiblePosition();
-                        int deletedPosition = mDataStore.pageUrls.indexOf(pageUrl) -
-                                firstVisiblePosition;
-                        if (deletedPosition >= 0
-                                && deletedPosition < mListView.getChildCount()) {
-                            // If still on screen, animate it
 
-                            mListView.setEnabled(false);
-
-                            for (int i = 0; i < mListView.getChildCount(); ++i) {
-                                View child = mListView.getChildAt(i);
-                                int position = firstVisiblePosition + i;
-                                String key = mAdapter.getItemKey(position);
-                                if (position != deletedPosition) {
-                                    mItemTopMap.put(key, child.getTop());
-                                }
-                            }
-
-                            View deletedChild = mListView.getChildAt(deletedPosition);
-                            final int deletedChildHeight = deletedChild.getHeight()
-                                    + mListView.getDividerHeight();
-
-                            final ViewTreeObserver observer = mListView.getViewTreeObserver();
-                            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                                public boolean onPreDraw() {
-                                    observer.removeOnPreDrawListener(this);
-
-                                    boolean firstAnimation = true;
-                                    int firstVisiblePosition = mListView.getFirstVisiblePosition();
-                                    for (int i = 0; i < mListView.getChildCount(); ++i) {
-                                        View child = mListView.getChildAt(i);
-                                        int position = firstVisiblePosition + i;
-                                        String key = mAdapter.getItemKey(position);
-                                        if (key.equals(Constants.MSG)) {
-                                            // No animatin on MsgView
-                                            continue;
-                                        }
-                                        int top = child.getTop();
-                                        Integer startTop = mItemTopMap.get(key);
-                                        if (startTop == null) {
-                                            startTop = top + (i > 0 ? deletedChildHeight
-                                                    : -deletedChildHeight);
-                                        }
-                                        int delta = startTop - top;
-                                        if (delta != 0) {
-                                            final Runnable endAction = firstAnimation ?
-                                                    new Runnable() {
-                                                        public void run() {
-                                                            mListView.setEnabled(true);
-                                                        }
-                                                    } :
-                                                    null;
-                                            firstAnimation = false;
-                                            TranslateAnimation translator = new TranslateAnimation(
-                                                    0, 0, delta, 0);
-                                            translator.setDuration(MOVE_DURATION);
-                                            child.startAnimation(translator);
-                                            if (endAction != null) {
-                                                child.getAnimation().setAnimationListener(
-                                                        new AnimationListenerAdapter() {
-                                                    @Override
-                                                    public void onAnimationEnd(
-                                                            Animation animation) {
-                                                        endAction.run();
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }
-                                    mItemTopMap.clear();
-                                    return true;
-                                }
-                            });
-                        }
-
-                        mDataStore.pageUrls.remove(pageUrl);
-
-                        if (mDataStore.pageUrls.isEmpty()
-                                && mDataStore.nextBtnStatus == NextBtnStatus.HIDE) {
-                            mDataStore.msg = getResources().getString(R.string.no_data);
-                        }
-                    } else {
-                        throw new IllegalArgumentException();
-                    }
-                } else {
-                    String msg = log.getMsg(Constants.DELETE_PAGE_URL, false, null);
-                    if (msg != null) {
-                        showAlertDialog(msg);
-                    }
+                pageUrl.status = PageUrlObjStatus.NORMAL;
+                if (mDataStore.msg != null
+                        && mDataStore.msg.equals(getResources().getString(R.string.no_data))) {
+                    mDataStore.msg = null;
                 }
+                mAdapter.notifyDataSetChanged();
+                return;
             }
-            mAdapter.notifyDataSetChanged();
+
+            String msg = log.getMsg(Constants.DELETE_PAGE_URL, false, keyString);
+            if (msg != null) {
+                showAlertDialog(msg);
+
+                pageUrl.status = PageUrlObjStatus.NORMAL;
+                if (mDataStore.msg !=null
+                        && mDataStore.msg.equals(getResources().getString(R.string.no_data))) {
+                    mDataStore.msg = null;
+                }
+                mAdapter.notifyDataSetChanged();
+                return;
+            }
+
+            LogInfo logInfo = log.getLogInfo(Constants.DELETE_PAGE_URL, true, keyString);
+            if (logInfo != null) {
+                mDataStore.pageUrls.remove(pageUrl);
+                mDeleteQueue[loaderID - Constants.DELETE_PAGE_URL_LOADER_ID] = 0;
+                return;
+            }
+
+            throw new IllegalArgumentException();
         }
     };
 
     private void onResendBtnClick(int position) {
 
-        // One at a time for now
-        // TODO: Implement queue for resending
-        boolean foundResending = false;
-        for (PageUrlObj pageUrl : mDataStore.pageUrls) {
-            if (pageUrl.resendBtnStatus == ResendBtnStatus.RESENDING) {
-                foundResending = true;
+        int queueIndex;
+        for (queueIndex = 0; queueIndex < mResendQueue.length; queueIndex++) {
+            if (mResendQueue[queueIndex] == 0) {
+                mResendQueue[queueIndex] = 1;
                 break;
             }
         }
 
-        if (foundResending) {
-            showAlertDialog("Queue is too long. "
-                    + "Please wait until the resending of others completes.");
+        if (queueIndex >= mResendQueue.length) {
+            showAlertDialog("Network is too busy. Please try again later.");
             return;
         }
 
-        PageUrlObj pageUrl = mDataStore.pageUrls.get(position);
+        PageUrlObj pageUrl = mDataStore.pageUrls.getWithNormalStatus(position);
         pageUrl.resendBtnStatus = ResendBtnStatus.RESENDING;
         mAdapter.notifyDataSetChanged();
 
-        mDataStore.resendToReader(this, Constants.RESEND_TO_READER_LOADER_ID, mDataStore.sSID,
+        int loaderID = Constants.RESEND_TO_READER_LOADER_ID + queueIndex;
+
+        mDataStore.resendToReader(this, loaderID, mDataStore.sSID,
                 mDataStore.sID, pageUrl.keyString, mResendToReaderCallback);
     }
 
     private ResendToReaderCallback mResendToReaderCallback = new ResendToReaderCallback() {
         @Override
-        public void onResendToReaderCallback(Log log) {
+        public void onResendToReaderCallback(int loaderID, String keyString, Log log) {
 
             // Find the one being resent
             PageUrlObj pageUrl = null;
             for (PageUrlObj p : mDataStore.pageUrls) {
-                if (p.resendBtnStatus == ResendBtnStatus.RESENDING) {
+                if (p.keyString.equals(keyString)) {
                     pageUrl = p;
                     break;
                 }
             }
             if (pageUrl == null) {
-                throw new IllegalArgumentException();
+                // Might already be deleted
+                return;
             }
 
             pageUrl.resendBtnStatus = ResendBtnStatus.NORMAL;
@@ -519,17 +556,16 @@ public class P2rActivity extends SherlockFragmentActivity {
             if (log == null) {
                 showAlertDialog(getString(R.string.connection_failed));
             } else {
-                String keyString = log.getValue(Constants.SEND_TO_READER, true);
-                if (keyString != null) {
-                    if (keyString.equals(pageUrl.keyString)) {
+                String msg = log.getMsg(Constants.SEND_TO_READER, false, keyString);
+                if (msg != null) {
+                    showAlertDialog(msg);
+                } else {
+                    LogInfo logInfo = log.getLogInfo(Constants.SEND_TO_READER, true, keyString);
+                    if (logInfo != null) {
                         pageUrl.resendBtnStatus = ResendBtnStatus.SENT;
+                        mResendQueue[loaderID - Constants.RESEND_TO_READER_LOADER_ID] = 0;
                     } else {
                         throw new IllegalArgumentException();
-                    }
-                } else {
-                    String msg = log.getMsg(Constants.SEND_TO_READER, false, null);
-                    if (msg != null) {
-                        showAlertDialog(msg);
                     }
                 }
             }
@@ -567,7 +603,7 @@ public class P2rActivity extends SherlockFragmentActivity {
 
                     mDataStore.cursorString = jsonObj.getString(Constants.CURSOR_STRING);
 
-                    if (mDataStore.pageUrls.isEmpty()) {
+                    if (mDataStore.pageUrls.isEmptyWithNormalStatus()) {
                         mDataStore.msg = getResources().getString(R.string.no_data);
                         mDataStore.nextBtnStatus = NextBtnStatus.HIDE;
                     } else {
@@ -621,7 +657,7 @@ public class P2rActivity extends SherlockFragmentActivity {
 
                     if (jsonPageUrls.length() == 0) mDataStore.nextBtnStatus = NextBtnStatus.HIDE;
 
-                    if (mDataStore.pageUrls.isEmpty()) {
+                    if (mDataStore.pageUrls.isEmptyWithNormalStatus()) {
                         mDataStore.msg = getResources().getString(R.string.no_data);
                     }
                 } else {
